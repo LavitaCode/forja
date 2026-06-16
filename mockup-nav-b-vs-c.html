@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayla Commander — Opção B vs C</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #020617;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      display: flex; flex-direction: column; align-items: center;
+      min-height: 100vh; padding: 2.5rem 1.5rem 4rem; gap: 2rem;
+    }
+    .page-header { text-align: center; }
+    .page-title { font-size: 1.2rem; font-weight: 800; color: #f8fafc; margin-bottom: .3rem; }
+    .page-sub { font-size: .68rem; color: #334155; text-transform: uppercase; letter-spacing: .1em; }
+
+    /* COLUMNS */
+    .cols { display: flex; gap: 3rem; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+    .col { display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+    .col-label {
+      font-size: .75rem; font-weight: 800; text-transform: uppercase; letter-spacing: .12em;
+      padding: .3rem 1rem; border-radius: 999px;
+    }
+    .col-b .col-label { background: #1e293b; color: #94a3b8; }
+    .col-c .col-label { background: #1d4ed8; color: #bfdbfe; }
+    .col-desc { font-size: .7rem; color: #475569; text-align: center; max-width: 360px; line-height: 1.5; }
+
+    .phones-col { display: flex; gap: 1rem; }
+    .pw { display: flex; flex-direction: column; align-items: center; gap: .5rem; }
+    .plbl { font-size: .6rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #334155; }
+
+    /* PHONE */
+    .phone {
+      width: 340px; height: 780px; background: #0f172a;
+      border-radius: 2.2rem; overflow: hidden; display: flex; flex-direction: column;
+      box-shadow: 0 0 0 6px #1e293b, 0 20px 50px rgba(0,0,0,.7);
+    }
+    .notch { height: 1.8rem; background: #0f172a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; position: relative; }
+    .notch::before { content: ''; width: 100px; height: 1.6rem; background: #020617; border-radius: 0 0 .9rem .9rem; position: absolute; top: 0; }
+    .sbar { display: flex; justify-content: space-between; padding: 0 1rem .35rem; font-size: .58rem; color: #334155; flex-shrink: 0; }
+    .hdr { padding: .6rem .9rem; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .hdr-title { font-size: .9rem; font-weight: 700; color: #f1f5f9; }
+    .badge { padding: .18rem .5rem; border-radius: 999px; font-size: .58rem; font-weight: 700; }
+    .badge-amber  { background: #451a03; color: #fb923c; }
+    .badge-green  { background: #052e16; color: #4ade80; }
+    .badge-blue   { background: #1e3a5f; color: #7dd3fc; }
+    .badge-purple { background: #2e1065; color: #c4b5fd; }
+
+    .content { flex: 1; overflow: hidden; padding: .8rem .9rem; display: flex; flex-direction: column; gap: .65rem; }
+
+    /* STATS */
+    .stats-row { display: flex; gap: .45rem; }
+    .sbox { flex: 1; background: #0a1628; border: 1px solid #1e293b; border-radius: .55rem; padding: .6rem; text-align: center; }
+    .sv { font-size: 1.2rem; font-weight: 800; }
+    .sv.c { color: #22d3ee; } .sv.a { color: #f59e0b; } .sv.g { color: #22c55e; }
+    .sl { font-size: .55rem; color: #475569; margin-top: .1rem; text-transform: uppercase; }
+
+    /* CARD */
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: .7rem; padding: .8rem; }
+    .ct { font-size: .58rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .55rem; }
+
+    /* EXEC ITEM */
+    .ei { display: flex; align-items: center; gap: .55rem; padding: .45rem 0; border-bottom: 1px solid #1e293b; }
+    .ei:last-child { border-bottom: none; padding-bottom: 0; }
+    .edot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .edot.run { background: #f59e0b; box-shadow: 0 0 4px #f59e0b88; }
+    .edot.rev { background: #3b82f6; box-shadow: 0 0 4px #3b82f688; }
+    .edot.done { background: #22c55e; }
+    .ei-info { flex: 1; }
+    .ei-name { font-size: .68rem; color: #e2e8f0; font-family: 'Menlo','Courier New',monospace; }
+    .ei-meta { font-size: .58rem; color: #475569; margin-top: .08rem; }
+    .etag { font-size: .55rem; padding: .12rem .38rem; border-radius: .22rem; font-weight: 700; flex-shrink: 0; }
+    .etag.run  { background: #451a03; color: #fb923c; }
+    .etag.rev  { background: #1e3a5f; color: #7dd3fc; }
+    .etag.done { background: #052e16; color: #4ade80; }
+
+    /* DM LIST (Opção B) */
+    .dm-list { display: flex; flex-direction: column; gap: 0; }
+    .dm-item { display: flex; align-items: center; gap: .6rem; padding: .6rem 0; border-bottom: 1px solid #1e293b; cursor: pointer; }
+    .dm-item:last-child { border-bottom: none; }
+    .dm-av { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .7rem; font-weight: 700; flex-shrink: 0; border: 2px solid; }
+    .dm-info { flex: 1; min-width: 0; }
+    .dm-name { font-size: .72rem; font-weight: 600; color: #e2e8f0; }
+    .dm-last { font-size: .62rem; color: #475569; margin-top: .1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .dm-right { display: flex; flex-direction: column; align-items: flex-end; gap: .2rem; flex-shrink: 0; }
+    .dm-time { font-size: .55rem; color: #334155; }
+    .dm-badge { background: #2563eb; color: #fff; font-size: .55rem; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+
+    /* REVIEW ITEMS */
+    .ri { background: #1e293b; border: 1px solid #334155; border-radius: .7rem; padding: .8rem; display: flex; flex-direction: column; gap: .45rem; }
+    .ri-h { display: flex; justify-content: space-between; align-items: flex-start; }
+    .ri-title { font-size: .7rem; font-weight: 600; color: #f1f5f9; font-family: 'Menlo','Courier New',monospace; }
+    .ri-age { font-size: .58rem; color: #475569; }
+    .ri-meta { display: flex; gap: .35rem; align-items: center; }
+    .ri-agent { font-size: .58rem; color: #7dd3fc; background: #1e3a5f; padding: .12rem .38rem; border-radius: .22rem; }
+    .ri-files { font-size: .58rem; color: #64748b; }
+    .ri-diff { display: flex; gap: .45rem; }
+    .ri-add { font-size: .62rem; color: #22d3ee; font-family: monospace; }
+    .ri-del { font-size: .62rem; color: #f87171; font-family: monospace; }
+    .ri-acts { display: flex; gap: .35rem; }
+    .ri-btn { flex: 1; padding: .5rem; border-radius: .45rem; border: none; font-size: .62rem; font-weight: 700; cursor: pointer; }
+    .ri-rej { background: #450a0a; color: #ef4444; border: 1px solid #7f1d1d; }
+    .ri-see { background: #1e3a5f; color: #38bdf8; border: 1px solid #1d4ed8; }
+    .ri-app { background: #052e16; color: #22c55e; border: 1px solid #166534; }
+
+    /* CHAT SCREEN */
+    .chat-list { display: flex; flex-direction: column; gap: 0; }
+    .chat-item { display: flex; align-items: center; gap: .6rem; padding: .65rem 0; border-bottom: 1px solid #1e293b; cursor: pointer; }
+    .chat-item:last-child { border-bottom: none; }
+    .chat-av { width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .72rem; font-weight: 700; flex-shrink: 0; border: 2px solid; }
+    .chat-info { flex: 1; min-width: 0; }
+    .chat-name { font-size: .75rem; font-weight: 600; color: #e2e8f0; }
+    .chat-preview { font-size: .62rem; color: #475569; margin-top: .1rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .chat-right { display: flex; flex-direction: column; align-items: flex-end; gap: .25rem; }
+    .chat-time { font-size: .55rem; color: #334155; }
+    .chat-unread { background: #2563eb; color: #fff; font-size: .55rem; font-weight: 800; min-width: 16px; height: 16px; border-radius: 8px; padding: 0 .25rem; display: flex; align-items: center; justify-content: center; }
+    .online-dot { width: 8px; height: 8px; border-radius: 50%; background: #22c55e; flex-shrink: 0; margin-left: auto; }
+
+    /* BOTTOM NAV */
+    .bnav {
+      height: 4.6rem; background: #0d1b2e; border-top: 1px solid #1e293b;
+      display: flex; align-items: flex-end; padding: 0 .4rem .7rem;
+      flex-shrink: 0;
+    }
+    .bnav-btn { flex: 1; display: flex; flex-direction: column; align-items: center; gap: .18rem; background: none; border: none; cursor: pointer; padding: .25rem 0; position: relative; }
+    .bi { font-size: 1.05rem; color: #475569; }
+    .bl { font-size: .55rem; color: #475569; font-weight: 500; }
+    .bnav-btn.active .bi { color: #38bdf8; }
+    .bnav-btn.active .bl { color: #38bdf8; }
+    .nb { position: absolute; top: 0; right: 50%; transform: translateX(8px); background: #ef4444; color: #fff; font-size: .5rem; font-weight: 800; min-width: 13px; height: 13px; border-radius: 6px; padding: 0 .2rem; display: flex; align-items: center; justify-content: center; border: 1.5px solid #0d1b2e; }
+
+    /* FAB */
+    .bnav-fab-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; margin-bottom: .45rem; }
+    .bnav-fab { width: 2.8rem; height: 2.8rem; background: linear-gradient(135deg, #2563eb, #7c3aed); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; box-shadow: 0 0 16px #3b82f650; border: 2.5px solid #0d1b2e; margin-bottom: .15rem; }
+    .bnav-fab-lbl { font-size: .5rem; color: #94a3b8; font-weight: 600; text-align: center; line-height: 1.2; }
+
+    /* VS divider */
+    .vs { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .5rem; padding-top: 360px; }
+    .vs-line { width: 1px; height: 50px; background: #1e293b; }
+    .vs-txt { font-size: .7rem; font-weight: 700; color: #334155; }
+
+    /* LEGEND */
+    .legend { max-width: 1400px; width: 100%; background: #0f172a; border: 1px solid #1e293b; border-radius: .75rem; padding: 1rem 1.2rem; display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+    .li { font-size: .65rem; color: #475569; display: flex; gap: .45rem; }
+    .li-tab { font-weight: 700; color: #64748b; min-width: 70px; flex-shrink: 0; }
+    .li-b { border-left: 2px solid #334155; padding-left: .5rem; }
+    .li-c { border-left: 2px solid #1d4ed8; padding-left: .5rem; }
+    .legend-header { font-size: .62rem; font-weight: 700; color: #475569; text-transform: uppercase; letter-spacing: .08em; margin-bottom: .3rem; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">Ayla Commander — Opção B vs Opção C</div>
+  <div class="page-sub">Nova Demanda · Mensagens entre devs · onde ficam?</div>
+</div>
+
+<div class="cols">
+
+  <!-- ===== OPÇÃO B ===== -->
+  <div class="col col-b">
+    <span class="col-label">Opção B — Home unificado</span>
+    <div class="col-desc">Home tem duas seções: execuções ativas + conversas com devs. Um badge duplo no ícone. War Room continua tab separada.</div>
+    <div class="phones-col">
+
+      <!-- B: HOME com DMs -->
+      <div class="pw">
+        <div class="plbl">Home (execuções + devs)</div>
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="sbar"><span>9:41</span><span>●●●</span></div>
+          <div class="hdr">
+            <span class="hdr-title">🏠 Olimpo</span>
+            <div style="display:flex;gap:.35rem;">
+              <span class="badge badge-amber">3 rodando</span>
+              <span class="badge badge-blue">2 msgs</span>
+            </div>
+          </div>
+          <div class="content">
+            <div class="stats-row">
+              <div class="sbox"><div class="sv c">3</div><div class="sl">Rodando</div></div>
+              <div class="sbox"><div class="sv a">2</div><div class="sl">Reviews</div></div>
+              <div class="sbox"><div class="sv g">11</div><div class="sl">Merged</div></div>
+            </div>
+
+            <!-- Execuções -->
+            <div class="card">
+              <div class="ct">⚡ Em execução</div>
+              <div class="ei">
+                <div class="edot rev"></div>
+                <div class="ei-info"><div class="ei-name">feat/jwt-refresh</div><div class="ei-meta">Apolo · aguarda review</div></div>
+                <span class="etag rev">Review</span>
+              </div>
+              <div class="ei">
+                <div class="edot run"></div>
+                <div class="ei-info"><div class="ei-name">feat/neon-migration</div><div class="ei-meta">Atena + Apolo · rodando</div></div>
+                <span class="etag run">Run</span>
+              </div>
+            </div>
+
+            <!-- DMs — seção mensagens -->
+            <div class="card">
+              <div class="ct">💬 Mensagens</div>
+              <div class="dm-list">
+                <div class="dm-item">
+                  <div class="dm-av" style="background:#0a2d35;color:#22d3ee;border-color:#22d3ee;">M</div>
+                  <div class="dm-info">
+                    <div class="dm-name">Mari</div>
+                    <div class="dm-last">oi, você viu o PR da autenticação?</div>
+                  </div>
+                  <div class="dm-right">
+                    <div class="dm-time">9:38</div>
+                    <div class="dm-badge">2</div>
+                  </div>
+                </div>
+                <div class="dm-item">
+                  <div class="dm-av" style="background:#2e1065;color:#c4b5fd;border-color:#8b5cf6;">P</div>
+                  <div class="dm-info">
+                    <div class="dm-name">Pietro</div>
+                    <div class="dm-last">branch mergeada, pode deletar</div>
+                  </div>
+                  <div class="dm-right">
+                    <div class="dm-time">ontem</div>
+                  </div>
+                </div>
+                <div class="dm-item">
+                  <div class="dm-av" style="background:#052e16;color:#4ade80;border-color:#22c55e;">K</div>
+                  <div class="dm-info">
+                    <div class="dm-name">Kelly</div>
+                    <div class="dm-last">deploy feito ✓</div>
+                  </div>
+                  <div class="dm-right">
+                    <div class="dm-time">ontem</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- BOTTOM NAV B -->
+          <nav class="bnav">
+            <button class="bnav-btn active">
+              <span class="bi">🏠</span>
+              <span class="nb">2</span>
+              <span class="bl">Home</span>
+            </button>
+            <button class="bnav-btn">
+              <span class="bi">🔍</span>
+              <span class="nb">2</span>
+              <span class="bl">Reviews</span>
+            </button>
+            <div class="bnav-fab-wrap">
+              <div class="bnav-fab">+</div>
+              <div class="bnav-fab-lbl">Nova<br>Demanda</div>
+            </div>
+            <button class="bnav-btn">
+              <span class="bi">⚔️</span>
+              <span class="bl">War Room</span>
+            </button>
+            <button class="bnav-btn">
+              <span class="bi" style="font-size:.8rem;letter-spacing:-.05em;">•••</span>
+              <span class="bl">Mais</span>
+            </button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- B: HOME abriu DM com Mari -->
+      <div class="pw">
+        <div class="plbl">Toca numa conversa → abre DM</div>
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="sbar"><span>9:41</span><span>●●●</span></div>
+          <div class="hdr">
+            <div style="display:flex;align-items:center;gap:.5rem;">
+              <span style="font-size:.75rem;color:#475569;">←</span>
+              <div class="dm-av" style="width:28px;height:28px;background:#0a2d35;color:#22d3ee;border-color:#22d3ee;font-size:.6rem;border:1.5px solid;">M</div>
+              <div>
+                <div style="font-size:.8rem;font-weight:700;color:#f1f5f9;">Mari</div>
+                <div style="font-size:.58rem;color:#22c55e;">● online</div>
+              </div>
+            </div>
+          </div>
+          <div class="content" style="gap:.5rem;">
+            <!-- mensagens -->
+            <div style="display:flex;justify-content:flex-end;">
+              <div style="background:#1e3a5f;border-radius:.7rem 0 .7rem .7rem;padding:.55rem .7rem;max-width:220px;">
+                <div style="font-size:.68rem;color:#cbd5e1;">PR do jwt-refresh tá pronto, pode revisar?</div>
+                <div style="font-size:.55rem;color:#334155;margin-top:.2rem;text-align:right;">9:35</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:.4rem;">
+              <div class="dm-av" style="width:24px;height:24px;background:#0a2d35;color:#22d3ee;border-color:#22d3ee;font-size:.58rem;border:1.5px solid;flex-shrink:0;">M</div>
+              <div style="background:#1e293b;border-radius:0 .7rem .7rem .7rem;padding:.55rem .7rem;max-width:220px;">
+                <div style="font-size:.68rem;color:#cbd5e1;">oi, você viu o PR da autenticação?</div>
+                <div style="font-size:.55rem;color:#334155;margin-top:.2rem;">9:38</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:.4rem;">
+              <div class="dm-av" style="width:24px;height:24px;background:#0a2d35;color:#22d3ee;border-color:#22d3ee;font-size:.58rem;border:1.5px solid;flex-shrink:0;">M</div>
+              <div style="background:#1e293b;border-radius:0 .7rem .7rem .7rem;padding:.55rem .7rem;max-width:220px;">
+                <div style="font-size:.68rem;color:#cbd5e1;">o diff ficou bem limpo, acho que passa 👍</div>
+                <div style="font-size:.55rem;color:#334155;margin-top:.2rem;">9:38</div>
+              </div>
+            </div>
+            <div style="flex:1;"></div>
+            <!-- input -->
+            <div style="display:flex;gap:.4rem;align-items:center;">
+              <div style="flex:1;background:#1e293b;border:1px solid #334155;border-radius:1.2rem;padding:.55rem .8rem;font-size:.7rem;color:#334155;">Responder...</div>
+              <div style="width:32px;height:32px;background:#2563eb;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:.8rem;flex-shrink:0;">↑</div>
+            </div>
+          </div>
+          <!-- BOTTOM NAV B -->
+          <nav class="bnav">
+            <button class="bnav-btn active">
+              <span class="bi">🏠</span>
+              <span class="bl">Home</span>
+            </button>
+            <button class="bnav-btn">
+              <span class="bi">🔍</span>
+              <span class="nb">2</span>
+              <span class="bl">Reviews</span>
+            </button>
+            <div class="bnav-fab-wrap">
+              <div class="bnav-fab">+</div>
+              <div class="bnav-fab-lbl">Nova<br>Demanda</div>
+            </div>
+            <button class="bnav-btn"><span class="bi">⚔️</span><span class="bl">War Room</span></button>
+            <button class="bnav-btn"><span class="bi" style="font-size:.8rem;letter-spacing:-.05em;">•••</span><span class="bl">Mais</span></button>
+          </nav>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NAV B resumida -->
+    <div style="background:#0f172a;border:1px solid #1e293b;border-radius:.65rem;padding:.7rem 1rem;font-size:.65rem;color:#64748b;text-align:center;">
+      🏠 Home &nbsp;|&nbsp; 🔍 Reviews &nbsp;|&nbsp; <strong style="color:#94a3b8;">+ Nova Demanda</strong> &nbsp;|&nbsp; ⚔️ War Room &nbsp;|&nbsp; ··· Mais
+    </div>
+  </div>
+
+  <!-- VS -->
+  <div class="vs">
+    <div class="vs-line"></div>
+    <div class="vs-txt">VS</div>
+    <div class="vs-line"></div>
+  </div>
+
+  <!-- ===== OPÇÃO C ===== -->
+  <div class="col col-c">
+    <span class="col-label">Opção C — 5 tabs explícitas</span>
+    <div class="col-desc">Chat ganha tab própria com badge de não lidas. Remove o ···. Tudo visível — sem nada escondido.</div>
+    <div class="phones-col">
+
+      <!-- C: HOME (só execuções) -->
+      <div class="pw">
+        <div class="plbl">Home (só execuções)</div>
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="sbar"><span>9:41</span><span>●●●</span></div>
+          <div class="hdr">
+            <span class="hdr-title">🏠 Olimpo</span>
+            <span class="badge badge-amber">3 rodando</span>
+          </div>
+          <div class="content">
+            <div class="stats-row">
+              <div class="sbox"><div class="sv c">3</div><div class="sl">Rodando</div></div>
+              <div class="sbox"><div class="sv a">2</div><div class="sl">Reviews</div></div>
+              <div class="sbox"><div class="sv g">11</div><div class="sl">Merged</div></div>
+            </div>
+            <div class="card">
+              <div class="ct">⏳ Aguardando Review</div>
+              <div class="ei">
+                <div class="edot rev"></div>
+                <div class="ei-info"><div class="ei-name">feat/jwt-refresh</div><div class="ei-meta">Apolo · +47 -12</div></div>
+                <span class="etag rev">Review</span>
+              </div>
+              <div class="ei">
+                <div class="edot rev"></div>
+                <div class="ei-info"><div class="ei-name">fix/auth-timeout</div><div class="ei-meta">Artemis · +8 -3</div></div>
+                <span class="etag rev">Review</span>
+              </div>
+            </div>
+            <div class="card">
+              <div class="ct">⚡ Execuções Ativas</div>
+              <div class="ei">
+                <div class="edot run"></div>
+                <div class="ei-info"><div class="ei-name">feat/neon-migration</div><div class="ei-meta">Atena + Apolo · Running</div></div>
+                <span class="etag run">Run</span>
+              </div>
+              <div class="ei">
+                <div class="edot run"></div>
+                <div class="ei-info"><div class="ei-name">chore/cleanup</div><div class="ei-meta">Hermes · PRE_FLIGHT</div></div>
+                <span class="etag run">Run</span>
+              </div>
+              <div class="ei">
+                <div class="edot done"></div>
+                <div class="ei-info"><div class="ei-name">fix/cors-sse</div><div class="ei-meta">Artemis · done</div></div>
+                <span class="etag done">Done</span>
+              </div>
+            </div>
+          </div>
+          <!-- BOTTOM NAV C -->
+          <nav class="bnav">
+            <button class="bnav-btn active"><span class="bi">🏠</span><span class="bl">Home</span></button>
+            <button class="bnav-btn"><span class="bi">🔍</span><span class="nb">2</span><span class="bl">Reviews</span></button>
+            <div class="bnav-fab-wrap">
+              <div class="bnav-fab">+</div>
+              <div class="bnav-fab-lbl">Nova<br>Demanda</div>
+            </div>
+            <button class="bnav-btn"><span class="bi">⚔️</span><span class="bl">War Room</span></button>
+            <button class="bnav-btn"><span class="bi">💬</span><span class="nb">2</span><span class="bl">Chat</span></button>
+          </nav>
+        </div>
+      </div>
+
+      <!-- C: CHAT tab -->
+      <div class="pw">
+        <div class="plbl">Chat — tab dedicada</div>
+        <div class="phone">
+          <div class="notch"></div>
+          <div class="sbar"><span>9:41</span><span>●●●</span></div>
+          <div class="hdr">
+            <span class="hdr-title">💬 Chat</span>
+            <span class="badge badge-blue">2 não lidas</span>
+          </div>
+          <div class="content">
+            <!-- DMs -->
+            <div class="ct" style="margin-bottom:.4rem;">Direto</div>
+            <div class="chat-list">
+              <div class="chat-item">
+                <div class="chat-av" style="background:#0a2d35;color:#22d3ee;border-color:#22d3ee;">M</div>
+                <div class="chat-info">
+                  <div class="chat-name">Mari</div>
+                  <div class="chat-preview">o diff ficou bem limpo, acho que passa 👍</div>
+                </div>
+                <div class="chat-right">
+                  <div class="chat-time">9:38</div>
+                  <div class="chat-unread">2</div>
+                </div>
+              </div>
+              <div class="chat-item">
+                <div class="chat-av" style="background:#2e1065;color:#c4b5fd;border-color:#8b5cf6;">P</div>
+                <div class="chat-info">
+                  <div class="chat-name">Pietro</div>
+                  <div class="chat-preview">branch mergeada, pode deletar</div>
+                </div>
+                <div class="chat-right">
+                  <div class="chat-time">ontem</div>
+                </div>
+              </div>
+              <div class="chat-item">
+                <div class="chat-av" style="background:#052e16;color:#4ade80;border-color:#22c55e;">K</div>
+                <div class="chat-info">
+                  <div class="chat-name">Kelly</div>
+                  <div class="chat-preview">deploy feito ✓</div>
+                </div>
+                <div class="chat-right">
+                  <div class="chat-time">ontem</div>
+                  <div class="online-dot"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Canais -->
+            <div class="ct" style="margin-top:.4rem;margin-bottom:.4rem;">Canais</div>
+            <div class="chat-list">
+              <div class="chat-item">
+                <div class="chat-av" style="background:#1e293b;color:#94a3b8;border-color:#334155;font-size:.9rem;">#</div>
+                <div class="chat-info">
+                  <div class="chat-name">#geral</div>
+                  <div class="chat-preview">Apolo: PR aberto → feat/jwt-refresh</div>
+                </div>
+                <div class="chat-right">
+                  <div class="chat-time">9:41</div>
+                </div>
+              </div>
+              <div class="chat-item">
+                <div class="chat-av" style="background:#1e293b;color:#94a3b8;border-color:#334155;font-size:.9rem;">#</div>
+                <div class="chat-info">
+                  <div class="chat-name">#deploys</div>
+                  <div class="chat-preview">Hermes: PRE_FLIGHT 13/13 ✓</div>
+                </div>
+                <div class="chat-right">
+                  <div class="chat-time">9:35</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- BOTTOM NAV C -->
+          <nav class="bnav">
+            <button class="bnav-btn"><span class="bi">🏠</span><span class="bl">Home</span></button>
+            <button class="bnav-btn"><span class="bi">🔍</span><span class="nb">2</span><span class="bl">Reviews</span></button>
+            <div class="bnav-fab-wrap">
+              <div class="bnav-fab">+</div>
+              <div class="bnav-fab-lbl">Nova<br>Demanda</div>
+            </div>
+            <button class="bnav-btn"><span class="bi">⚔️</span><span class="bl">War Room</span></button>
+            <button class="bnav-btn active"><span class="bi">💬</span><span class="bl">Chat</span></button>
+          </nav>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- NAV C resumida -->
+    <div style="background:#0f172a;border:1px solid #1d4ed8;border-radius:.65rem;padding:.7rem 1rem;font-size:.65rem;color:#64748b;text-align:center;">
+      🏠 Home &nbsp;|&nbsp; 🔍 Reviews &nbsp;|&nbsp; <strong style="color:#94a3b8;">+ Nova Demanda</strong> &nbsp;|&nbsp; ⚔️ War Room &nbsp;|&nbsp; <strong style="color:#7dd3fc;">💬 Chat</strong>
+    </div>
+  </div>
+
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div>
+    <div class="legend-header">Opção B</div>
+    <div class="li li-b"><span class="li-tab">🏠 Home</span>Execuções + lista de DMs. Badge duplo (PRs + msgs). Toca numa conversa → abre DM.</div>
+    <div class="li li-b" style="margin-top:.4rem;"><span class="li-tab">Pro</span>4 tabs limpas. Tudo num lugar — cockpit completo.</div>
+    <div class="li li-b" style="margin-top:.2rem;"><span class="li-tab">Contra</span>Home fica carregada. Badge duplo pode confundir.</div>
+  </div>
+  <div>
+    <div class="legend-header">Opção C</div>
+    <div class="li li-c"><span class="li-tab">💬 Chat</span>Tab dedicada com DMs + canais IRC. Badge de não lidas visível sempre.</div>
+    <div class="li li-c" style="margin-top:.4rem;"><span class="li-tab">Pro</span>Separação clara: produto (Home/Reviews/War Room) vs comunicação (Chat).</div>
+    <div class="li li-c" style="margin-top:.2rem;"><span class="li-tab">Contra</span>5 tabs — mais clique, mas nada escondido.</div>
+  </div>
+</div>
+
+</body>
+</html>
