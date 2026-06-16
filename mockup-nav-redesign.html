@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayla Commander — Nav Redesign</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace;
+      background: #020617;
+      color: #e2e8f0;
+      padding: 32px 20px 48px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 28px;
+    }
+    .page-header { text-align: center; }
+    .page-title { font-size: 20px; font-weight: 800; color: #f8fafc; margin-bottom: 4px; }
+    .page-sub { font-size: 12px; color: #475569; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    /* NAV REDESIGN RATIONALE */
+    .rationale {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+      max-width: 1600px;
+    }
+    .rat-item {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 10px;
+      padding: 12px 16px; font-size: 11px; color: #94a3b8;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .rat-icon { font-size: 16px; }
+    .rat-before { color: #ef4444; text-decoration: line-through; }
+    .rat-after  { color: #22d3ee; font-weight: 700; }
+
+    /* PHONES GRID */
+    .phones {
+      display: flex; gap: 14px; align-items: flex-start;
+      flex-wrap: wrap; justify-content: center;
+    }
+    .phone-wrapper { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .phone-label {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.1em; color: #64748b;
+    }
+    .phone {
+      width: 360px; height: 780px;
+      background: #0f172a;
+      border-radius: 38px;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      box-shadow: 0 0 0 6px #1e293b, 0 28px 60px rgba(0,0,0,0.7);
+      position: relative;
+    }
+    .notch { height: 32px; background: #0f172a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .notch-bar { width: 100px; height: 4px; background: #1e293b; border-radius: 2px; }
+
+    /* STATUS BAR */
+    .sbar { display: flex; justify-content: space-between; align-items: center; padding: 0 18px 8px; font-size: 10px; color: #334155; flex-shrink: 0; }
+
+    /* HEADER */
+    .hdr { padding: 10px 16px; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .hdr-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+    .hdr-badge { background: #3b82f6; color: #fff; font-size: 10px; font-weight: 700; padding: 3px 8px; border-radius: 999px; }
+    .hdr-badge.amber { background: #d97706; }
+    .hdr-badge.green { background: #16a34a; }
+
+    /* CONTENT */
+    .content { flex: 1; overflow: hidden; padding: 14px 16px; display: flex; flex-direction: column; gap: 10px; }
+
+    /* CARDS */
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 14px; }
+    .card-title { font-size: 10px; font-weight: 600; color: #64748b; text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px; }
+
+    /* EXECUTION ITEMS */
+    .exec-item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid #1e293b; }
+    .exec-item:last-child { border-bottom: none; padding-bottom: 0; }
+    .exec-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .exec-dot.running { background: #f59e0b; box-shadow: 0 0 6px #f59e0b88; }
+    .exec-dot.done    { background: #22c55e; }
+    .exec-dot.review  { background: #3b82f6; box-shadow: 0 0 6px #3b82f688; }
+    .exec-info { flex: 1; }
+    .exec-name { font-size: 12px; color: #e2e8f0; font-family: 'Menlo','Courier New',monospace; }
+    .exec-meta { font-size: 10px; color: #475569; margin-top: 2px; }
+    .exec-badge { font-size: 9px; padding: 2px 6px; border-radius: 4px; font-weight: 700; flex-shrink: 0; }
+    .eb-running { background: #451a03; color: #fb923c; }
+    .eb-review  { background: #1e3a5f; color: #7dd3fc; }
+    .eb-done    { background: #052e16; color: #4ade80; }
+
+    /* STATS ROW */
+    .stats-row { display: flex; gap: 8px; }
+    .stat-box { flex: 1; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 10px; text-align: center; }
+    .stat-val { font-size: 20px; font-weight: 800; }
+    .stat-val.blue   { color: #38bdf8; }
+    .stat-val.amber  { color: #f59e0b; }
+    .stat-val.green  { color: #22c55e; }
+    .stat-lbl { font-size: 9px; color: #475569; margin-top: 2px; text-transform: uppercase; }
+
+    /* DISPATCH SCREEN */
+    .dispatch-prompt {
+      background: #0f172a; border: 1px solid #334155; border-radius: 12px;
+      padding: 14px; min-height: 110px; position: relative;
+    }
+    .dispatch-prompt textarea {
+      background: transparent; border: none; outline: none; color: #e2e8f0;
+      font-size: 13px; width: 100%; resize: none; font-family: inherit; line-height: 1.6;
+      height: 80px;
+    }
+    .dispatch-prompt .placeholder { font-size: 13px; color: #334155; line-height: 1.6; }
+    .dispatch-agents { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+    .dag { background: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 4px 8px; font-size: 10px; color: #94a3b8; display: flex; align-items: center; gap: 4px; }
+    .dag-dot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; }
+    .quick-actions { display: flex; flex-direction: column; gap: 6px; }
+    .qa-btn {
+      background: #1e293b; border: 1px solid #334155; border-radius: 10px;
+      padding: 12px 14px; color: #cbd5e1; font-size: 12px; text-align: left;
+      display: flex; align-items: center; gap: 10px; cursor: pointer;
+    }
+    .qa-icon { font-size: 16px; width: 24px; text-align: center; flex-shrink: 0; }
+    .qa-text { flex: 1; }
+    .qa-label { font-weight: 600; color: #e2e8f0; font-size: 12px; }
+    .qa-sub { font-size: 10px; color: #475569; margin-top: 1px; }
+    .dispatch-send {
+      background: #2563eb; color: #fff; border: none; border-radius: 12px;
+      padding: 14px; font-size: 14px; font-weight: 700; width: 100%;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      box-shadow: 0 0 16px #3b82f640;
+    }
+
+    /* REVIEWS SCREEN */
+    .review-item {
+      background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+      padding: 14px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .ri-header { display: flex; justify-content: space-between; align-items: flex-start; }
+    .ri-title { font-size: 13px; font-weight: 600; color: #f1f5f9; font-family: 'Menlo','Courier New',monospace; }
+    .ri-age { font-size: 10px; color: #475569; }
+    .ri-meta { display: flex; gap: 6px; align-items: center; }
+    .ri-agent { font-size: 10px; color: #7dd3fc; background: #1e3a5f; padding: 2px 6px; border-radius: 4px; }
+    .ri-files { font-size: 10px; color: #64748b; }
+    .ri-diff { display: flex; gap: 8px; }
+    .ri-add { font-size: 11px; color: #22d3ee; font-family: monospace; }
+    .ri-del { font-size: 11px; color: #f87171; font-family: monospace; }
+    .ri-actions { display: flex; gap: 6px; }
+    .ri-btn { flex: 1; padding: 8px; border-radius: 8px; border: none; font-size: 11px; font-weight: 700; cursor: pointer; }
+    .ri-reject  { background: #450a0a; color: #ef4444; border: 1px solid #7f1d1d; }
+    .ri-review  { background: #1e3a5f; color: #38bdf8; border: 1px solid #1d4ed8; }
+    .ri-approve { background: #052e16; color: #22c55e; border: 1px solid #166534; }
+
+    /* WAR ROOM SCREEN */
+    .wr-presence { display: flex; gap: 6px; align-items: center; margin-bottom: 10px; }
+    .wr-dot { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; border: 2px solid; }
+    .wr-dot.online { border-color: #22c55e; background: #052e16; color: #4ade80; }
+    .wr-dot.agent  { border-color: #3b82f6; background: #1e3a5f; color: #7dd3fc; }
+    .wr-msg { display: flex; gap: 8px; margin-bottom: 8px; }
+    .wr-avatar { width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 700; flex-shrink: 0; margin-top: 2px; }
+    .wr-bubble { background: #1e293b; border-radius: 0 10px 10px 10px; padding: 8px 10px; max-width: 260px; }
+    .wr-bubble.user { background: #1e3a5f; border-radius: 10px 0 10px 10px; margin-left: auto; }
+    .wr-sender { font-size: 9px; font-weight: 700; margin-bottom: 3px; text-transform: uppercase; letter-spacing: 0.05em; }
+    .wr-text { font-size: 11px; color: #cbd5e1; line-height: 1.5; }
+    .wr-action { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; margin-top: 6px; font-size: 10px; color: #64748b; }
+    .wr-action strong { color: #38bdf8; }
+    .wr-input { display: flex; gap: 6px; align-items: center; }
+    .wr-input-box { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 20px; padding: 10px 14px; font-size: 12px; color: #94a3b8; }
+    .wr-send { width: 36px; height: 36px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 14px; border: none; flex-shrink: 0; }
+    .demand-banner { background: #1e3a5f; border: 1px solid #1d4ed8; border-radius: 8px; padding: 8px 10px; margin-bottom: 8px; font-size: 11px; color: #bfdbfe; display: flex; gap: 6px; align-items: flex-start; }
+
+    /* BOTTOM NAV */
+    .bnav {
+      background: #0f172a; border-top: 1px solid #1e293b;
+      display: flex; padding: 8px 0 12px;
+      flex-shrink: 0;
+    }
+    .bnav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      background: none; border: none; cursor: pointer; padding: 4px 0;
+    }
+    .bnav-icon { font-size: 20px; color: #475569; }
+    .bnav-label { font-size: 9px; color: #475569; font-weight: 500; }
+    .bnav-btn.active .bnav-icon  { color: #3b82f6; }
+    .bnav-btn.active .bnav-label { color: #3b82f6; }
+    .bnav-btn.dispatch .bnav-icon { color: #f8fafc; }
+    .bnav-btn.dispatch .bnav-label { color: #f8fafc; }
+    .bnav-center {
+      position: relative;
+    }
+    .bnav-center-btn {
+      width: 48px; height: 48px; background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin-top: -18px; box-shadow: 0 0 20px #3b82f660;
+      font-size: 22px; color: #fff; border: 3px solid #0f172a; cursor: pointer;
+    }
+    .bnav-center-label { font-size: 9px; color: #f8fafc; font-weight: 600; margin-top: 4px; text-align: center; }
+    .bnav-badge { position: absolute; top: -6px; right: -4px; background: #ef4444; color: #fff; font-size: 8px; font-weight: 800; width: 16px; height: 16px; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid #0f172a; }
+
+    /* LEGEND */
+    .legend {
+      max-width: 1600px; background: #0f172a; border: 1px solid #1e293b;
+      border-radius: 12px; padding: 16px 20px;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px;
+    }
+    .legend-item { font-size: 11px; color: #64748b; display: flex; gap: 8px; align-items: flex-start; }
+    .legend-tab { font-weight: 700; color: #94a3b8; min-width: 80px; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">Ayla Commander — Redesign de Navegação</div>
+  <div class="page-sub">Foco no produto: Orquestrador → Execução → Code Review</div>
+</div>
+
+<!-- RATIONALE -->
+<div class="rationale">
+  <div class="rat-item"><span class="rat-icon">🔄</span><span class="rat-before">Home = Cockpit genérico</span> → <span class="rat-after">Home = Execuções ativas + PRs</span></div>
+  <div class="rat-item"><span class="rat-icon">⚡</span><span class="rat-before">War Room = entrada</span> → <span class="rat-after">Disparar = coração do produto</span></div>
+  <div class="rat-item"><span class="rat-icon">🔍</span><span class="rat-before">Code Review = rota escondida</span> → <span class="rat-after">Reviews = tab dedicada</span></div>
+  <div class="rat-item"><span class="rat-icon">💬</span><span class="rat-before">Chat IRC = tab principal</span> → <span class="rat-after">Chat IRC = dentro de ···</span></div>
+</div>
+
+<!-- PHONES -->
+<div class="phones">
+
+  <!-- 1. HOME / COCKPIT -->
+  <div class="phone-wrapper">
+    <div class="phone-label">① Home — Cockpit</div>
+    <div class="phone">
+      <div class="notch"><div class="notch-bar"></div></div>
+      <div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="hdr">
+        <div class="hdr-title">🏠 Olimpo</div>
+        <span class="hdr-badge amber">3 em execução</span>
+      </div>
+      <div class="content">
+
+        <!-- Stats -->
+        <div class="stats-row">
+          <div class="stat-box"><div class="stat-val blue">3</div><div class="stat-lbl">Rodando</div></div>
+          <div class="stat-box"><div class="stat-val amber">2</div><div class="stat-lbl">Reviews</div></div>
+          <div class="stat-box"><div class="stat-val green">11</div><div class="stat-lbl">Merged hoje</div></div>
+        </div>
+
+        <!-- PRs pendentes -->
+        <div class="card">
+          <div class="card-title">⏳ Aguardando Review</div>
+          <div class="exec-item">
+            <div class="exec-dot review"></div>
+            <div class="exec-info">
+              <div class="exec-name">feat/jwt-refresh</div>
+              <div class="exec-meta">Apolo · 3 arquivos · +47 -12</div>
+            </div>
+            <span class="exec-badge eb-review">Review</span>
+          </div>
+          <div class="exec-item">
+            <div class="exec-dot review"></div>
+            <div class="exec-info">
+              <div class="exec-name">fix/auth-timeout</div>
+              <div class="exec-meta">Artemis · 1 arquivo · +8 -3</div>
+            </div>
+            <span class="exec-badge eb-review">Review</span>
+          </div>
+        </div>
+
+        <!-- Execuções ativas -->
+        <div class="card">
+          <div class="card-title">⚡ Execuções Ativas</div>
+          <div class="exec-item">
+            <div class="exec-dot running"></div>
+            <div class="exec-info">
+              <div class="exec-name">feat/neon-migration</div>
+              <div class="exec-meta">Atena + Apolo · Running</div>
+            </div>
+            <span class="exec-badge eb-running">Rodando</span>
+          </div>
+          <div class="exec-item">
+            <div class="exec-dot running"></div>
+            <div class="exec-info">
+              <div class="exec-name">chore/cleanup-branches</div>
+              <div class="exec-meta">Hermes · PRE_FLIGHT</div>
+            </div>
+            <span class="exec-badge eb-running">Rodando</span>
+          </div>
+          <div class="exec-item">
+            <div class="exec-dot done"></div>
+            <div class="exec-info">
+              <div class="exec-name">fix/cors-sse</div>
+              <div class="exec-meta">Artemis · PR aberto</div>
+            </div>
+            <span class="exec-badge eb-done">Done</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <div class="bnav">
+        <button class="bnav-btn active">
+          <span class="bnav-icon">🏠</span>
+          <span class="bnav-label">Home</span>
+        </button>
+        <button class="bnav-btn">
+          <span class="bnav-icon">🔍</span>
+          <span class="bnav-label">Reviews</span>
+        </button>
+        <div class="bnav-center" style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div class="bnav-center-btn">⚡</div>
+          <div class="bnav-center-label">Disparar</div>
+        </div>
+        <button class="bnav-btn">
+          <span class="bnav-icon">⚔️</span>
+          <span class="bnav-label">War Room</span>
+        </button>
+        <button class="bnav-btn">
+          <span class="bnav-icon">···</span>
+          <span class="bnav-label">Mais</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. DISPARAR -->
+  <div class="phone-wrapper">
+    <div class="phone-label">② Disparar — Orquestrador</div>
+    <div class="phone">
+      <div class="notch"><div class="notch-bar"></div></div>
+      <div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="hdr">
+        <div class="hdr-title">⚡ Nova Demanda</div>
+        <span class="hdr-badge green">6 agentes online</span>
+      </div>
+      <div class="content">
+
+        <!-- Input principal -->
+        <div class="dispatch-prompt">
+          <div class="placeholder">Descreva o objetivo...<br><br>Ex: "implementar refresh token com expiração de 7 dias"</div>
+        </div>
+
+        <!-- Agentes disponíveis -->
+        <div class="dispatch-agents">
+          <div class="dag"><div class="dag-dot"></div>Hermes</div>
+          <div class="dag"><div class="dag-dot"></div>Atena</div>
+          <div class="dag"><div class="dag-dot"></div>Apolo</div>
+          <div class="dag"><div class="dag-dot"></div>Artemis</div>
+          <div class="dag"><div class="dag-dot"></div>Afrodite</div>
+          <div class="dag"><div class="dag-dot"></div>Hefesto</div>
+        </div>
+
+        <!-- Ações rápidas -->
+        <div class="card-title" style="color:#475569;">Ações rápidas</div>
+        <div class="quick-actions">
+          <div class="qa-btn">
+            <span class="qa-icon">🐛</span>
+            <div class="qa-text">
+              <div class="qa-label">Investigar bug</div>
+              <div class="qa-sub">Hermes audita → Apolo reproduce → Artemis corrige</div>
+            </div>
+          </div>
+          <div class="qa-btn">
+            <span class="qa-icon">✨</span>
+            <div class="qa-text">
+              <div class="qa-label">Nova feature</div>
+              <div class="qa-sub">PRE_FLIGHT → TDD → Sprint completo</div>
+            </div>
+          </div>
+          <div class="qa-btn">
+            <span class="qa-icon">🧹</span>
+            <div class="qa-text">
+              <div class="qa-label">Refactor / chore</div>
+              <div class="qa-sub">Atena arquiteta → Artemis implementa</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="dispatch-send">⚡ Disparar para o War Room</button>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <div class="bnav">
+        <button class="bnav-btn">
+          <span class="bnav-icon">🏠</span>
+          <span class="bnav-label">Home</span>
+        </button>
+        <button class="bnav-btn">
+          <span class="bnav-icon">🔍</span>
+          <span class="bnav-label">Reviews</span>
+        </button>
+        <div class="bnav-center" style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div class="bnav-center-btn" style="box-shadow: 0 0 24px #7c3aed80;">⚡</div>
+          <div class="bnav-center-label">Disparar</div>
+        </div>
+        <button class="bnav-btn">
+          <span class="bnav-icon">⚔️</span>
+          <span class="bnav-label">War Room</span>
+        </button>
+        <button class="bnav-btn">
+          <span class="bnav-icon">···</span>
+          <span class="bnav-label">Mais</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. REVIEWS -->
+  <div class="phone-wrapper">
+    <div class="phone-label">③ Reviews — PRs Pendentes</div>
+    <div class="phone">
+      <div class="notch"><div class="notch-bar"></div></div>
+      <div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="hdr">
+        <div class="hdr-title">🔍 Code Reviews</div>
+        <span class="hdr-badge" style="background:#7c3aed;">2 pendentes</span>
+      </div>
+      <div class="content">
+        <!-- PR 1 -->
+        <div class="review-item">
+          <div class="ri-header">
+            <div class="ri-title">feat/jwt-refresh</div>
+            <div class="ri-age">há 3 min</div>
+          </div>
+          <div class="ri-meta">
+            <span class="ri-agent">⚡ Apolo</span>
+            <span class="ri-files">3 arquivos</span>
+          </div>
+          <div class="ri-diff">
+            <span class="ri-add">+47 inserções</span>
+            <span class="ri-del">-12 deleções</span>
+          </div>
+          <div class="ri-actions">
+            <button class="ri-btn ri-reject">❌ Rejeitar</button>
+            <button class="ri-btn ri-review">🔍 Ver diff</button>
+            <button class="ri-btn ri-approve">✅ Aprovar</button>
+          </div>
+        </div>
+
+        <!-- PR 2 -->
+        <div class="review-item">
+          <div class="ri-header">
+            <div class="ri-title">fix/auth-timeout</div>
+            <div class="ri-age">há 12 min</div>
+          </div>
+          <div class="ri-meta">
+            <span class="ri-agent">🏹 Artemis</span>
+            <span class="ri-files">1 arquivo</span>
+          </div>
+          <div class="ri-diff">
+            <span class="ri-add">+8 inserções</span>
+            <span class="ri-del">-3 deleções</span>
+          </div>
+          <div class="ri-actions">
+            <button class="ri-btn ri-reject">❌ Rejeitar</button>
+            <button class="ri-btn ri-review">🔍 Ver diff</button>
+            <button class="ri-btn ri-approve">✅ Aprovar</button>
+          </div>
+        </div>
+
+        <!-- PR 3 merged -->
+        <div class="review-item" style="opacity:0.4;">
+          <div class="ri-header">
+            <div class="ri-title">chore/cleanup</div>
+            <div class="ri-age">há 1h</div>
+          </div>
+          <div class="ri-meta">
+            <span class="ri-agent">🔭 Hermes</span>
+            <span class="ri-files">5 arquivos</span>
+          </div>
+          <div class="ri-diff">
+            <span class="ri-add">+12</span>
+            <span class="ri-del">-89</span>
+          </div>
+          <div style="font-size:11px;color:#22c55e;font-weight:700;margin-top:4px;">✅ Mergeado</div>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <div class="bnav">
+        <button class="bnav-btn">
+          <span class="bnav-icon">🏠</span>
+          <span class="bnav-label">Home</span>
+        </button>
+        <button class="bnav-btn active">
+          <div style="position:relative;display:inline-block;">
+            <span class="bnav-icon">🔍</span>
+            <span class="bnav-badge">2</span>
+          </div>
+          <span class="bnav-label">Reviews</span>
+        </button>
+        <div class="bnav-center" style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div class="bnav-center-btn">⚡</div>
+          <div class="bnav-center-label">Disparar</div>
+        </div>
+        <button class="bnav-btn">
+          <span class="bnav-icon">⚔️</span>
+          <span class="bnav-label">War Room</span>
+        </button>
+        <button class="bnav-btn">
+          <span class="bnav-icon">···</span>
+          <span class="bnav-label">Mais</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. WAR ROOM -->
+  <div class="phone-wrapper">
+    <div class="phone-label">④ War Room — Ao vivo</div>
+    <div class="phone">
+      <div class="notch"><div class="notch-bar"></div></div>
+      <div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="hdr">
+        <div class="hdr-title">⚔️ War Room</div>
+        <span class="hdr-badge green">● AO VIVO</span>
+      </div>
+      <div class="content" style="padding: 10px 12px;">
+
+        <!-- Presença -->
+        <div class="wr-presence">
+          <div class="wr-dot online">R</div>
+          <div class="wr-dot agent">A</div>
+          <div class="wr-dot agent" style="border-color:#8b5cf6;background:#2e1065;color:#c4b5fd;">H</div>
+          <div class="wr-dot agent" style="border-color:#06b6d4;background:#0e4f5a;color:#67e8f9;">At</div>
+          <span style="font-size:10px;color:#334155;margin-left:4px;">4 online</span>
+        </div>
+
+        <!-- Demand banner -->
+        <div class="demand-banner">
+          🎯 <span><strong>DEMANDA ATIVA:</strong> implementar refresh token com expiração de 7 dias</span>
+        </div>
+
+        <!-- Messages -->
+        <div class="wr-msg">
+          <div class="wr-avatar" style="background:#1e3a5f;color:#7dd3fc;">H</div>
+          <div class="wr-bubble">
+            <div class="wr-sender" style="color:#7dd3fc;">Hermes</div>
+            <div class="wr-text">Varredura completa. 3 arquivos impactados: auth.service.ts, jwt-refresh.interceptor.ts, auth.model.ts</div>
+          </div>
+        </div>
+
+        <div class="wr-msg">
+          <div class="wr-avatar" style="background:#0e4f5a;color:#67e8f9;">At</div>
+          <div class="wr-bubble">
+            <div class="wr-sender" style="color:#67e8f9;">Atena</div>
+            <div class="wr-text">Arquitetura aprovada. Interceptor com retry automático. PRE_FLIGHT passou 13/13.</div>
+            <div class="wr-action"><strong>PRE_FLIGHT ✓</strong> · git limpo · MCPs ativos · Afrodite aprovada</div>
+          </div>
+        </div>
+
+        <div class="wr-msg" style="flex-direction:row-reverse;">
+          <div class="wr-bubble user">
+            <div class="wr-sender" style="color:#bfdbfe;text-align:right;">Rafael</div>
+            <div class="wr-text">Pode executar. TTL = 7 dias, one-time use.</div>
+          </div>
+        </div>
+
+        <div class="wr-msg">
+          <div class="wr-avatar" style="background:#1e3a5f;color:#a78bfa;">Ap</div>
+          <div class="wr-bubble">
+            <div class="wr-sender" style="color:#a78bfa;">Apolo</div>
+            <div class="wr-text">RED ✓ → GREEN ✓ → 47 linhas. PR aberto. Aguardando review.</div>
+            <div class="wr-action"><strong>feat/jwt-refresh</strong> · +47 -12 · <span style="color:#22d3ee;">→ Reviews</span></div>
+          </div>
+        </div>
+
+        <!-- Input -->
+        <div style="flex:1;"></div>
+        <div class="wr-input">
+          <div class="wr-input-box">Digite a demanda ou comentário...</div>
+          <button class="wr-send">↑</button>
+        </div>
+      </div>
+
+      <!-- BOTTOM NAV -->
+      <div class="bnav">
+        <button class="bnav-btn">
+          <span class="bnav-icon">🏠</span>
+          <span class="bnav-label">Home</span>
+        </button>
+        <button class="bnav-btn">
+          <span class="bnav-icon">🔍</span>
+          <span class="bnav-label">Reviews</span>
+        </button>
+        <div class="bnav-center" style="display:flex;flex-direction:column;align-items:center;flex:1;">
+          <div class="bnav-center-btn">⚡</div>
+          <div class="bnav-center-label">Disparar</div>
+        </div>
+        <button class="bnav-btn active">
+          <span class="bnav-icon">⚔️</span>
+          <span class="bnav-label">War Room</span>
+        </button>
+        <button class="bnav-btn">
+          <span class="bnav-icon">···</span>
+          <span class="bnav-label">Mais</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="legend-item"><span class="legend-tab">🏠 Home</span>Cockpit de execuções ativas + PRs pendentes de review. Entrada principal para ROOT/DEV.</div>
+  <div class="legend-item"><span class="legend-tab">⚡ Disparar</span>Coração do produto. Input de objetivo → orquestrador monta war room + ritos automaticamente. Botão central elevado.</div>
+  <div class="legend-item"><span class="legend-tab">🔍 Reviews</span>Lista de PRs aguardando aprovação. Badge com contador. Entra no Code Review (diff real). Tab dedicada — não mais rota escondida.</div>
+  <div class="legend-item"><span class="legend-tab">⚔️ War Room</span>Sala ao vivo com os agentes. Demanda ativa no topo. Output do Apolo tem link direto para Reviews.</div>
+  <div class="legend-item"><span class="legend-tab">··· Mais</span>Chat IRC, Relatórios, Ayla direta, Persona tuning, Configurações. Infraestrutura — não o produto.</div>
+</div>
+
+</body>
+</html>
