@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ayla Commander – Nav Redesign (Íris)</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #020617;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem 4rem;
+      gap: 2rem;
+    }
+
+    .page-header { text-align: center; }
+    .page-title { font-size: 1.25rem; font-weight: 800; color: #f8fafc; margin-bottom: .3rem; }
+    .page-sub { font-size: .7rem; color: #334155; text-transform: uppercase; letter-spacing: .1em; }
+
+    /* RATIONALE PILLS */
+    .rationale { display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; max-width: 1600px; }
+    .rat { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: .45rem .9rem; font-size: .7rem; color: #64748b; display: flex; align-items: center; gap: .5rem; }
+    .rat s { color: #ef4444; }
+    .rat b { color: #22d3ee; }
+
+    /* PHONES */
+    .phones { display: flex; gap: 1.25rem; flex-wrap: wrap; justify-content: center; }
+    .pw { display: flex; flex-direction: column; align-items: center; gap: .6rem; }
+    .plbl { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #334155; }
+
+    .phone {
+      width: 355px; height: 790px;
+      background: #0f172a;
+      border-radius: 2.4rem;
+      box-shadow: 0 0 0 7px #1e293b, 0 24px 60px rgba(0,0,0,.7);
+      display: flex; flex-direction: column;
+      overflow: hidden; position: relative;
+    }
+
+    /* NOTCH */
+    .notch { height: 2rem; background: #0f172a; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .notch::before { content: ''; width: 110px; height: 1.6rem; background: #020617; border-radius: 0 0 1rem 1rem; position: absolute; top: 0; }
+    .sbar { display: flex; justify-content: space-between; padding: 0 1.1rem .4rem; font-size: .6rem; color: #334155; flex-shrink: 0; }
+
+    /* HDR */
+    .hdr { padding: .65rem 1rem; border-bottom: 1px solid #1e293b; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
+    .hdr-title { font-size: .95rem; font-weight: 700; color: #f1f5f9; }
+    .badge { padding: .2rem .55rem; border-radius: 999px; font-size: .6rem; font-weight: 700; }
+    .badge-blue   { background: #1e3a5f; color: #7dd3fc; }
+    .badge-amber  { background: #451a03; color: #fb923c; }
+    .badge-green  { background: #052e16; color: #4ade80; }
+    .badge-purple { background: #2e1065; color: #c4b5fd; }
+
+    /* CONTENT */
+    .content { flex: 1; overflow: hidden; padding: .9rem 1rem; display: flex; flex-direction: column; gap: .7rem; }
+
+    /* STATS ROW */
+    .stats-row { display: flex; gap: .5rem; }
+    .sbox { flex: 1; background: #0a1628; border: 1px solid #1e293b; border-radius: .6rem; padding: .7rem; text-align: center; }
+    .sv { font-size: 1.3rem; font-weight: 800; }
+    .sv.c  { color: #22d3ee; }
+    .sv.a  { color: #f59e0b; }
+    .sv.g  { color: #22c55e; }
+    .sl { font-size: .6rem; color: #475569; margin-top: .15rem; text-transform: uppercase; }
+
+    /* CARD */
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: .75rem; padding: .9rem; }
+    .ct { font-size: .6rem; font-weight: 600; color: #475569; text-transform: uppercase; letter-spacing: .05em; margin-bottom: .6rem; }
+
+    /* EXEC ITEM */
+    .ei { display: flex; align-items: center; gap: .6rem; padding: .5rem 0; border-bottom: 1px solid #1e293b; }
+    .ei:last-child { border-bottom: none; padding-bottom: 0; }
+    .edot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .edot.run  { background: #f59e0b; box-shadow: 0 0 5px #f59e0b88; }
+    .edot.rev  { background: #3b82f6; box-shadow: 0 0 5px #3b82f688; }
+    .edot.done { background: #22c55e; }
+    .ei-info { flex: 1; }
+    .ei-name { font-size: .72rem; color: #e2e8f0; font-family: 'Menlo','Courier New',monospace; }
+    .ei-meta { font-size: .6rem; color: #475569; margin-top: .1rem; }
+    .etag { font-size: .58rem; padding: .15rem .4rem; border-radius: .25rem; font-weight: 700; flex-shrink: 0; }
+    .etag.run  { background: #451a03; color: #fb923c; }
+    .etag.rev  { background: #1e3a5f; color: #7dd3fc; }
+    .etag.done { background: #052e16; color: #4ade80; }
+
+    /* DISPATCH */
+    .dp-box { background: #0a1628; border: 1px solid #334155; border-radius: .75rem; padding: .9rem; min-height: 90px; }
+    .dp-placeholder { font-size: .8rem; color: #334155; line-height: 1.6; }
+    .dp-agents { display: flex; gap: .4rem; flex-wrap: wrap; margin-top: .5rem; }
+    .dag { background: #1e293b; border: 1px solid #334155; border-radius: .35rem; padding: .2rem .5rem; font-size: .6rem; color: #94a3b8; display: flex; align-items: center; gap: .3rem; }
+    .ddot { width: 5px; height: 5px; border-radius: 50%; background: #22c55e; }
+    .qa { display: flex; flex-direction: column; gap: .45rem; }
+    .qa-btn { background: #1e293b; border: 1px solid #334155; border-radius: .65rem; padding: .75rem .9rem; display: flex; align-items: center; gap: .7rem; }
+    .qa-ico { font-size: 1rem; width: 1.3rem; text-align: center; flex-shrink: 0; }
+    .qa-lbl { font-size: .75rem; font-weight: 600; color: #e2e8f0; }
+    .qa-sub { font-size: .6rem; color: #475569; margin-top: .1rem; }
+    .dp-send { background: linear-gradient(135deg, #2563eb, #7c3aed); color: #fff; border: none; border-radius: .75rem; padding: .85rem; font-size: .8rem; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: .5rem; box-shadow: 0 0 14px #3b82f640; }
+
+    /* REVIEW ITEM */
+    .ri { background: #1e293b; border: 1px solid #334155; border-radius: .75rem; padding: .9rem; display: flex; flex-direction: column; gap: .5rem; }
+    .ri-h { display: flex; justify-content: space-between; align-items: flex-start; }
+    .ri-title { font-size: .75rem; font-weight: 600; color: #f1f5f9; font-family: 'Menlo','Courier New',monospace; }
+    .ri-age { font-size: .6rem; color: #475569; }
+    .ri-meta { display: flex; gap: .4rem; align-items: center; }
+    .ri-agent { font-size: .6rem; color: #7dd3fc; background: #1e3a5f; padding: .15rem .4rem; border-radius: .25rem; }
+    .ri-files { font-size: .6rem; color: #64748b; }
+    .ri-diff { display: flex; gap: .5rem; }
+    .ri-add { font-size: .65rem; color: #22d3ee; font-family: monospace; }
+    .ri-del { font-size: .65rem; color: #f87171; font-family: monospace; }
+    .ri-acts { display: flex; gap: .4rem; }
+    .ri-btn { flex: 1; padding: .55rem; border-radius: .5rem; border: none; font-size: .68rem; font-weight: 700; cursor: pointer; }
+    .ri-rej  { background: #450a0a; color: #ef4444; border: 1px solid #7f1d1d; }
+    .ri-see  { background: #1e3a5f; color: #38bdf8; border: 1px solid #1d4ed8; }
+    .ri-app  { background: #052e16; color: #22c55e; border: 1px solid #166534; box-shadow: 0 0 6px #22c55e22; }
+
+    /* WAR ROOM */
+    .wr-presence { display: flex; gap: .4rem; align-items: center; margin-bottom: .5rem; }
+    .wr-dot { width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .65rem; font-weight: 700; border: 2px solid; }
+    .demand-banner { background: #1e3a5f; border: 1px solid #1d4ed8; border-radius: .5rem; padding: .55rem .7rem; font-size: .65rem; color: #bfdbfe; display: flex; gap: .4rem; }
+    .wr-msgs { display: flex; flex-direction: column; gap: .6rem; flex: 1; overflow: hidden; }
+    .wr-msg { display: flex; gap: .5rem; }
+    .wr-av { width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .6rem; font-weight: 700; flex-shrink: 0; margin-top: .15rem; }
+    .wr-bbl { background: #1e293b; border-radius: 0 .7rem .7rem .7rem; padding: .55rem .7rem; max-width: 240px; }
+    .wr-bbl.me { background: #1e3a5f; border-radius: .7rem 0 .7rem .7rem; margin-left: auto; }
+    .wr-sender { font-size: .58rem; font-weight: 700; margin-bottom: .2rem; text-transform: uppercase; letter-spacing: .04em; }
+    .wr-text { font-size: .7rem; color: #cbd5e1; line-height: 1.5; }
+    .wr-action { background: #0a1628; border: 1px solid #1e293b; border-radius: .4rem; padding: .4rem .55rem; margin-top: .35rem; font-size: .6rem; color: #475569; }
+    .wr-input-row { display: flex; gap: .4rem; align-items: center; margin-top: auto; }
+    .wr-in { flex: 1; background: #1e293b; border: 1px solid #334155; border-radius: 1.2rem; padding: .6rem .85rem; font-size: .72rem; color: #64748b; }
+    .wr-snd { width: 34px; height: 34px; background: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: .85rem; border: none; flex-shrink: 0; }
+
+    /* BOTTOM NAV */
+    .bnav {
+      height: 4.8rem;
+      background: #0d1b2e;
+      border-top: 1px solid #1e293b;
+      display: flex;
+      align-items: flex-end;
+      padding: 0 .5rem .75rem;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .bnav-btn {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: .2rem;
+      background: none; border: none; cursor: pointer; padding: .3rem 0;
+    }
+    .bi { font-size: 1.1rem; color: #475569; }
+    .bl { font-size: .58rem; color: #475569; font-weight: 500; }
+    .bnav-btn.active .bi { color: #38bdf8; }
+    .bnav-btn.active .bl { color: #38bdf8; }
+
+    /* FAB */
+    .bnav-fab-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; margin-bottom: .5rem; }
+    .bnav-fab {
+      width: 3rem; height: 3rem;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; color: #fff;
+      box-shadow: 0 0 18px #3b82f660;
+      border: 3px solid #0d1b2e;
+      margin-bottom: .2rem;
+    }
+    .bnav-fab-lbl { font-size: .58rem; color: #94a3b8; font-weight: 600; }
+
+    .bnav-badge {
+      position: absolute; top: .5rem; right: .25rem;
+      background: #ef4444; color: #fff; font-size: .55rem; font-weight: 800;
+      width: 14px; height: 14px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 2px solid #0d1b2e;
+    }
+    .rel { position: relative; }
+
+    /* LEGEND */
+    .legend {
+      max-width: 1500px; width: 100%;
+      background: #0f172a; border: 1px solid #1e293b; border-radius: .75rem;
+      padding: 1rem 1.25rem;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: .65rem;
+    }
+    .li { font-size: .68rem; color: #475569; display: flex; gap: .5rem; }
+    .li-tab { font-weight: 700; color: #64748b; min-width: 75px; }
+  </style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="page-title">Ayla Commander — Redesign de Navegação</div>
+  <div class="page-sub">Íris · Orquestrador → Execução → Code Review</div>
+</div>
+
+<div class="rationale">
+  <div class="rat">🔄 <s>Home = cockpit genérico</s> → <b>Home = execuções + PRs pendentes</b></div>
+  <div class="rat">⚡ <s>War Room = entrada</s> → <b>Disparar (FAB) = coração do produto</b></div>
+  <div class="rat">🔍 <s>Code Review = rota escondida /code-panel/:id</s> → <b>Reviews = tab dedicada</b></div>
+  <div class="rat">💬 <s>Chat IRC = tab principal</s> → <b>IRC = dentro de ···</b></div>
+</div>
+
+<div class="phones">
+
+  <!-- ① HOME -->
+  <div class="pw">
+    <div class="plbl">① Home — Cockpit</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="hdr">
+        <span class="hdr-title">🏠 Olimpo</span>
+        <span class="badge badge-amber">3 em execução</span>
+      </div>
+      <div class="content">
+        <div class="stats-row">
+          <div class="sbox"><div class="sv c">3</div><div class="sl">Rodando</div></div>
+          <div class="sbox"><div class="sv a">2</div><div class="sl">Reviews</div></div>
+          <div class="sbox"><div class="sv g">11</div><div class="sl">Merged</div></div>
+        </div>
+        <div class="card">
+          <div class="ct">⏳ Aguardando Review</div>
+          <div class="ei">
+            <div class="edot rev"></div>
+            <div class="ei-info">
+              <div class="ei-name">feat/jwt-refresh</div>
+              <div class="ei-meta">Apolo · 3 arquivos · +47 -12</div>
+            </div>
+            <span class="etag rev">Review</span>
+          </div>
+          <div class="ei">
+            <div class="edot rev"></div>
+            <div class="ei-info">
+              <div class="ei-name">fix/auth-timeout</div>
+              <div class="ei-meta">Artemis · 1 arquivo · +8 -3</div>
+            </div>
+            <span class="etag rev">Review</span>
+          </div>
+        </div>
+        <div class="card">
+          <div class="ct">⚡ Execuções Ativas</div>
+          <div class="ei">
+            <div class="edot run"></div>
+            <div class="ei-info">
+              <div class="ei-name">feat/neon-migration</div>
+              <div class="ei-meta">Atena + Apolo · Running</div>
+            </div>
+            <span class="etag run">Rodando</span>
+          </div>
+          <div class="ei">
+            <div class="edot run"></div>
+            <div class="ei-info">
+              <div class="ei-name">chore/cleanup-branches</div>
+              <div class="ei-meta">Hermes · PRE_FLIGHT</div>
+            </div>
+            <span class="etag run">Rodando</span>
+          </div>
+          <div class="ei">
+            <div class="edot done"></div>
+            <div class="ei-info">
+              <div class="ei-name">fix/cors-sse</div>
+              <div class="ei-meta">Artemis · PR aberto</div>
+            </div>
+            <span class="etag done">Done</span>
+          </div>
+        </div>
+      </div>
+      <nav class="bnav">
+        <button class="bnav-btn active"><span class="bi">🏠</span><span class="bl">Home</span></button>
+        <button class="bnav-btn rel"><span class="bi">🔍</span><span class="bnav-badge">2</span><span class="bl">Reviews</span></button>
+        <div class="bnav-fab-wrap"><div class="bnav-fab">⚡</div><div class="bnav-fab-lbl">Disparar</div></div>
+        <button class="bnav-btn"><span class="bi">⚔️</span><span class="bl">War Room</span></button>
+        <button class="bnav-btn"><span class="bi" style="font-size:.85rem;color:#475569;letter-spacing:-.05em;">•••</span><span class="bl">Mais</span></button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ② DISPARAR -->
+  <div class="pw">
+    <div class="plbl">② Disparar — Orquestrador</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="hdr">
+        <span class="hdr-title">⚡ Nova Demanda</span>
+        <span class="badge badge-green">6 online</span>
+      </div>
+      <div class="content">
+        <div class="dp-box">
+          <div class="dp-placeholder">Descreva o objetivo...<br><br>Ex: "implementar refresh token com expiração de 7 dias"</div>
+        </div>
+        <div class="dp-agents">
+          <div class="dag"><div class="ddot"></div>Hermes</div>
+          <div class="dag"><div class="ddot"></div>Atena</div>
+          <div class="dag"><div class="ddot"></div>Apolo</div>
+          <div class="dag"><div class="ddot"></div>Artemis</div>
+          <div class="dag"><div class="ddot"></div>Afrodite</div>
+          <div class="dag"><div class="ddot"></div>Hefesto</div>
+        </div>
+        <div class="ct">Ações rápidas</div>
+        <div class="qa">
+          <div class="qa-btn">
+            <span class="qa-ico">🐛</span>
+            <div><div class="qa-lbl">Investigar bug</div><div class="qa-sub">Hermes audita → Apolo reproduce → Artemis corrige</div></div>
+          </div>
+          <div class="qa-btn">
+            <span class="qa-ico">✨</span>
+            <div><div class="qa-lbl">Nova feature</div><div class="qa-sub">PRE_FLIGHT → TDD → Sprint completo</div></div>
+          </div>
+          <div class="qa-btn">
+            <span class="qa-ico">🧹</span>
+            <div><div class="qa-lbl">Refactor / chore</div><div class="qa-sub">Atena arquiteta → Artemis implementa</div></div>
+          </div>
+        </div>
+        <button class="dp-send">⚡ Disparar para o War Room</button>
+      </div>
+      <nav class="bnav">
+        <button class="bnav-btn"><span class="bi">🏠</span><span class="bl">Home</span></button>
+        <button class="bnav-btn"><span class="bi">🔍</span><span class="bl">Reviews</span></button>
+        <div class="bnav-fab-wrap"><div class="bnav-fab" style="box-shadow:0 0 22px #7c3aed88;">⚡</div><div class="bnav-fab-lbl" style="color:#c4b5fd;">Disparar</div></div>
+        <button class="bnav-btn"><span class="bi">⚔️</span><span class="bl">War Room</span></button>
+        <button class="bnav-btn"><span class="bi" style="font-size:.85rem;color:#475569;letter-spacing:-.05em;">•••</span><span class="bl">Mais</span></button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ③ REVIEWS -->
+  <div class="pw">
+    <div class="plbl">③ Reviews — PRs Pendentes</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="hdr">
+        <span class="hdr-title">🔍 Code Reviews</span>
+        <span class="badge badge-purple">2 pendentes</span>
+      </div>
+      <div class="content">
+        <div class="ri">
+          <div class="ri-h"><div class="ri-title">feat/jwt-refresh</div><div class="ri-age">há 3 min</div></div>
+          <div class="ri-meta"><span class="ri-agent">⚡ Apolo</span><span class="ri-files">3 arquivos</span></div>
+          <div class="ri-diff"><span class="ri-add">+47 inserções</span><span class="ri-del">-12 deleções</span></div>
+          <div class="ri-acts">
+            <button class="ri-btn ri-rej">❌ Rejeitar</button>
+            <button class="ri-btn ri-see">🔍 Ver diff</button>
+            <button class="ri-btn ri-app">✅ Aprovar</button>
+          </div>
+        </div>
+        <div class="ri">
+          <div class="ri-h"><div class="ri-title">fix/auth-timeout</div><div class="ri-age">há 12 min</div></div>
+          <div class="ri-meta"><span class="ri-agent">🏹 Artemis</span><span class="ri-files">1 arquivo</span></div>
+          <div class="ri-diff"><span class="ri-add">+8 inserções</span><span class="ri-del">-3 deleções</span></div>
+          <div class="ri-acts">
+            <button class="ri-btn ri-rej">❌ Rejeitar</button>
+            <button class="ri-btn ri-see">🔍 Ver diff</button>
+            <button class="ri-btn ri-app">✅ Aprovar</button>
+          </div>
+        </div>
+        <div class="ri" style="opacity:.35;">
+          <div class="ri-h"><div class="ri-title">chore/cleanup</div><div class="ri-age">há 1h</div></div>
+          <div class="ri-meta"><span class="ri-agent">🔭 Hermes</span><span class="ri-files">5 arquivos</span></div>
+          <div class="ri-diff"><span class="ri-add">+12</span><span class="ri-del">-89</span></div>
+          <div style="font-size:.7rem;color:#22c55e;font-weight:700;margin-top:.3rem;">✅ Mergeado</div>
+        </div>
+      </div>
+      <nav class="bnav">
+        <button class="bnav-btn"><span class="bi">🏠</span><span class="bl">Home</span></button>
+        <button class="bnav-btn active rel"><span class="bi">🔍</span><span class="bnav-badge">2</span><span class="bl">Reviews</span></button>
+        <div class="bnav-fab-wrap"><div class="bnav-fab">⚡</div><div class="bnav-fab-lbl">Disparar</div></div>
+        <button class="bnav-btn"><span class="bi">⚔️</span><span class="bl">War Room</span></button>
+        <button class="bnav-btn"><span class="bi" style="font-size:.85rem;color:#475569;letter-spacing:-.05em;">•••</span><span class="bl">Mais</span></button>
+      </nav>
+    </div>
+  </div>
+
+  <!-- ④ WAR ROOM -->
+  <div class="pw">
+    <div class="plbl">④ War Room — Ao vivo</div>
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="sbar"><span>9:41</span><span>●●●</span></div>
+      <div class="hdr">
+        <span class="hdr-title">⚔️ War Room</span>
+        <span class="badge badge-green">● AO VIVO</span>
+      </div>
+      <div class="content" style="padding:.7rem .9rem;">
+        <div class="wr-presence">
+          <div class="wr-dot" style="border-color:#22c55e;background:#052e16;color:#4ade80;">R</div>
+          <div class="wr-dot" style="border-color:#38bdf8;background:#0e3a4f;color:#7dd3fc;">A</div>
+          <div class="wr-dot" style="border-color:#8b5cf6;background:#2e1065;color:#c4b5fd;">H</div>
+          <div class="wr-dot" style="border-color:#06b6d4;background:#0a2d35;color:#67e8f9;">At</div>
+          <span style="font-size:.6rem;color:#334155;margin-left:.3rem;">4 online</span>
+        </div>
+        <div class="demand-banner">🎯 <span><strong>DEMANDA ATIVA:</strong> implementar refresh token com expiração de 7 dias</span></div>
+        <div class="wr-msgs">
+          <div class="wr-msg">
+            <div class="wr-av" style="background:#0e3a4f;color:#67e8f9;">H</div>
+            <div class="wr-bbl">
+              <div class="wr-sender" style="color:#67e8f9;">Hermes</div>
+              <div class="wr-text">Varredura completa. 3 arquivos impactados: auth.service.ts, interceptor, model.</div>
+            </div>
+          </div>
+          <div class="wr-msg">
+            <div class="wr-av" style="background:#0a2d35;color:#22d3ee;">At</div>
+            <div class="wr-bbl">
+              <div class="wr-sender" style="color:#22d3ee;">Atena</div>
+              <div class="wr-text">Arquitetura aprovada. PRE_FLIGHT 13/13 ✓</div>
+              <div class="wr-action">git limpo · MCPs ativos · Afrodite PASS</div>
+            </div>
+          </div>
+          <div class="wr-msg" style="flex-direction:row-reverse;">
+            <div class="wr-bbl me">
+              <div class="wr-sender" style="color:#bfdbfe;text-align:right;">Rafael</div>
+              <div class="wr-text">Pode executar. TTL 7 dias, one-time use.</div>
+            </div>
+          </div>
+          <div class="wr-msg">
+            <div class="wr-av" style="background:#2e1065;color:#c4b5fd;">Ap</div>
+            <div class="wr-bbl">
+              <div class="wr-sender" style="color:#c4b5fd;">Apolo</div>
+              <div class="wr-text">RED ✓ → GREEN ✓ → PR aberto. +47 -12.</div>
+              <div class="wr-action"><strong>feat/jwt-refresh</strong> · <span style="color:#22d3ee;">→ Reviews ↗</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="wr-input-row" style="margin-top:.5rem;">
+          <div class="wr-in">Digite demanda ou comentário...</div>
+          <button class="wr-snd">↑</button>
+        </div>
+      </div>
+      <nav class="bnav">
+        <button class="bnav-btn"><span class="bi">🏠</span><span class="bl">Home</span></button>
+        <button class="bnav-btn"><span class="bi">🔍</span><span class="bl">Reviews</span></button>
+        <div class="bnav-fab-wrap"><div class="bnav-fab">⚡</div><div class="bnav-fab-lbl">Disparar</div></div>
+        <button class="bnav-btn active"><span class="bi">⚔️</span><span class="bl">War Room</span></button>
+        <button class="bnav-btn"><span class="bi" style="font-size:.85rem;color:#475569;letter-spacing:-.05em;">•••</span><span class="bl">Mais</span></button>
+      </nav>
+    </div>
+  </div>
+
+</div>
+
+<!-- LEGEND -->
+<div class="legend">
+  <div class="li"><span class="li-tab">🏠 Home</span>Cockpit de execuções + PRs pendentes. Entrada principal ROOT/DEV.</div>
+  <div class="li"><span class="li-tab">⚡ Disparar</span>FAB central elevado. Coração do produto — input de objetivo → war room + ritos automáticos.</div>
+  <div class="li"><span class="li-tab">🔍 Reviews</span>Lista de PRs com badge contador. Reject / Ver diff / Aprovar por card. Antes era rota escondida.</div>
+  <div class="li"><span class="li-tab">⚔️ War Room</span>Sala ao vivo. Output do Apolo linka direto para Reviews — ciclo fechado.</div>
+  <div class="li"><span class="li-tab">··· Mais</span>Chat IRC, Relatórios, Ayla direta. Infraestrutura — fora do foco do produto.</div>
+</div>
+
+</body>
+</html>
