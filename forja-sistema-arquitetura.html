@@ -6,264 +6,280 @@
     <title>Forja — Arquitetura do Sistema</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #0a0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
-
-        .schema-section { padding-top: 4rem; }
-
-        /* ── Schema section ── */
-        .schema-section {
-            max-width: 1100px;
-            margin: 0 auto;
-            padding: 3rem 2rem 5rem;
-        }
-
-        .schema-header {
-            text-align: center;
-            margin-bottom: 3rem;
-        }
-        .schema-header h2 {
-            font-size: 1.6rem;
-            font-weight: 700;
-            color: #f1f5f9;
-            margin-bottom: .5rem;
-        }
-        .schema-header p {
-            color: #64748b;
-            font-size: .92rem;
-        }
-        .schema-header .badge {
-            display: inline-block;
-            margin-top: .75rem;
-            padding: .35rem 1rem;
-            background: #0c1a3a;
-            border: 1px solid #3b82f6;
-            border-radius: 2rem;
-            color: #93c5fd;
-            font-size: .78rem;
-            font-weight: 600;
-            letter-spacing: .05em;
-        }
-
-        /* ── Layer stack ── */
-        .layer-stack {
+        body {
+            background: #0a0f1a;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             display: flex;
-            flex-direction: column;
-            gap: 0;
-            position: relative;
-        }
-
-        .layer {
-            display: grid;
-            grid-template-columns: 56px 1fr 2fr;
-            gap: 0 1.5rem;
+            justify-content: center;
             align-items: center;
-            padding: 1.1rem 1.5rem;
-            border: 1px solid #1e293b;
-            border-bottom: none;
-            position: relative;
-            transition: background .15s;
-        }
-        .layer:first-child { border-radius: 12px 12px 0 0; }
-        .layer:last-child  { border-bottom: 1px solid #1e293b; border-radius: 0 0 12px 12px; }
-        .layer:hover { background: #0d1525; }
-
-        .layer-num {
-            width: 40px; height: 40px;
-            border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 800; font-size: 1rem;
-            flex-shrink: 0;
-        }
-
-        .layer-title { font-weight: 700; font-size: .97rem; color: #f1f5f9; }
-        .layer-subtitle { font-size: .78rem; font-weight: 500; margin-top: .15rem; }
-
-        .layer-desc { font-size: .86rem; color: #94a3b8; line-height: 1.55; }
-
-        /* Layer color palette */
-        .l1 { background: #0d1525; border-color: #1e3a5f; }
-        .l1 .layer-num { background: #1e3a5f; color: #93c5fd; }
-        .l1 .layer-subtitle { color: #60a5fa; }
-
-        .l2 { background: #0d1421; border-color: #2d1b69; }
-        .l2 .layer-num { background: #2d1b69; color: #c4b5fd; }
-        .l2 .layer-subtitle { color: #a78bfa; }
-
-        .l3 { background: #0c1a14; border-color: #14532d; }
-        .l3 .layer-num { background: #14532d; color: #86efac; }
-        .l3 .layer-subtitle { color: #4ade80; }
-
-        .l4 { background: #11180d; border-color: #1a2e08; }
-        .l4 .layer-num { background: #1a3a0a; color: #bef264; }
-        .l4 .layer-subtitle { color: #a3e635; }
-
-        .l5 { background: #1a120c; border-color: #431407; }
-        .l5 .layer-num { background: #431407; color: #fdba74; }
-        .l5 .layer-subtitle { color: #fb923c; }
-
-        .l6 { background: #1a1016; border-color: #500724; }
-        .l6 .layer-num { background: #500724; color: #f9a8d4; }
-        .l6 .layer-subtitle { color: #f472b6; }
-
-        .l7 { background: #1a1208; border-color: #713f12; }
-        .l7 .layer-num { background: #78350f; color: #fde68a; }
-        .l7 .layer-subtitle { color: #fbbf24; }
-
-        /* Schema = layer 8 — highlighted */
-        .l8 {
-            background: #1a1614;
-            border: 2px solid #d97706 !important;
-            border-radius: 0 0 12px 12px !important;
-        }
-        .l8 .layer-num { background: #d97706; color: #0a0f1a; }
-        .l8 .layer-subtitle { color: #fbbf24; }
-        .l8 .layer-title { color: #fde68a; }
-        .l8 .layer-desc { color: #d4a96a; }
-
-        .schema-tag {
-            display: inline-block;
-            margin-left: .5rem;
-            padding: .15rem .6rem;
-            background: #78350f;
-            border: 1px solid #d97706;
-            border-radius: .4rem;
-            font-size: .7rem;
-            font-weight: 700;
-            color: #fbbf24;
-            vertical-align: middle;
-            letter-spacing: .05em;
-        }
-
-        /* ── Arrow between layers ── */
-        .arrow-down {
-            text-align: center;
-            font-size: .9rem;
-            color: #334155;
-            line-height: 1;
-            padding: 2px 0;
-            border-left: 1px solid #1e293b;
-            border-right: 1px solid #1e293b;
-            margin: 0 0;
-        }
-
-        /* ── Note ── */
-        .note {
-            margin-top: 2.5rem;
-            padding: 1.25rem 1.5rem;
-            background: #0c1814;
-            border: 1px solid #14532d;
-            border-radius: .75rem;
-            font-size: .85rem;
-            color: #86efac;
-            line-height: 1.6;
-        }
-        .note strong { color: #4ade80; }
-
-        footer {
-            text-align: center;
+            min-height: 100vh;
             padding: 2rem;
-            border-top: 1px solid #1e293b;
-            color: #334155;
-            font-size: .8rem;
         }
-
-        @media (max-width: 640px) {
-            .layer { grid-template-columns: 44px 1fr; gap: .75rem; }
-            .layer-desc { grid-column: 1 / -1; margin-top: .25rem; }
-        }
+        svg { width: 100%; max-width: 1400px; height: auto; display: block; }
     </style>
 </head>
 <body>
+<svg viewBox="-140 0 1540 1060" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+        <marker id="arrowAmber" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#d97706"/>
+        </marker>
+        <marker id="arrowBlue" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#3b82f6"/>
+        </marker>
+        <marker id="arrowIndigo" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#6366f1"/>
+        </marker>
+        <marker id="arrowSlate" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#94a3b8"/>
+        </marker>
+        <marker id="arrowDash" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#64748b"/>
+        </marker>
+        <marker id="arrowGreen" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L9,3 z" fill="#22c55e"/>
+        </marker>
+    </defs>
 
-    <div class="schema-section">
+    <!-- BG -->
+    <rect width="1400" height="1060" fill="#0a0f1a"/>
 
-        <div class="schema-header">
-            <h2>Modelo Base dos Agentes — 7 Camadas + Schema</h2>
-            <p>Arquitetura cognitiva padrão de todo agente Olimpo. Cada agente é uma instância deste stack.</p>
-            <div class="badge">Íris · Modelo Base · 7 layers + schema = 8</div>
-        </div>
+    <!-- Title -->
+    <text x="700" y="42" font-size="22" font-weight="700" fill="#f1f5f9" text-anchor="middle">Forja — Arquitetura do Sistema</text>
+    <text x="700" y="64" font-size="13" fill="#64748b" text-anchor="middle">CLI (local-first) vs Mobile/Web (remote-first) · Ayla como orquestradora central</text>
+    <line x1="60" y1="78" x2="1340" y2="78" stroke="#1e293b" stroke-width="1"/>
 
-        <div class="layer-stack">
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SWIMLANE: CLI -->
+    <!-- ═══════════════════════════════════════════ -->
 
-            <div class="layer l1">
-                <div class="layer-num">1</div>
-                <div>
-                    <div class="layer-title">Input & Percepção</div>
-                    <div class="layer-subtitle">Parsing · Normalização · Injeção de contexto</div>
-                </div>
-                <div class="layer-desc">Recebe o prompt bruto, normaliza encoding, injeta contexto de sessão (session_id, tenant_id, origin, timestamp). Resolve quem está falando e de onde.</div>
-            </div>
+    <!-- Lane background -->
+    <rect x="60" y="95" width="460" height="330" rx="10" fill="#0d1525" stroke="#1e293b" stroke-width="1"/>
+    <!-- Lane label -->
+    <rect x="60" y="95" width="460" height="36" rx="10" fill="#1a2235"/>
+    <rect x="60" y="117" width="460" height="14" fill="#1a2235"/>
+    <text x="80" y="119" font-size="13" font-weight="700" fill="#d97706">CLI</text>
+    <text x="150" y="119" font-size="11" fill="#64748b">admin / dev da org · instalado localmente · qualquer org</text>
 
-            <div class="layer l2">
-                <div class="layer-num">2</div>
-                <div>
-                    <div class="layer-title">Auth & Origin Resolution</div>
-                    <div class="layer-subtitle">Role · Origin · Trust level</div>
-                </div>
-                <div class="layer-desc">Deriva origin (authenticated / personal / mari / guest) a partir do role do tenant. Define trust level da sessão. Gates de autorização se alocam aqui — falha-fechado se origin não resolvido.</div>
-            </div>
+    <!-- Box: Projeto Local -->
+    <rect x="90" y="150" width="180" height="90" rx="8" fill="#131c2e" stroke="#d97706" stroke-width="2"/>
+    <text x="180" y="186" font-size="13" font-weight="700" fill="#fbbf24" text-anchor="middle">Projeto Local</text>
+    <text x="180" y="205" font-size="11" fill="#94a3b8" text-anchor="middle">filesystem da máquina</text>
+    <text x="180" y="222" font-size="10" fill="#64748b" text-anchor="middle">edita · testa · roda</text>
 
-            <div class="layer l3">
-                <div class="layer-num">3</div>
-                <div>
-                    <div class="layer-title">Memory Recall</div>
-                    <div class="layer-subtitle">Episódico · Neon · Cross-sessão</div>
-                </div>
-                <div class="layer-desc">Consulta Neon Postgres: episódios anteriores, preferências, decisões de arquitetura, handoffs. Memória cross-sessão real — não RAG stateless. Buffer local em fallback, replay automático no reconnect.</div>
-            </div>
+    <!-- Box: Ayla Local -->
+    <rect x="320" y="150" width="180" height="90" rx="8" fill="#131c2e" stroke="#d97706" stroke-width="2"/>
+    <text x="410" y="178" font-size="13" font-weight="700" fill="#fbbf24" text-anchor="middle">Ayla Local</text>
+    <text x="410" y="196" font-size="11" fill="#94a3b8" text-anchor="middle">localhost:8080</text>
+    <text x="410" y="212" font-size="10" fill="#64748b" text-anchor="middle">+ Agentes Olimpo</text>
+    <text x="410" y="228" font-size="10" fill="#475569" text-anchor="middle">instalados localmente</text>
 
-            <div class="layer l4">
-                <div class="layer-num">4</div>
-                <div>
-                    <div class="layer-title">Raciocínio & Deliberação</div>
-                    <div class="layer-subtitle">Chain-of-thought · Reflexão diferida · Detecção</div>
-                </div>
-                <div class="layer-desc">Motor principal de raciocínio. Inclui reflexão diferida (decisões pesadas passam para a sessão N+1), detecção de manipulação com nomeação explícita, e deliberation loop pré-geração quando necessário.</div>
-            </div>
+    <!-- Arrow: Local ↔ Ayla Local -->
+    <line x1="270" y1="195" x2="318" y2="195" stroke="#d97706" stroke-width="2" marker-end="url(#arrowAmber)"/>
+    <text x="294" y="188" font-size="10" fill="#d97706" text-anchor="middle">invoke</text>
 
-            <div class="layer l5">
-                <div class="layer-num">5</div>
-                <div>
-                    <div class="layer-title">Tool Selection & Planning</div>
-                    <div class="layer-subtitle">MCP · invoke_agent · Orquestração</div>
-                </div>
-                <div class="layer-desc">Seleciona ferramentas (MCP filesystem, GitHub, Playwright etc.) e decide se invoca sub-agentes via invoke_agent. Compõe o plano de execução. Budget de tokens por loop controlado aqui (airbag 80k tokens).</div>
-            </div>
+    <!-- Arrow: Projeto Local → GitHub (direto, sem passar por Ayla) -->
+    <path d="M 180 240 Q 180 320 640 210" stroke="#22c55e" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
+    <text x="340" y="318" font-size="10" fill="#22c55e" text-anchor="middle">git push</text>
 
-            <div class="layer l6">
-                <div class="layer-num">6</div>
-                <div>
-                    <div class="layer-title">Execução</div>
-                    <div class="layer-subtitle">Tool calls · Commits · Persistência</div>
-                </div>
-                <div class="layer-desc">Executa ferramentas, commita no GitHub, persiste no Neon, publica via Centrifugo. Handoff automático entre agentes com payload estruturado. Retry com airbag de iterações (max 25 ciclos).</div>
-            </div>
+    <!-- Fallback: Ayla Local → EC2 (se local offline) -->
+    <rect x="320" y="270" width="180" height="50" rx="6" fill="#0f1929" stroke="#475569" stroke-width="1" stroke-dasharray="4,3"/>
+    <text x="410" y="291" font-size="11" fill="#64748b" text-anchor="middle">fallback</text>
+    <text x="410" y="308" font-size="10" fill="#475569" text-anchor="middle">se local offline → EC2</text>
 
-            <div class="layer l7">
-                <div class="layer-num">7</div>
-                <div>
-                    <div class="layer-title">Policy & Veto Gate</div>
-                    <div class="layer-subtitle">Musa · PolicyEngine · JARVIS override</div>
-                </div>
-                <div class="layer-desc">Camada de segurança: Musa audita ANTES de capabilities críticas. PolicyEngine aplica guardrails por origin. Root pode emitir JARVIS OVERRIDE (suspende gates de política, logado com SHA-256). Veto ofensivo absoluto para não-root.</div>
-            </div>
+    <line x1="410" y1="240" x2="410" y2="270" stroke="#64748b" stroke-width="1.5" stroke-dasharray="4,3" marker-end="url(#arrowDash)"/>
 
-            <div class="layer l8">
-                <div class="layer-num">8</div>
-                <div>
-                    <div class="layer-title">Output Contract <span class="schema-tag">SCHEMA</span></div>
-                    <div class="layer-subtitle">Structured output · §422 · Fail-closed</div>
-                </div>
-                <div class="layer-desc">Saída validada contra contrato (Output Contract). Zero any, zero fallback silencioso, zero catch que descarta. Se Neon offline → 503 retryável, não dado inventado. Schema 8 = o que garante que cada camada entrega o que prometeu.</div>
-            </div>
+    <!-- Arrow fallback → Ayla EC2 (curva) -->
+    <path d="M 500 295 Q 700 370 700 430" stroke="#64748b" stroke-width="1.5" fill="none" stroke-dasharray="5,4" marker-end="url(#arrowDash)"/>
+    <text x="630" y="370" font-size="10" fill="#64748b">fallback</text>
 
-        </div>
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SWIMLANE: Mobile / Web -->
+    <!-- ═══════════════════════════════════════════ -->
 
-    </div>
+    <rect x="60" y="450" width="460" height="270" rx="10" fill="#0d1525" stroke="#1e293b" stroke-width="1"/>
+    <rect x="60" y="450" width="460" height="36" rx="10" fill="#131e33"/>
+    <rect x="60" y="472" width="460" height="14" fill="#131e33"/>
+    <text x="80" y="474" font-size="13" font-weight="700" fill="#3b82f6">Mobile / Web</text>
+    <text x="180" y="474" font-size="11" fill="#64748b">admin / dev da org · Forja app · Angular / Ionic</text>
 
-    <footer>
-        Forja · Arquitetura do Sistema · v2.0 · 2026-06-17
-    </footer>
+    <!-- Box: Forja App -->
+    <rect x="90" y="506" width="180" height="90" rx="8" fill="#131c2e" stroke="#3b82f6" stroke-width="2"/>
+    <text x="180" y="542" font-size="13" font-weight="700" fill="#60a5fa" text-anchor="middle">Forja App</text>
+    <text x="180" y="561" font-size="11" fill="#94a3b8" text-anchor="middle">mobile / web</text>
+    <text x="180" y="578" font-size="10" fill="#64748b" text-anchor="middle">interface de trabalho</text>
 
+    <!-- Box: sem local -->
+    <rect x="320" y="506" width="180" height="90" rx="8" fill="#0a0f1a" stroke="#334155" stroke-width="1" stroke-dasharray="5,4"/>
+    <text x="410" y="542" font-size="12" fill="#475569" text-anchor="middle">sem projeto local</text>
+    <text x="410" y="561" font-size="11" fill="#334155" text-anchor="middle">git pull depois</text>
+    <text x="410" y="578" font-size="10" fill="#2d3a4f" text-anchor="middle">na máquina do dev</text>
+
+    <!-- Arrow App → EC2 (sempre) -->
+    <path d="M 270 551 Q 700 551 700 510" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+    <text x="520" y="544" font-size="10" fill="#3b82f6" text-anchor="middle">sempre EC2</text>
+
+    <!-- Arrow App → GitHub commit direto -->
+    <path d="M 180 506 Q 180 420 640 250" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrowBlue)"/>
+    <text x="280" y="430" font-size="10" fill="#3b82f6">commit direto</text>
+
+    <!-- Arrow GitHub → pull (volta para dev) -->
+    <rect x="90" y="618" width="180" height="50" rx="6" fill="#0f1929" stroke="#6366f1" stroke-width="1.5"/>
+    <text x="180" y="639" font-size="11" font-weight="600" fill="#818cf8" text-anchor="middle">git pull</text>
+    <text x="180" y="656" font-size="10" fill="#64748b" text-anchor="middle">puxa para máquina depois</text>
+
+    <path d="M 640 260 Q 640 690 270 643" stroke="#6366f1" stroke-width="1.5" fill="none" stroke-dasharray="5,4" marker-end="url(#arrowIndigo)"/>
+    <text x="480" y="690" font-size="10" fill="#6366f1" text-anchor="middle">pull</text>
+
+    <!-- PROCESSO INVERSO label -->
+    <text x="540" y="760" font-size="11" fill="#475569" text-anchor="middle" font-style="italic">↑ CLI: local → push → GitHub</text>
+    <text x="540" y="778" font-size="11" fill="#475569" text-anchor="middle" font-style="italic">↓ Mobile: GitHub ← commit · pull → local</text>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- GITHUB -->
+    <!-- ═══════════════════════════════════════════ -->
+
+    <rect x="560" y="150" width="240" height="130" rx="10" fill="#131c2e" stroke="#6366f1" stroke-width="2.5"/>
+    <text x="680" y="186" font-size="15" font-weight="700" fill="#a5b4fc" text-anchor="middle">GitHub</text>
+    <text x="680" y="207" font-size="11" fill="#94a3b8" text-anchor="middle">repositório da org</text>
+    <line x1="580" y1="218" x2="780" y2="218" stroke="#1e293b" stroke-width="1"/>
+    <text x="680" y="236" font-size="10" fill="#64748b" text-anchor="middle">source of truth</text>
+    <text x="680" y="252" font-size="10" fill="#64748b" text-anchor="middle">PRs · branches · histórico</text>
+    <text x="680" y="268" font-size="10" fill="#475569" text-anchor="middle">versão canônica</text>
+
+    <!-- GitHub → Ayla EC2 -->
+    <line x1="680" y1="280" x2="700" y2="418" stroke="#6366f1" stroke-width="2" marker-end="url(#arrowIndigo)"/>
+    <text x="715" y="355" font-size="10" fill="#6366f1">webhook / API</text>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- AYLA EC2 -->
+    <!-- ═══════════════════════════════════════════ -->
+
+    <rect x="560" y="420" width="280" height="160" rx="10" fill="#1a2540" stroke="#e2e8f0" stroke-width="2.5"/>
+    <line x1="570" y1="420" x2="830" y2="420" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"/>
+    <text x="700" y="455" font-size="16" font-weight="700" fill="#f8fafc" text-anchor="middle">Ayla — EC2 Olimpo</text>
+    <text x="700" y="475" font-size="12" fill="#94a3b8" text-anchor="middle">Orquestradora Central</text>
+    <line x1="580" y1="488" x2="820" y2="488" stroke="#1e293b" stroke-width="1"/>
+    <circle cx="585" cy="505" r="3" fill="#22c55e"/>
+    <text x="597" y="509" font-size="11" fill="#cbd5e1">Invoker → Agentes Olimpo</text>
+    <circle cx="585" cy="527" r="3" fill="#22c55e"/>
+    <text x="597" y="531" font-size="11" fill="#cbd5e1">Memória &amp; Roteamento</text>
+    <circle cx="585" cy="549" r="3" fill="#22c55e"/>
+    <text x="597" y="553" font-size="11" fill="#cbd5e1">Tenant isolado por org</text>
+
+    <!-- Ayla → Agentes -->
+    <line x1="700" y1="580" x2="700" y2="778" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowSlate)"/>
+    <text x="720" y="700" font-size="10" fill="#94a3b8">invoke</text>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- AGENTES OLIMPO -->
+    <!-- ═══════════════════════════════════════════ -->
+
+    <rect x="420" y="780" width="560" height="220" rx="10" fill="#0d1525" stroke="#334155" stroke-width="1.5"/>
+    <text x="700" y="810" font-size="14" font-weight="700" fill="#e2e8f0" text-anchor="middle">Agentes Olimpo</text>
+    <text x="700" y="828" font-size="11" fill="#475569" text-anchor="middle">Especialistas por domínio · invocados pela Ayla via Invoker</text>
+    <line x1="440" y1="676" x2="960" y2="676" stroke="#1e293b" stroke-width="1"/>
+
+    <!-- Row 1 -->
+    <g font-size="11" text-anchor="middle">
+      <rect x="440" y="848" width="110" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="495" y="876" font-weight="600" fill="#cbd5e1">Atena</text>
+      <text x="495" y="892" font-size="9" fill="#475569">arquitetura</text>
+
+      <rect x="560" y="848" width="110" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="615" y="876" font-weight="600" fill="#cbd5e1">Hermes</text>
+      <text x="615" y="892" font-size="9" fill="#475569">varredura</text>
+
+      <rect x="680" y="848" width="110" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="735" y="876" font-weight="600" fill="#cbd5e1">Apolo</text>
+      <text x="735" y="892" font-size="9" fill="#475569">qualidade</text>
+
+      <rect x="800" y="848" width="110" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="855" y="876" font-weight="600" fill="#cbd5e1">Afrodite</text>
+      <text x="855" y="892" font-size="9" fill="#475569">validação</text>
+
+      <rect x="920" y="848" width="42" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="941" y="872" fill="#475569">+</text>
+      <text x="941" y="886" fill="#475569">4</text>
+
+      <!-- Row 2 -->
+      <rect x="440" y="910" width="110" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="495" y="938" font-weight="600" fill="#cbd5e1">Gaia</text>
+      <text x="495" y="954" font-size="9" fill="#475569">estratégia</text>
+
+      <rect x="560" y="910" width="110" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="615" y="938" font-weight="600" fill="#cbd5e1">Íris</text>
+      <text x="615" y="954" font-size="9" fill="#475569">design</text>
+
+      <rect x="680" y="910" width="110" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="735" y="938" font-weight="600" fill="#cbd5e1">Hefesto</text>
+      <text x="735" y="954" font-size="9" fill="#475569">build</text>
+
+      <rect x="800" y="910" width="110" height="52" rx="6" fill="#131c2e" stroke="#1e293b"/>
+      <text x="855" y="938" font-weight="600" fill="#cbd5e1">Quiron</text>
+      <text x="855" y="954" font-size="9" fill="#475569">UX / acesso</text>
+    </g>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- LEGENDA -->
+    <!-- ═══════════════════════════════════════════ -->
+
+    <rect x="1060" y="150" width="280" height="210" rx="10" fill="#0d1525" stroke="#1e293b" stroke-width="1"/>
+    <text x="1080" y="176" font-size="12" font-weight="700" fill="#94a3b8">Legenda</text>
+    <line x1="1080" y1="184" x2="1320" y2="184" stroke="#1e293b" stroke-width="1"/>
+
+    <line x1="1090" y1="204" x2="1130" y2="204" stroke="#d97706" stroke-width="2" marker-end="url(#arrowAmber)"/>
+    <text x="1140" y="208" font-size="11" fill="#cbd5e1">CLI (local-first)</text>
+
+    <line x1="1090" y1="229" x2="1130" y2="229" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrowBlue)"/>
+    <text x="1140" y="233" font-size="11" fill="#cbd5e1">Mobile / Web</text>
+
+    <line x1="1090" y1="254" x2="1130" y2="254" stroke="#22c55e" stroke-width="2" marker-end="url(#arrowGreen)"/>
+    <text x="1140" y="258" font-size="11" fill="#cbd5e1">commit / push</text>
+
+    <line x1="1090" y1="279" x2="1130" y2="279" stroke="#6366f1" stroke-width="2" marker-end="url(#arrowIndigo)"/>
+    <text x="1140" y="283" font-size="11" fill="#cbd5e1">GitHub / pull</text>
+
+    <line x1="1090" y1="304" x2="1130" y2="304" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrowSlate)"/>
+    <text x="1140" y="308" font-size="11" fill="#cbd5e1">Orquestração</text>
+
+    <line x1="1090" y1="329" x2="1130" y2="329" stroke="#64748b" stroke-width="2" stroke-dasharray="5,4" marker-end="url(#arrowDash)"/>
+    <text x="1140" y="333" font-size="11" fill="#cbd5e1">Fallback EC2</text>
+
+    <!-- Footer -->
+    <text x="700" y="1042" font-size="10" fill="#1e293b" text-anchor="middle">Forja · Olimpo Platform · Arquitetura Multi-tenant · 2026</text>
+
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- PC FÍSICO DO DEV (à esquerda) -->
+    <!-- ═══════════════════════════════════════════ -->
+
+    <!-- PC box -->
+    <rect x="-125" y="330" width="110" height="100" rx="8" fill="#131c2e" stroke="#94a3b8" stroke-width="1.5"/>
+    <!-- monitor -->
+    <rect x="-113" y="342" width="86" height="54" rx="4" fill="#0a0f1a" stroke="#475569" stroke-width="1"/>
+    <rect x="-99" y="348" width="58" height="38" rx="2" fill="#0f172a"/>
+    <!-- screen glow -->
+    <rect x="-96" y="350" width="52" height="14" rx="2" fill="#1e3a5f" opacity="0.6"/>
+    <rect x="-96" y="368" width="34" height="6" rx="1" fill="#1e293b"/>
+    <!-- stand -->
+    <rect x="-84" y="396" width="28" height="6" rx="2" fill="#334155"/>
+    <rect x="-76" y="402" width="12" height="4" rx="1" fill="#334155"/>
+    <!-- base -->
+    <rect x="-92" y="406" width="44" height="5" rx="2" fill="#334155"/>
+    <!-- label -->
+    <text x="-70" y="426" font-size="10" font-weight="600" fill="#94a3b8" text-anchor="middle">Dev PC</text>
+
+    <!-- Arrow: PC → Projeto Local (CLI) -->
+    <path d="M -15 370 Q 40 300 90 210" stroke="#94a3b8" stroke-width="1.5" fill="none" marker-end="url(#arrowSlate)"/>
+    <text x="-10" y="295" font-size="9" fill="#64748b" text-anchor="middle">trabalha</text>
+    <text x="-10" y="307" font-size="9" fill="#64748b" text-anchor="middle">local</text>
+
+    <!-- Arrow: git pull (Mobile) → PC -->
+    <path d="M 90 643 Q 20 660 -15 430" stroke="#6366f1" stroke-width="1.5" fill="none" stroke-dasharray="5,4" marker-end="url(#arrowIndigo)"/>
+    <text x="-28" y="560" font-size="9" fill="#6366f1" text-anchor="middle">git pull</text>
+    <text x="-28" y="572" font-size="9" fill="#475569" text-anchor="middle">→ local</text>
+
+</svg>
 </body>
 </html>
