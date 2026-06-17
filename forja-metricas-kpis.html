@@ -1,1229 +1,826 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Forja — Métricas & KPIs (AaaS)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #0a0f1a;
-    --surface: #0f1729;
-    --surface2: #162035;
-    --border: #1e2d4a;
-    --orange: #f97316;
-    --orange-dim: rgba(249,115,22,0.15);
-    --cyan: #22d3ee;
-    --cyan-dim: rgba(34,211,238,0.12);
-    --green: #22c55e;
-    --green-dim: rgba(34,197,94,0.12);
-    --yellow: #eab308;
-    --yellow-dim: rgba(234,179,8,0.12);
-    --red: #ef4444;
-    --red-dim: rgba(239,68,68,0.12);
-    --purple: #a855f7;
-    --text: #e2e8f0;
-    --text-muted: #64748b;
-    --text-dim: #94a3b8;
-  }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', sans-serif;
-    font-size: 14px;
-    line-height: 1.6;
-    min-height: 100vh;
-  }
-  a { color: var(--cyan); text-decoration: none; }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B9 — Métricas & KPIs · Forja</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-  /* ── Layout ── */
-  .wrapper { max-width: 1200px; margin: 0 auto; padding: 0 24px 80px; }
+    :root {
+      --bg:        #020617;
+      --card:      #0f172a;
+      --border:    #1e293b;
+      --amber:     #f59e0b;
+      --blue:      #3b82f6;
+      --green:     #22c55e;
+      --red:       #ef4444;
+      --yellow:    #eab308;
+      --text:      #f1f5f9;
+      --muted:     #94a3b8;
+      --subtle:    #475569;
+    }
 
-  /* ── Header ── */
-  .site-header {
-    background: var(--surface);
-    border-bottom: 1px solid var(--border);
-    padding: 20px 24px;
-    position: sticky; top: 0; z-index: 100;
-  }
-  .site-header .inner {
-    max-width: 1200px; margin: 0 auto;
-    display: flex; align-items: center; justify-content: space-between;
-  }
-  .logo {
-    display: flex; align-items: center; gap: 12px;
-  }
-  .logo-icon {
-    width: 36px; height: 36px;
-    background: linear-gradient(135deg, var(--orange), #fb923c);
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    font-weight: 800; font-size: 18px; color: #fff;
-  }
-  .logo-text { font-size: 20px; font-weight: 700; color: #fff; }
-  .logo-sub { font-size: 11px; color: var(--text-muted); letter-spacing: 0.08em; text-transform: uppercase; }
-  .header-meta { text-align: right; }
-  .header-meta .date { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
-  .header-meta .version { font-size: 11px; color: var(--orange); font-weight: 600; letter-spacing: 0.05em; }
+    html { scroll-behavior: smooth; }
 
-  /* ── Sections ── */
-  section { margin-top: 48px; }
-  .section-title {
-    font-size: 11px; font-weight: 700; letter-spacing: 0.12em;
-    text-transform: uppercase; color: var(--text-muted);
-    margin-bottom: 20px;
-    display: flex; align-items: center; gap: 10px;
-  }
-  .section-title::after {
-    content: ''; flex: 1; height: 1px;
-    background: linear-gradient(to right, var(--border), transparent);
-  }
-  .section-title .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--orange); flex-shrink: 0;
-  }
-  h2 { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  h3 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 12px; }
-  p { color: var(--text-dim); margin-bottom: 8px; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
 
-  /* ── Cards ── */
-  .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 24px;
-  }
-  .card-sm { padding: 16px 20px; }
-  .grid { display: grid; gap: 16px; }
-  .grid-2 { grid-template-columns: repeat(2, 1fr); }
-  .grid-3 { grid-template-columns: repeat(3, 1fr); }
-  .grid-4 { grid-template-columns: repeat(4, 1fr); }
-  @media (max-width: 768px) {
-    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
-  }
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
 
-  /* ── North Star gauge ── */
-  .ns-layout { display: grid; grid-template-columns: 300px 1fr; gap: 32px; align-items: start; }
-  @media (max-width: 768px) { .ns-layout { grid-template-columns: 1fr; } }
-  .gauge-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .gauge-outer {
-    width: 220px; height: 110px;
-    position: relative; overflow: hidden;
-  }
-  .gauge-svg { width: 100%; height: 100%; }
-  .gauge-label {
-    font-size: 28px; font-weight: 800; color: var(--orange);
-    text-align: center; margin-top: -4px;
-  }
-  .gauge-sub { font-size: 12px; color: var(--text-muted); text-align: center; }
-  .ns-metric-name { font-size: 18px; font-weight: 700; color: var(--cyan); margin-bottom: 8px; }
-  .ns-why { color: var(--text-dim); font-size: 13px; line-height: 1.7; }
-  .ns-why strong { color: var(--text); }
-  .ns-pillars { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
-  .ns-pillar {
-    background: var(--surface2);
-    border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px;
-    text-align: center;
-  }
-  .ns-pillar .icon { font-size: 20px; margin-bottom: 4px; }
-  .ns-pillar .label { font-size: 11px; color: var(--text-muted); }
-  .ns-pillar .val { font-size: 14px; font-weight: 600; color: #fff; }
+    /* ── Header ── */
+    header {
+      padding: 56px 0 32px;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      margin-bottom: 56px;
+    }
 
-  /* ── MRR table ── */
-  .mrr-table { width: 100%; border-collapse: collapse; }
-  .mrr-table th {
-    text-align: left; padding: 10px 16px;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-    text-transform: uppercase; color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-  }
-  .mrr-table td {
-    padding: 14px 16px;
-    border-bottom: 1px solid rgba(30,45,74,0.5);
-    vertical-align: middle;
-  }
-  .mrr-table tr:last-child td { border-bottom: none; }
-  .mrr-table tr:hover td { background: rgba(255,255,255,0.02); }
-  .bar-wrap { display: flex; align-items: center; gap: 10px; }
-  .bar-bg { flex: 1; height: 6px; background: var(--surface2); border-radius: 3px; overflow: hidden; }
-  .bar-fill { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
-  .bar-label { font-size: 12px; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
-  .mrr-val { font-size: 16px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace; }
-  .tag {
-    display: inline-block; padding: 2px 8px; border-radius: 4px;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.04em;
-  }
-  .tag-orange { background: var(--orange-dim); color: var(--orange); }
-  .tag-cyan { background: var(--cyan-dim); color: var(--cyan); }
-  .tag-green { background: var(--green-dim); color: var(--green); }
-  .tag-yellow { background: var(--yellow-dim); color: var(--yellow); }
-  .tag-red { background: var(--red-dim); color: var(--red); }
-  .tag-purple { background: rgba(168,85,247,0.12); color: var(--purple); }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245,158,11,.12);
+      border: 1px solid rgba(245,158,11,.3);
+      color: var(--amber);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
 
-  /* ── Funil ── */
-  .funnel-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-  .funnel-step {
-    position: relative;
-    display: flex; align-items: center; justify-content: space-between;
-    border-radius: 6px; padding: 14px 20px;
-    color: #fff; font-weight: 600;
-    transition: opacity 0.2s;
-  }
-  .funnel-step .fs-left { display: flex; align-items: center; gap: 10px; }
-  .funnel-step .fs-num { font-family: 'JetBrains Mono', monospace; font-size: 18px; font-weight: 700; }
-  .funnel-step .fs-label { font-size: 13px; }
-  .funnel-step .fs-rate {
-    font-size: 12px; font-family: 'JetBrains Mono', monospace;
-    opacity: 0.8; text-align: right;
-  }
-  .funnel-arrow {
-    font-size: 18px; color: var(--text-muted); text-align: center;
-    margin: 0; line-height: 1;
-  }
-  .funnel-grid { display: grid; grid-template-columns: 1fr 200px; gap: 32px; align-items: start; }
-  @media (max-width: 768px) { .funnel-grid { grid-template-columns: 1fr; } }
-  .funnel-aside { display: flex; flex-direction: column; gap: 12px; }
-  .aside-card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 14px;
-  }
-  .aside-card .ac-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 6px; }
-  .aside-card .ac-val { font-size: 20px; font-weight: 700; }
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      letter-spacing: -.03em;
+      line-height: 1.1;
+      margin-bottom: 12px;
+    }
 
-  /* ── LTV/CAC table ── */
-  .ltv-table { width: 100%; border-collapse: collapse; }
-  .ltv-table th {
-    padding: 10px 16px; text-align: left;
-    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
-    text-transform: uppercase; color: var(--text-muted);
-    border-bottom: 1px solid var(--border);
-  }
-  .ltv-table td { padding: 16px; border-bottom: 1px solid rgba(30,45,74,0.5); vertical-align: middle; }
-  .ltv-table tr:last-child td { border-bottom: none; }
-  .tier-badge {
-    display: inline-flex; align-items: center; gap: 6px;
-    font-weight: 700; font-size: 14px;
-  }
-  .tier-dot { width: 8px; height: 8px; border-radius: 50%; }
-  .ratio-bar {
-    display: flex; height: 8px; border-radius: 4px; overflow: hidden;
-    background: var(--surface2); margin-top: 6px;
-  }
-  .ratio-fill { border-radius: 4px; }
-  .metric-cell { text-align: right; }
-  .metric-big { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; }
-  .metric-sub { font-size: 11px; color: var(--text-muted); }
+    header h1 span { color: var(--amber); }
 
-  /* ── Churn ── */
-  .churn-grid { display: grid; grid-template-columns: 220px 1fr; gap: 24px; }
-  @media (max-width: 768px) { .churn-grid { grid-template-columns: 1fr; } }
-  .churn-dial {
-    display: flex; flex-direction: column; align-items: center;
-    justify-content: center; gap: 6px;
-  }
-  .semaforo-list { display: flex; flex-direction: column; gap: 10px; }
-  .semaforo-item {
-    display: flex; align-items: flex-start; gap: 12px;
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 12px 16px;
-  }
-  .sem-dot {
-    width: 10px; height: 10px; border-radius: 50%;
-    flex-shrink: 0; margin-top: 4px;
-  }
-  .sem-title { font-weight: 600; font-size: 13px; color: #fff; margin-bottom: 2px; }
-  .sem-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-  .drivers-section { margin-top: 20px; }
-  .drivers-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
-  @media (max-width: 768px) { .drivers-grid { grid-template-columns: 1fr; } }
-  .driver-card {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 8px; padding: 14px;
-  }
-  .driver-card .icon { font-size: 22px; margin-bottom: 6px; }
-  .driver-card .driver-title { font-weight: 600; font-size: 13px; color: #fff; margin-bottom: 4px; }
-  .driver-card .driver-desc { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
-  .driver-card .driver-impact {
-    margin-top: 8px; font-size: 11px; font-weight: 600;
-    padding: 2px 8px; border-radius: 4px; display: inline-block;
-  }
+    .subtitle {
+      font-size: 1.05rem;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
 
-  /* ── Alertas ── */
-  .alert-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  @media (max-width: 768px) { .alert-grid { grid-template-columns: 1fr; } }
-  .alert-card {
-    border-radius: 10px; padding: 18px 20px;
-    border-left: 3px solid transparent;
-    position: relative; overflow: hidden;
-  }
-  .alert-card::before {
-    content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-    opacity: 0.06; pointer-events: none;
-  }
-  .alert-red { background: var(--red-dim); border-left-color: var(--red); }
-  .alert-yellow { background: var(--yellow-dim); border-left-color: var(--yellow); }
-  .alert-green { background: var(--green-dim); border-left-color: var(--green); }
-  .alert-header { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
-  .alert-icon { font-size: 18px; }
-  .alert-level { font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
-  .alert-red .alert-level { color: var(--red); }
-  .alert-yellow .alert-level { color: var(--yellow); }
-  .alert-green .alert-level { color: var(--green); }
-  .alert-title { font-size: 14px; font-weight: 700; color: #fff; margin-bottom: 6px; }
-  .alert-trigger { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--text-dim); margin-bottom: 8px; }
-  .alert-action { font-size: 12px; color: var(--text-dim); line-height: 1.5; }
-  .alert-action strong { color: var(--text); }
+    .tagline {
+      font-size: .9rem;
+      color: var(--subtle);
+      font-style: italic;
+    }
 
-  /* ── War Room ── */
-  .warroom-intro {
-    background: var(--surface2); border: 1px solid var(--border);
-    border-radius: 10px; padding: 16px 20px; margin-bottom: 24px;
-    font-size: 13px; color: var(--text-dim);
-  }
-  .debate { display: flex; flex-direction: column; gap: 16px; }
-  .message {
-    display: flex; gap: 12px; align-items: flex-start;
-  }
-  .message.right { flex-direction: row-reverse; }
-  .avatar {
-    width: 36px; height: 36px; border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 16px; flex-shrink: 0; font-weight: 700;
-  }
-  .avatar-afrodite { background: linear-gradient(135deg, var(--orange), #fb923c); color: #fff; }
-  .avatar-gaia { background: linear-gradient(135deg, var(--cyan), #06b6d4); color: #0f1729; }
-  .bubble {
-    max-width: 70%; padding: 14px 16px;
-    border-radius: 12px; font-size: 13px; line-height: 1.6;
-    position: relative;
-  }
-  .bubble-afrodite {
-    background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.2);
-    border-bottom-left-radius: 4px;
-  }
-  .bubble-gaia {
-    background: rgba(34,211,238,0.08); border: 1px solid rgba(34,211,238,0.2);
-    border-bottom-right-radius: 4px;
-  }
-  .speaker { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; margin-bottom: 6px; }
-  .speaker-afrodite { color: var(--orange); }
-  .speaker-gaia { color: var(--cyan); }
-  .bubble p { color: var(--text-dim); margin-bottom: 4px; }
-  .bubble p:last-child { margin-bottom: 0; }
-  .bubble strong { color: var(--text); }
-  .bubble code {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px;
-    background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 3px;
-    color: var(--cyan);
-  }
-  .verdict-card {
-    background: linear-gradient(135deg, rgba(249,115,22,0.08), rgba(34,211,238,0.08));
-    border: 1px solid var(--border); border-radius: 12px; padding: 20px 24px;
-    margin-top: 8px;
-  }
-  .verdict-title { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 10px; }
-  .verdict-items { display: flex; flex-direction: column; gap: 6px; }
-  .verdict-item { display: flex; gap: 8px; font-size: 13px; color: var(--text-dim); }
-  .verdict-item::before { content: '→'; color: var(--orange); font-weight: 700; flex-shrink: 0; }
+    /* ── Section titles ── */
+    .section-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
 
-  /* ── Footer ── */
-  .footer {
-    margin-top: 64px; padding: 24px 0;
-    border-top: 1px solid var(--border);
-    text-align: center; font-size: 12px; color: var(--text-muted);
-  }
-  .footer .agents { color: var(--orange); font-weight: 600; }
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
 
-  /* ── Misc ── */
-  .mono { font-family: 'JetBrains Mono', monospace; }
-  .text-orange { color: var(--orange); }
-  .text-cyan { color: var(--cyan); }
-  .text-green { color: var(--green); }
-  .text-yellow { color: var(--yellow); }
-  .text-red { color: var(--red); }
-  .text-muted { color: var(--text-muted); }
-  .fw-700 { font-weight: 700; }
-  .mt-16 { margin-top: 16px; }
-  .mt-24 { margin-top: 24px; }
-  .mb-8 { margin-bottom: 8px; }
-  .note {
-    background: var(--surface2); border-left: 3px solid var(--cyan);
-    border-radius: 4px; padding: 10px 14px; font-size: 12px;
-    color: var(--text-dim); margin-top: 12px; line-height: 1.6;
-  }
-  .note strong { color: var(--cyan); }
-</style>
+    /* ── North Star Hero ── */
+    .north-star {
+      position: relative;
+      background: linear-gradient(135deg, rgba(245,158,11,.08) 0%, rgba(245,158,11,.03) 60%, transparent 100%);
+      border: 1px solid rgba(245,158,11,.35);
+      border-radius: 20px;
+      padding: 44px 48px;
+      margin-bottom: 64px;
+      overflow: hidden;
+    }
+
+    .north-star::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      box-shadow: 0 0 80px rgba(245,158,11,.08) inset;
+      pointer-events: none;
+    }
+
+    .north-star::after {
+      content: '★';
+      position: absolute;
+      right: 40px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 120px;
+      color: rgba(245,158,11,.06);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    .ns-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 10px;
+    }
+
+    .ns-metric {
+      font-size: clamp(1.6rem, 4vw, 2.6rem);
+      font-weight: 900;
+      letter-spacing: -.04em;
+      color: var(--amber);
+      margin-bottom: 6px;
+    }
+
+    .ns-metric span {
+      font-size: clamp(.9rem, 2vw, 1.1rem);
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0;
+    }
+
+    .ns-def {
+      font-size: .95rem;
+      color: var(--muted);
+      max-width: 640px;
+      margin-bottom: 20px;
+      line-height: 1.7;
+    }
+
+    .ns-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-top: 28px;
+    }
+
+    .ns-block {
+      background: rgba(255,255,255,.03);
+      border: 1px solid rgba(245,158,11,.15);
+      border-radius: 12px;
+      padding: 18px 20px;
+    }
+
+    .ns-block-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      color: var(--amber);
+      opacity: .7;
+      margin-bottom: 6px;
+    }
+
+    .ns-block-text {
+      font-size: .88rem;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .ns-value-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(34,197,94,.1);
+      border: 1px solid rgba(34,197,94,.3);
+      color: var(--green);
+      font-size: 1rem;
+      font-weight: 700;
+      padding: 8px 18px;
+      border-radius: 99px;
+      margin-top: 16px;
+    }
+
+    /* ── Section ── */
+    section { margin-bottom: 64px; }
+
+    /* ── MRR Table ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .88rem;
+    }
+
+    thead tr {
+      background: rgba(255,255,255,.03);
+      border-bottom: 1px solid var(--border);
+    }
+
+    th {
+      padding: 14px 16px;
+      text-align: left;
+      font-size: .75rem;
+      font-weight: 600;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 13px 16px;
+      border-bottom: 1px solid rgba(30,41,59,.6);
+      color: var(--text);
+      white-space: nowrap;
+    }
+
+    tr:last-child td { border-bottom: none; }
+
+    tr.row-today td { background: rgba(34,197,94,.06); }
+    tr.row-today td:first-child { border-left: 3px solid var(--green); }
+
+    tr.row-m3  td { opacity: .9; }
+    tr.row-m6  td { opacity: .78; }
+    tr.row-m12 td { opacity: .66; }
+
+    tr.row-m18 td { color: var(--amber); opacity: .8; }
+    tr.row-m18 td:first-child { border-left: 3px solid var(--amber); }
+
+    .tag-green {
+      display: inline-block;
+      background: rgba(34,197,94,.12);
+      color: var(--green);
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+
+    .tag-amber {
+      display: inline-block;
+      background: rgba(245,158,11,.12);
+      color: var(--amber);
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+
+    .tag-muted {
+      display: inline-block;
+      background: rgba(148,163,184,.1);
+      color: var(--muted);
+      font-size: .72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 99px;
+    }
+
+    /* ── Alerts ── */
+    .alerts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .alert-card {
+      border-radius: 12px;
+      padding: 20px 22px;
+      border: 1px solid;
+    }
+
+    .alert-card.red {
+      background: rgba(239,68,68,.08);
+      border-color: rgba(239,68,68,.3);
+    }
+
+    .alert-card.yellow {
+      background: rgba(234,179,8,.08);
+      border-color: rgba(234,179,8,.3);
+    }
+
+    .alert-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      font-size: .88rem;
+      margin-bottom: 8px;
+    }
+
+    .alert-card.red   .alert-header { color: var(--red); }
+    .alert-card.yellow .alert-header { color: var(--yellow); }
+
+    .alert-trigger {
+      font-size: .82rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 4px;
+    }
+
+    .alert-action {
+      font-size: .82rem;
+      color: var(--subtle);
+      line-height: 1.5;
+    }
+
+    /* ── Funnel ── */
+    .funnel {
+      display: flex;
+      align-items: stretch;
+      gap: 0;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .funnel-step {
+      flex: 1;
+      min-width: 140px;
+      position: relative;
+    }
+
+    .funnel-inner {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-right: none;
+      padding: 20px 16px 20px 20px;
+      height: 100%;
+    }
+
+    .funnel-step:first-child .funnel-inner { border-radius: 12px 0 0 12px; }
+    .funnel-step:last-child  .funnel-inner {
+      border-right: 1px solid var(--border);
+      border-radius: 0 12px 12px 0;
+    }
+
+    .funnel-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: -14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 14px solid transparent;
+      border-bottom: 14px solid transparent;
+      border-left: 14px solid var(--border);
+      z-index: 2;
+    }
+
+    .funnel-step:not(:last-child)::before {
+      content: '';
+      position: absolute;
+      right: -12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-top: 13px solid transparent;
+      border-bottom: 13px solid transparent;
+      border-left: 13px solid var(--card);
+      z-index: 3;
+    }
+
+    .funnel-name {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--muted);
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .funnel-rate {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--blue);
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .funnel-desc {
+      font-size: .72rem;
+      color: var(--subtle);
+      line-height: 1.4;
+    }
+
+    .funnel-tag {
+      display: inline-block;
+      background: rgba(59,130,246,.1);
+      color: var(--blue);
+      font-size: .65rem;
+      font-weight: 600;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-top: 6px;
+    }
+
+    /* ── Current State ── */
+    .current-state {
+      background: linear-gradient(135deg, rgba(245,158,11,.07) 0%, rgba(245,158,11,.02) 100%);
+      border: 1px solid rgba(245,158,11,.25);
+      border-radius: 16px;
+      padding: 32px 36px;
+    }
+
+    .cs-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .cs-stat { text-align: center; }
+
+    .cs-value {
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--amber);
+      letter-spacing: -.04em;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .cs-label {
+      font-size: .75rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .cs-disclaimer {
+      background: rgba(0,0,0,.2);
+      border: 1px solid rgba(245,158,11,.15);
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: .82rem;
+      color: var(--muted);
+    }
+
+    .cs-disclaimer strong { color: var(--amber); }
+
+    /* ── Not-yet-metrics ── */
+    .not-yet {
+      background: rgba(59,130,246,.06);
+      border: 1px solid rgba(59,130,246,.25);
+      border-radius: 16px;
+      padding: 32px 36px;
+    }
+
+    .not-yet-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .nym-item {
+      background: rgba(255,255,255,.02);
+      border: 1px solid rgba(59,130,246,.12);
+      border-radius: 10px;
+      padding: 16px 18px;
+    }
+
+    .nym-title {
+      font-size: .82rem;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 6px;
+    }
+
+    .nym-text {
+      font-size: .82rem;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    /* ── Footer ── */
+    footer {
+      margin-top: 80px;
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+      text-align: center;
+      font-size: .82rem;
+      color: var(--subtle);
+    }
+
+    footer strong { color: var(--muted); }
+
+    /* ── Code ── */
+    code {
+      background: rgba(255,255,255,.06);
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: .85em;
+      font-family: 'JetBrains Mono', 'Fira Code', monospace;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .container { padding: 0 16px; }
+      header { padding: 40px 0 24px; }
+      .north-star { padding: 28px 22px; }
+      .north-star::after { font-size: 60px; right: 16px; }
+      .ns-grid { grid-template-columns: 1fr; }
+      .alerts-grid { grid-template-columns: 1fr; }
+      .cs-grid { grid-template-columns: repeat(2, 1fr); }
+      .not-yet-grid { grid-template-columns: 1fr; }
+
+      .funnel { flex-direction: column; overflow-x: visible; }
+      .funnel-step { min-width: unset; }
+      .funnel-inner {
+        border-right: 1px solid var(--border);
+        border-bottom: none;
+        border-radius: 0;
+        padding: 16px;
+      }
+      .funnel-step:first-child .funnel-inner { border-radius: 12px 12px 0 0; }
+      .funnel-step:last-child  .funnel-inner {
+        border-bottom: 1px solid var(--border);
+        border-radius: 0 0 12px 12px;
+      }
+      .funnel-step::after,
+      .funnel-step::before { display: none; }
+
+      th, td { padding: 10px 12px; }
+    }
+  </style>
 </head>
 <body>
 
-<!-- ─────────────────── HEADER ─────────────────── -->
-<header class="site-header">
-  <div class="inner">
-    <div class="logo">
-      <div class="logo-icon">F</div>
-      <div>
-        <div class="logo-text">Forja</div>
-        <div class="logo-sub">Agent-as-a-Service · Métricas & KPIs</div>
-      </div>
+<div class="container">
+
+  <!-- HEADER -->
+  <header>
+    <div class="badge">AaaS · Agent as a Service</div>
+    <h1>B9 — Métricas <span>&amp;</span> KPIs</h1>
+    <p class="subtitle">North Star: <strong>WAACO</strong> — Weekly Active Agent-Calling Orgs</p>
+    <p class="tagline">"Stop building agents. Start using the best one."</p>
+  </header>
+
+  <!-- NORTH STAR -->
+  <div class="north-star">
+    <div class="ns-label">★ North Star Metric</div>
+    <div class="ns-metric">WAACO <span>Weekly Active Agent-Calling Orgs</span></div>
+    <div class="ns-def">
+      Número de organizações que invocam pelo menos 1 agente via <code>invoke_agent</code> ou <code>orchestrate</code> em uma semana.
     </div>
-    <div class="header-meta">
-      <div class="version">WAR ROOM v1.0</div>
-      <div class="date">Afrodite × Gaia · 2026-06-17</div>
+    <div class="ns-value-pill">
+      <span>⚡</span>
+      <span>2 WAACOs ativos hoje — v0.5.0</span>
     </div>
-  </div>
-</header>
-
-<div class="wrapper">
-
-<!-- ─────────────────── 1. NORTH STAR ─────────────────── -->
-<section>
-  <div class="section-title"><span class="dot"></span> North Star Metric</div>
-
-  <div class="card">
-    <div class="ns-layout">
-      <div class="gauge-wrap">
-        <!-- SVG Half-gauge -->
-        <div class="gauge-outer">
-          <svg class="gauge-svg" viewBox="0 0 220 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <!-- Track -->
-            <path d="M 20 110 A 90 90 0 0 1 200 110" stroke="#1e2d4a" stroke-width="14" stroke-linecap="round" fill="none"/>
-            <!-- Fill — 38% do arco -->
-            <path d="M 20 110 A 90 90 0 0 1 200 110" stroke="url(#gaugeGrad)" stroke-width="14" stroke-linecap="round" fill="none"
-              stroke-dasharray="283" stroke-dashoffset="175"/>
-            <!-- Needle at 38% -->
-            <line x1="110" y1="110" x2="61" y2="34" stroke="#f97316" stroke-width="3" stroke-linecap="round"/>
-            <circle cx="110" cy="110" r="6" fill="#f97316"/>
-            <defs>
-              <linearGradient id="gaugeGrad" x1="20" y1="110" x2="200" y2="110" gradientUnits="userSpaceOnUse">
-                <stop offset="0%" stop-color="#22d3ee"/>
-                <stop offset="60%" stop-color="#f97316"/>
-                <stop offset="100%" stop-color="#ef4444"/>
-              </linearGradient>
-            </defs>
-          </svg>
+    <div class="ns-grid">
+      <div class="ns-block">
+        <div class="ns-block-label">Por que esta métrica?</div>
+        <div class="ns-block-text">
+          Captura adoção real do core differentiator (orquestração). Uma org que usa a memória e invoca agentes está extraindo valor do moat real — não apenas fazendo login.
         </div>
-        <div class="gauge-label">MAU × Agentes</div>
-        <div class="gauge-sub">Weekly Active Agent Calls per Paid Org</div>
       </div>
-
-      <div>
-        <div class="ns-metric-name">Weekly Active Agent Calls / Paid Org (WAACO)</div>
-        <p class="ns-why">
-          A North Star do Forja mede <strong>quantas vezes por semana cada organização pagante aciona agentes reais</strong>.
-          É o proxy mais direto de valor entregue: uma org que usa agentes frequentemente resolve problemas reais,
-          justifica o custo e dificilmente cancela. Frequência weekly — não mensal — captura engajamento antes de
-          o churn se materializar na fatura.
-        </p>
-        <p class="ns-why" style="margin-top:8px;">
-          <strong>Por que não MRR?</strong> MRR é consequência. Uma org que chega em <strong>≥ 20 WAACO</strong>
-          tende a expandir assentos (Team) e converter upsells. Abaixo de 5 WAACO por mais de 2 semanas consecutivas
-          é sinal de churn iminente com 60 dias de antecedência — janela de intervenção real.
-        </p>
-
-        <div class="ns-pillars">
-          <div class="ns-pillar">
-            <div class="icon">🎯</div>
-            <div class="val">≥ 20</div>
-            <div class="label">WAACO alvo (M6)</div>
-          </div>
-          <div class="ns-pillar">
-            <div class="icon">⚠️</div>
-            <div class="val">≤ 5</div>
-            <div class="label">Alerta churn</div>
-          </div>
-          <div class="ns-pillar">
-            <div class="icon">🚀</div>
-            <div class="val">≥ 50</div>
-            <div class="label">Power user</div>
-          </div>
-        </div>
-
-        <div class="note">
-          <strong>Nota Afrodite:</strong> WAACO funciona pois o custo variável (inferência ~R$15-30/user/mês)
-          é proporcional ao uso — um WAACO alto indica que a margem por org está sendo
-          coberta pelo ticket médio, não erosão silenciosa.
+      <div class="ns-block">
+        <div class="ns-block-label">Estado atual (v0.5.0)</div>
+        <div class="ns-block-text">
+          <strong style="color:var(--green)">2 WAACOs</strong> — Rafael (founder) + 1 usuário externo. Gate por role ROOT|DEV ativo. invoke_agent + orchestrate disponíveis para DEV via PR #790.
         </div>
       </div>
     </div>
   </div>
-</section>
 
-<!-- ─────────────────── 2. MRR TARGETS ─────────────────── -->
-<section>
-  <div class="section-title"><span class="dot"></span> MRR Targets — Linha do Tempo</div>
-
-  <div class="card" style="padding:0;overflow:hidden;">
-    <table class="mrr-table">
-      <thead>
-        <tr>
-          <th>Período</th>
-          <th>MRR Target</th>
-          <th>Progresso relativo</th>
-          <th>Paid Orgs</th>
-          <th>Mix</th>
-          <th>ARR</th>
-          <th>Notas</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td><span class="tag tag-yellow">Mês 3</span></td>
-          <td><span class="mrr-val">R$ 5.000</span></td>
-          <td>
-            <div class="bar-wrap">
-              <div class="bar-bg"><div class="bar-fill" style="width:5%;background:var(--yellow);"></div></div>
-              <span class="bar-label">5%</span>
-            </div>
-          </td>
-          <td class="mono text-dim">~30–40</td>
-          <td><span class="tag tag-orange">70% Pro</span></td>
-          <td class="mono text-muted">~R$60k</td>
-          <td class="text-muted" style="font-size:12px;">Fase founder-led sales. Produto ainda em early adoption. Foco: 1º churno diagnóstico.</td>
-        </tr>
-        <tr>
-          <td><span class="tag tag-orange">Mês 6</span></td>
-          <td><span class="mrr-val">R$ 20.000</span></td>
-          <td>
-            <div class="bar-wrap">
-              <div class="bar-bg"><div class="bar-fill" style="width:20%;background:var(--orange);"></div></div>
-              <span class="bar-label">20%</span>
-            </div>
-          </td>
-          <td class="mono text-dim">~140–160</td>
-          <td><span class="tag tag-cyan">60% Pro + 15% Team</span></td>
-          <td class="mono text-muted">~R$240k</td>
-          <td class="text-muted" style="font-size:12px;">PLG começando a funcionar. Primeiros upgrades Free→Pro orgânicos. Onboarding refinado.</td>
-        </tr>
-        <tr>
-          <td><span class="tag tag-cyan">Mês 12</span></td>
-          <td><span class="mrr-val">R$ 80.000</span></td>
-          <td>
-            <div class="bar-wrap">
-              <div class="bar-bg"><div class="bar-fill" style="width:80%;background:var(--cyan);"></div></div>
-              <span class="bar-label">80%</span>
-            </div>
-          </td>
-          <td class="mono text-dim">~550–620</td>
-          <td><span class="tag tag-green">50% Pro + 30% Team</span></td>
-          <td class="mono text-muted">~R$960k</td>
-          <td class="text-muted" style="font-size:12px;">Loop viral via convites Team. Integrations com IDEs/Slack. NDR > 100%.</td>
-        </tr>
-        <tr>
-          <td><span class="tag tag-green">Mês 24</span></td>
-          <td><span class="mrr-val">R$ 300.000</span></td>
-          <td>
-            <div class="bar-wrap">
-              <div class="bar-bg"><div class="bar-fill" style="width:100%;background:linear-gradient(to right,var(--cyan),var(--green));"></div></div>
-              <span class="bar-label">alvo</span>
-            </div>
-          </td>
-          <td class="mono text-dim">~1.800–2.100</td>
-          <td><span class="tag tag-green">40% Pro + 45% Team</span></td>
-          <td class="mono text-muted">~R$3,6M</td>
-          <td class="text-muted" style="font-size:12px;">Enterprise tier introduzido. Expansão via assentos Team é principal driver. Série A territory.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="note" style="margin-top:14px;">
-    <strong>Premissas:</strong> crescimento composto ~30% MoM (M3→M6), desacelerando para ~18% (M6→M12), depois ~13% (M12→M24).
-    Mix Team assume média 2,8 assentos/org. Free tier não gera receita mas alimenta o pipeline PLG —
-    meta: 1 em cada 8 Free converte para Pro em 90 dias.
-  </div>
-</section>
-
-<!-- ─────────────────── 3. FUNIL ─────────────────── -->
-<section>
-  <div class="section-title"><span class="dot"></span> Funil de Aquisição</div>
-
-  <div class="funnel-grid">
-    <div class="card" style="padding:28px;">
-      <div class="funnel-wrap">
-
-        <!-- Visitantes -->
-        <div class="funnel-step" style="width:100%;background:rgba(34,211,238,0.10);border:1px solid rgba(34,211,238,0.25);">
-          <div class="fs-left">
-            <span style="font-size:20px;">🌐</span>
-            <div>
-              <div class="fs-label text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Visitantes únicos / mês</div>
-              <div class="fs-num text-cyan">10.000</div>
-            </div>
-          </div>
-          <div class="fs-rate"><span class="tag tag-cyan">100%</span></div>
-        </div>
-
-        <div class="funnel-arrow">▼</div>
-
-        <!-- Signup Free -->
-        <div class="funnel-step" style="width:88%;background:rgba(34,211,238,0.07);border:1px solid rgba(34,211,238,0.15);">
-          <div class="fs-left">
-            <span style="font-size:20px;">✍️</span>
-            <div>
-              <div class="fs-label text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Signup Free</div>
-              <div class="fs-num" style="color:#fff;">800</div>
-            </div>
-          </div>
-          <div class="fs-rate">
-            <div style="font-size:11px;color:var(--text-muted);">conv. visitante</div>
-            <div class="text-cyan fw-700" style="font-size:14px;">8%</div>
-          </div>
-        </div>
-
-        <div class="funnel-arrow">▼</div>
-
-        <!-- Trial Ativado -->
-        <div class="funnel-step" style="width:72%;background:rgba(249,115,22,0.08);border:1px solid rgba(249,115,22,0.2);">
-          <div class="fs-left">
-            <span style="font-size:20px;">⚡</span>
-            <div>
-              <div class="fs-label text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Trial ativado (≥1 agent call)</div>
-              <div class="fs-num text-orange">480</div>
-            </div>
-          </div>
-          <div class="fs-rate">
-            <div style="font-size:11px;color:var(--text-muted);">de signups</div>
-            <div class="text-orange fw-700" style="font-size:14px;">60%</div>
-          </div>
-        </div>
-
-        <div class="funnel-arrow">▼</div>
-
-        <!-- Engajado -->
-        <div class="funnel-step" style="width:56%;background:rgba(249,115,22,0.06);border:1px solid rgba(249,115,22,0.12);">
-          <div class="fs-left">
-            <span style="font-size:20px;">🔥</span>
-            <div>
-              <div class="fs-label text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Engajado (≥5 calls / semana)</div>
-              <div class="fs-num" style="color:#fff;">144</div>
-            </div>
-          </div>
-          <div class="fs-rate">
-            <div style="font-size:11px;color:var(--text-muted);">de ativados</div>
-            <div style="color:#fb923c;" class="fw-700" style="font-size:14px;">30%</div>
-          </div>
-        </div>
-
-        <div class="funnel-arrow">▼</div>
-
-        <!-- Paid -->
-        <div class="funnel-step" style="width:40%;background:rgba(34,197,94,0.10);border:1px solid rgba(34,197,94,0.25);">
-          <div class="fs-left">
-            <span style="font-size:20px;">💳</span>
-            <div>
-              <div class="fs-label text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Converted Paid (Pro/Team)</div>
-              <div class="fs-num text-green">~100</div>
-            </div>
-          </div>
-          <div class="fs-rate">
-            <div style="font-size:11px;color:var(--text-muted);">de engajados</div>
-            <div class="text-green fw-700" style="font-size:14px;">69%</div>
-          </div>
-        </div>
-
-        <div class="funnel-arrow">▼</div>
-
-        <!-- Expansão -->
-        <div class="funnel-step" style="width:28%;background:rgba(168,85,247,0.10);border:1px solid rgba(168,85,247,0.25);">
-          <div class="fs-left">
-            <span style="font-size:20px;">📈</span>
-            <div>
-              <div class="fs-label text-muted" style="font-size:11px;text-transform:uppercase;letter-spacing:.06em;">Expansão (Team / upsell)</div>
-              <div class="fs-num" style="color:var(--purple);">~25</div>
-            </div>
-          </div>
-          <div class="fs-rate">
-            <div style="font-size:11px;color:var(--text-muted);">de pagos</div>
-            <div style="color:var(--purple);" class="fw-700" style="font-size:14px;">25%</div>
-          </div>
-        </div>
-
-      </div>
+  <!-- MRR TARGETS -->
+  <section>
+    <h2 class="section-title">📈 Targets MRR &amp; Crescimento</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Marco</th>
+            <th>Signups</th>
+            <th>WAACO</th>
+            <th>Contas Pagantes</th>
+            <th>MRR</th>
+            <th>Churn</th>
+            <th>CAC</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="row-today">
+            <td><span class="tag-green">Hoje · v0.5.0</span></td>
+            <td>3</td>
+            <td><strong style="color:var(--green)">2</strong></td>
+            <td>3</td>
+            <td><strong style="color:var(--green)">R$297</strong></td>
+            <td>0% <span style="font-size:.75rem;color:var(--subtle)">(N=3)</span></td>
+            <td>~R$0</td>
+          </tr>
+          <tr class="row-m3">
+            <td><span class="tag-amber">M3</span></td>
+            <td>15</td>
+            <td>5</td>
+            <td>5</td>
+            <td>R$495</td>
+            <td>&lt;10%</td>
+            <td>R$200</td>
+          </tr>
+          <tr class="row-m6">
+            <td><span class="tag-muted">M6</span></td>
+            <td>50</td>
+            <td>15</td>
+            <td>12</td>
+            <td>R$1.188</td>
+            <td>&lt;8%</td>
+            <td>R$200</td>
+          </tr>
+          <tr class="row-m12">
+            <td><span class="tag-muted">M12</span></td>
+            <td>200</td>
+            <td>50</td>
+            <td>30</td>
+            <td>R$3.570</td>
+            <td>&lt;7%</td>
+            <td>R$300</td>
+          </tr>
+          <tr class="row-m18">
+            <td><span class="tag-amber">M18 · Series A gate</span></td>
+            <td>500+</td>
+            <td>100+</td>
+            <td>70+</td>
+            <td>R$8.330+</td>
+            <td>&lt;5%</td>
+            <td>R$300</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+  </section>
 
-    <div class="funnel-aside">
-      <div class="aside-card">
-        <div class="ac-title">Visitante → Pago</div>
-        <div class="ac-val text-orange">~1,0%</div>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">
-          Benchmark SaaS PLG: 0,5–2%. Alvo conservador mas realista para AaaS B2B em early stage.
-        </p>
+  <!-- CRITICAL ALERTS -->
+  <section>
+    <h2 class="section-title">🚨 Alertas Críticos — Threshold Triggers</h2>
+    <div class="alerts-grid">
+
+      <div class="alert-card red">
+        <div class="alert-header">🔴 RED ALERT</div>
+        <div class="alert-trigger">Churn &gt; 15% em qualquer mês</div>
+        <div class="alert-action">Produto não está entregando valor. Parar crescimento imediatamente e investigar causa-raiz antes de qualquer iniciativa de aquisição.</div>
       </div>
-      <div class="aside-card">
-        <div class="ac-title">Time-to-Value alvo</div>
-        <div class="ac-val text-cyan">&lt; 8 min</div>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">
-          Primeiro agente rodando em menos de 8 minutos após signup. Chave da ativação.
-        </p>
+
+      <div class="alert-card yellow">
+        <div class="alert-header">🟡 YELLOW</div>
+        <div class="alert-trigger">WAACO cresce, MRR não cresce</div>
+        <div class="alert-action">Pricing ou upgrade journey quebrado. Revisar conversão Free → Pro, CTAs e comunicação de valor nos planos pagos.</div>
       </div>
-      <div class="aside-card">
-        <div class="ac-title">Maior gargalo</div>
-        <div class="ac-val text-yellow">Signup → Ativação</div>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">
-          60% de ativação é otimista: onboarding guiado e template de primeiro agente são críticos para chegar lá.
-        </p>
+
+      <div class="alert-card red">
+        <div class="alert-header">🔴 RED ALERT</div>
+        <div class="alert-trigger">Invocações/org &lt; 5/semana</div>
+        <div class="alert-action">Baixa ativação — onboarding falhou. Usuário não chegou ao momento "aha". Revisar primeiro invoke_agent guiado e reduzir fricção inicial.</div>
       </div>
-      <div class="aside-card">
-        <div class="ac-title">NDR alvo (M12)</div>
-        <div class="ac-val text-green">&gt; 105%</div>
-        <p style="font-size:12px;color:var(--text-muted);margin-top:4px;">
-          Expansão via assentos Team deve compensar o churn. NDR ≥ 100% = o cano não vaza.
-        </p>
+
+      <div class="alert-card yellow">
+        <div class="alert-header">🟡 YELLOW</div>
+        <div class="alert-trigger">CAC &gt; R$500 em M1–M3</div>
+        <div class="alert-action">Outbound founder-led ineficiente. Revisar pitch e definição de ICP. Focar em canais com menor fricção de conversão antes de escalar budget.</div>
       </div>
+
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- ─────────────────── 4. CAC / LTV / PAYBACK ─────────────────── -->
-<section>
-  <div class="section-title"><span class="dot"></span> CAC · LTV · Payback por Tier</div>
+  <!-- CONVERSION FUNNEL -->
+  <section>
+    <h2 class="section-title">🔄 Funil de Conversão</h2>
+    <div class="funnel">
 
-  <div class="card" style="padding:0;overflow:hidden;">
-    <table class="ltv-table">
-      <thead>
-        <tr>
-          <th>Tier</th>
-          <th class="metric-cell">Ticket Mensal</th>
-          <th class="metric-cell">CAC estimado</th>
-          <th class="metric-cell">Churn Mensal</th>
-          <th class="metric-cell">LTV</th>
-          <th class="metric-cell">LTV / CAC</th>
-          <th class="metric-cell">Payback</th>
-          <th>Observação</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Free -->
-        <tr>
-          <td>
-            <div class="tier-badge">
-              <div class="tier-dot" style="background:var(--text-muted);"></div>
-              <span>Free</span>
-            </div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-muted">R$ 0</div>
-            <div class="metric-sub">sem receita</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big" style="color:#fff;">R$ 40</div>
-            <div class="metric-sub">mkt + infra</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-red">12%</div>
-            <div class="metric-sub">/mês (inativo)</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-muted">—</div>
-            <div class="metric-sub">pipeline PLG</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-muted">—</div>
-            <div class="ratio-bar" style="width:80px;margin:6px auto 0;">
-              <div class="ratio-fill" style="width:5%;background:var(--text-muted);"></div>
-            </div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-muted">—</div>
-          </td>
-          <td style="font-size:12px;color:var(--text-muted);">Valor é o pipeline: 1 em 8 converte Pro em 90d. CAC = custo de aquisição de tráfego / taxa de conv.</td>
-        </tr>
-        <!-- Pro -->
-        <tr>
-          <td>
-            <div class="tier-badge">
-              <div class="tier-dot" style="background:var(--orange);"></div>
-              <span class="text-orange">Pro</span>
-            </div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-orange">R$ 99</div>
-            <div class="metric-sub">/mês</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big" style="color:#fff;">R$ 250</div>
-            <div class="metric-sub">avg (PLG + outbound)</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-yellow">4,5%</div>
-            <div class="metric-sub">/mês</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-orange">R$ 1.400</div>
-            <div class="metric-sub">LTV = ARPU / churn × (1 - infra%)</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-green">5,6×</div>
-            <div class="ratio-bar" style="width:80px;margin:6px auto 0;">
-              <div class="ratio-fill" style="width:56%;background:var(--green);"></div>
-            </div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-cyan">~3 meses</div>
-          </td>
-          <td style="font-size:12px;color:var(--text-muted);">LTV/CAC ≥ 3× = saudável. Payback curto porque CAC é baixo via PLG. Foco: reter além de mês 3.</td>
-        </tr>
-        <!-- Team -->
-        <tr>
-          <td>
-            <div class="tier-badge">
-              <div class="tier-dot" style="background:var(--cyan);"></div>
-              <span class="text-cyan">Team</span>
-            </div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-cyan">R$ 333</div>
-            <div class="metric-sub">~2,8 assentos × R$119</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big" style="color:#fff;">R$ 600</div>
-            <div class="metric-sub">outbound + CS</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-green">2,5%</div>
-            <div class="metric-sub">/mês</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-cyan">R$ 9.300</div>
-            <div class="metric-sub">com expansão de assentos</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-green">15,5×</div>
-            <div class="ratio-bar" style="width:80px;margin:6px auto 0;">
-              <div class="ratio-fill" style="width:100%;background:linear-gradient(to right,var(--cyan),var(--green));"></div>
-            </div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-green">~2 meses</div>
-          </td>
-          <td style="font-size:12px;color:var(--text-muted);">LTV inclui expansão (NRR &gt;100%). Team é o principal driver de crescimento composto a partir do M9.</td>
-        </tr>
-        <!-- Enterprise (futuro) -->
-        <tr>
-          <td>
-            <div class="tier-badge">
-              <div class="tier-dot" style="background:var(--purple);"></div>
-              <span style="color:var(--purple);">Enterprise</span>
-            </div>
-            <div style="font-size:10px;color:var(--text-muted);margin-top:2px;">(M18+)</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big" style="color:var(--purple);">R$ 2–8k</div>
-            <div class="metric-sub">custom / org</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big" style="color:#fff;">R$ 3–6k</div>
-            <div class="metric-sub">sales-led</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-green">0,8%</div>
-            <div class="metric-sub">/mês</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big" style="color:var(--purple);">R$ 120–600k</div>
-            <div class="metric-sub">deal size dependente</div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big text-green">20–40×</div>
-            <div class="ratio-bar" style="width:80px;margin:6px auto 0;">
-              <div class="ratio-fill" style="width:100%;background:var(--purple);"></div>
-            </div>
-          </td>
-          <td class="metric-cell">
-            <div class="metric-big" style="color:var(--purple);">&lt; 3 meses</div>
-          </td>
-          <td style="font-size:12px;color:var(--text-muted);">Tier a definir no M12. Requer SLA, SSO, audit logs. Não incluído nos targets de MRR acima.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div class="note" style="margin-top:14px;">
-    <strong>LTV calculado como:</strong> <code>(ARPU × margem_bruta) / churn_mensal</code>.
-    Margem bruta estimada 65–70% para Pro (custo inferência ~R$22/user, gross margin desconsiderando CS).
-    Para Team, NDR &gt; 100% efetivamente torna o LTV teoricamente ilimitado — conservamos 24 meses como horizonte.
-  </div>
-</section>
-
-<!-- ─────────────────── 5. CHURN ─────────────────── -->
-<section>
-  <div class="section-title"><span class="dot"></span> Churn — Drivers & Semáforos</div>
-
-  <div class="card">
-    <div class="churn-grid">
-      <div class="churn-dial">
-        <!-- Mini gauge churn Pro -->
-        <svg width="160" height="80" viewBox="0 0 160 80" fill="none">
-          <path d="M 10 80 A 70 70 0 0 1 150 80" stroke="#1e2d4a" stroke-width="12" stroke-linecap="round" fill="none"/>
-          <!-- 4.5% do range 0-15% = 30% do arco -->
-          <path d="M 10 80 A 70 70 0 0 1 150 80" stroke="#eab308" stroke-width="12" stroke-linecap="round" fill="none"
-            stroke-dasharray="220" stroke-dashoffset="154"/>
-          <circle cx="80" cy="80" r="4" fill="#eab308"/>
-        </svg>
-        <div style="font-size:24px;font-weight:800;color:var(--yellow);margin-top:-8px;">4,5%</div>
-        <div style="font-size:11px;color:var(--text-muted);">Churn Mensal Esperado — Pro</div>
-        <div style="margin-top:16px;text-align:center;">
-          <div style="font-size:18px;font-weight:700;color:var(--green);">2,5%</div>
-          <div style="font-size:11px;color:var(--text-muted);">Churn Team</div>
-        </div>
-        <div style="margin-top:12px;text-align:center;">
-          <div style="font-size:18px;font-weight:700;color:var(--text-muted);">~54%</div>
-          <div style="font-size:11px;color:var(--text-muted);">Annual Retention Pro</div>
+      <div class="funnel-step">
+        <div class="funnel-inner">
+          <div class="funnel-name">Awareness</div>
+          <div class="funnel-rate" style="color:var(--muted)">—</div>
+          <div class="funnel-desc">Orgânico, comunidades, outbound founder</div>
         </div>
       </div>
 
-      <div>
-        <h3>Semáforos de Churn</h3>
-        <div class="semaforo-list">
-          <div class="semaforo-item">
-            <div class="sem-dot" style="background:var(--red);box-shadow:0 0 6px var(--red);"></div>
-            <div>
-              <div class="sem-title">WAACO caiu para ≤ 3 por 2 semanas seguidas</div>
-              <div class="sem-desc">Org está desengajando. Acionar CS imediatamente — janela de recuperação de ~21 dias antes do cancelamento formal.</div>
-            </div>
-          </div>
-          <div class="semaforo-item">
-            <div class="sem-dot" style="background:var(--red);box-shadow:0 0 6px var(--red);"></div>
-            <div>
-              <div class="sem-title">Cobrança falhou + WAACO baixo</div>
-              <div class="sem-desc">Combinação prediz churn involuntário. Retentativa automática + email manual do founder dentro de 24h.</div>
-            </div>
-          </div>
-          <div class="semaforo-item">
-            <div class="sem-dot" style="background:var(--yellow);box-shadow:0 0 6px var(--yellow);"></div>
-            <div>
-              <div class="sem-title">NPS &lt; 30 em coorte de 60 dias</div>
-              <div class="sem-desc">Satisfação baixa antes de o churn aparecer no MRR. Entrevistas qualitativas urgentes.</div>
-            </div>
-          </div>
-          <div class="semaforo-item">
-            <div class="sem-dot" style="background:var(--yellow);box-shadow:0 0 6px var(--yellow);"></div>
-            <div>
-              <div class="sem-title">Apenas 1 usuário ativo por org Team</div>
-              <div class="sem-desc">"Champion dependency" — se o campeão sair, a org vai junto. Incentivar expansão de assentos.</div>
-            </div>
-          </div>
-          <div class="semaforo-item">
-            <div class="sem-dot" style="background:var(--green);box-shadow:0 0 6px var(--green);"></div>
-            <div>
-              <div class="sem-title">Org convidou ≥ 2 assentos adicionais</div>
-              <div class="sem-desc">Sinal de expansão saudável. Churn desse coorte é historicamente &lt; 1%/mês.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="drivers-section mt-24">
-      <h3 class="mb-8">O que move o churn</h3>
-      <div class="drivers-grid">
-        <div class="driver-card">
-          <div class="icon">🐢</div>
-          <div class="driver-title">Latência percebida dos agentes</div>
-          <div class="driver-desc">Inferência lenta (>8s por chamada) quebra o loop cognitivo do dev. Principal driver de abandono precoce (30 dias).</div>
-          <div class="driver-impact tag tag-red">Alto impacto</div>
-        </div>
-        <div class="driver-card">
-          <div class="icon">🧩</div>
-          <div class="driver-title">Falta de integrações</div>
-          <div class="driver-desc">Dev prefere agentes que vivem no IDE/Slack. Sem integração, o Forja vira "mais uma janela aberta".</div>
-          <div class="driver-impact tag tag-red">Alto impacto</div>
-        </div>
-        <div class="driver-card">
-          <div class="icon">💸</div>
-          <div class="driver-title">Percepção de custo-benefício</div>
-          <div class="driver-desc">Se o usuário não consegue atribuir 1 vitória concreta ao agente por semana, R$99/mês parece caro.</div>
-          <div class="driver-impact tag tag-red">Alto impacto</div>
-        </div>
-        <div class="driver-card">
-          <div class="icon">📉</div>
-          <div class="driver-title">Onboarding não-concluído</div>
-          <div class="driver-desc">Trial que não chega no primeiro "aha moment" (agent call resolvendo algo real) em 48h raramente converte.</div>
-          <div class="driver-impact tag tag-yellow">Médio impacto</div>
-        </div>
-        <div class="driver-card">
-          <div class="icon">🔐</div>
-          <div class="driver-title">Bloqueio de dados/privacidade</div>
-          <div class="driver-desc">Empresas maiores pausam o uso enquanto aguardam análise jurídica. Churn de 60-90 dias após o signup.</div>
-          <div class="driver-impact tag tag-yellow">Médio impacto</div>
-        </div>
-        <div class="driver-card">
-          <div class="icon">🏃</div>
-          <div class="driver-title">Competidor com freemium mais generoso</div>
-          <div class="driver-desc">Se um concorrente aumentar limits do free, haverá pressão sobre o modelo de conversão. Monitorar mensalmente.</div>
-          <div class="driver-impact tag tag-yellow">Médio impacto</div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ─────────────────── 6. ALERTAS OPERACIONAIS ─────────────────── -->
-<section>
-  <div class="section-title"><span class="dot"></span> Alertas Operacionais — Quando Agir</div>
-
-  <div class="alert-grid">
-
-    <div class="alert-card alert-red">
-      <div class="alert-header">
-        <span class="alert-icon">🚨</span>
-        <span class="alert-level">Crítico — Agir em &lt;4h</span>
-      </div>
-      <div class="alert-title">Churn Spike</div>
-      <div class="alert-trigger">Se: churn mensal &gt; 8% por 2 meses consecutivos</div>
-      <div class="alert-action">
-        <strong>Ação:</strong> congelar aquisição paga, entrevistar 10 churned users em 48h,
-        audit completo do onboarding + WAACO médio do coorte churned.
-        Hipótese-padrão: latência ou falta de valor percebido.
-      </div>
-    </div>
-
-    <div class="alert-card alert-red">
-      <div class="alert-header">
-        <span class="alert-icon">⚠️</span>
-        <span class="alert-level">Crítico — Agir em &lt;24h</span>
-      </div>
-      <div class="alert-title">Custo de Infra Explodindo</div>
-      <div class="alert-trigger">Se: custo Bedrock+EC2+Neon &gt; 45% da receita bruta</div>
-      <div class="alert-action">
-        <strong>Ação:</strong> revisar roteamento de modelos (Qwen para social, Claude para crítico),
-        implementar rate limiting por tier, considerar ajuste de preços.
-        Custo atual ~R$15-30/usuário ativo/mês — margem vai abaixo de 55%.
-      </div>
-    </div>
-
-    <div class="alert-card alert-red">
-      <div class="alert-header">
-        <span class="alert-icon">📉</span>
-        <span class="alert-level">Crítico — Agir em &lt;48h</span>
-      </div>
-      <div class="alert-title">MRR Growth Estagnado</div>
-      <div class="alert-trigger">Se: crescimento MoM &lt; 10% por 3 meses consecutivos</div>
-      <div class="alert-action">
-        <strong>Ação:</strong> investigar topo de funil (visitantes caindo?) vs. conversão (taxa Free→Paid estagnada?).
-        Considerar pivô em canal de aquisição ou reposicionamento da proposta de valor.
-      </div>
-    </div>
-
-    <div class="alert-card alert-yellow">
-      <div class="alert-header">
-        <span class="alert-icon">🔔</span>
-        <span class="alert-level">Atenção — Agir em &lt;1 semana</span>
-      </div>
-      <div class="alert-title">Ativação em Queda</div>
-      <div class="alert-trigger">Se: Free → 1ª agent call &lt; 40% em 7 dias</div>
-      <div class="alert-action">
-        <strong>Ação:</strong> revisar onboarding email sequence, simplificar setup do primeiro agente,
-        adicionar template "quick start" que funcione sem configuração.
-        Meta: &gt;60% em 7 dias.
-      </div>
-    </div>
-
-    <div class="alert-card alert-yellow">
-      <div class="alert-header">
-        <span class="alert-icon">⏱️</span>
-        <span class="alert-level">Atenção — Agir em &lt;1 semana</span>
-      </div>
-      <div class="alert-title">Latência p95 Alta</div>
-      <div class="alert-trigger">Se: p95 agent response time &gt; 12s por 48h consecutivas</div>
-      <div class="alert-action">
-        <strong>Ação:</strong> verificar EC2 instance health, revisar budget de tokens do tool-loop
-        (OLIMPO_MAX_TOOL_LOOP_TOKENS), considerar streaming obrigatório para todas as chamadas.
-      </div>
-    </div>
-
-    <div class="alert-card alert-yellow">
-      <div class="alert-header">
-        <span class="alert-icon">💰</span>
-        <span class="alert-level">Atenção — Monitorar semanal</span>
-      </div>
-      <div class="alert-title">LTV/CAC se Deteriorando</div>
-      <div class="alert-trigger">Se: LTV/CAC Pro &lt; 3× por 2 trimestres</div>
-      <div class="alert-action">
-        <strong>Ação:</strong> revisar canais de aquisição (CAC subindo?), checar se churn
-        aumentou (LTV caindo?). Reduzir gasto em canais com CAC &gt; R$400 para Pro.
-      </div>
-    </div>
-
-    <div class="alert-card alert-green">
-      <div class="alert-header">
-        <span class="alert-icon">🎯</span>
-        <span class="alert-level">Saudável — Otimizar</span>
-      </div>
-      <div class="alert-title">Expansão Acelerando</div>
-      <div class="alert-trigger">Se: Team net new MRR &gt; 40% do total novo MRR</div>
-      <div class="alert-action">
-        <strong>Ação positiva:</strong> duplicar investimento em CS/onboarding para Team.
-        Criar programa de referral B2B. Antecipar tier Enterprise.
-        Este é o sinal de product-market fit real.
-      </div>
-    </div>
-
-    <div class="alert-card alert-green">
-      <div class="alert-header">
-        <span class="alert-icon">📊</span>
-        <span class="alert-level">Saudável — Monitorar</span>
-      </div>
-      <div class="alert-title">WAACO Médio &gt; 20</div>
-      <div class="alert-trigger">Se: WAACO médio das orgs pagas &gt; 20 por 4 semanas</div>
-      <div class="alert-action">
-        <strong>Ação positiva:</strong> considerar aumento de preços (elasticidade baixa
-        quando valor é claro). Momento ideal para introduzir add-ons ou tier acima.
-        Documentar cases de sucesso para vendas.
-      </div>
-    </div>
-
-    <div class="alert-card alert-green">
-      <div class="alert-header">
-        <span class="alert-icon">🌱</span>
-        <span class="alert-level">Saudável — Manter</span>
-      </div>
-      <div class="alert-title">NDR Acima de 105%</div>
-      <div class="alert-trigger">Se: NDR (Net Dollar Retention) &gt; 105% por trimestre</div>
-      <div class="alert-action">
-        <strong>Ação positiva:</strong> o modelo está funcionando — expansão compensa churn.
-        Foco: aumentar aquisição (mais topo de funil). O modelo de crescimento é validado.
-        Apresentável para investidores Série A.
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- ─────────────────── 7. WAR ROOM ─────────────────── -->
-<section>
-  <div class="section-title"><span class="dot"></span> War Room Notes — Afrodite × Gaia</div>
-
-  <div class="warroom-intro">
-    Sessão de debate estruturado entre <strong>Afrodite</strong> (validação de métricas, rigor quantitativo, contratos de dados)
-    e <strong>Gaia</strong> (visão estratégica, posicionamento, crescimento de longo prazo).
-    Objetivo: expor tensões reais do modelo de negócio AaaS antes de comprometer com targets.
-  </div>
-
-  <div class="card">
-    <div class="debate">
-
-      <div class="message">
-        <div class="avatar avatar-afrodite">A</div>
-        <div class="bubble bubble-afrodite">
-          <div class="speaker speaker-afrodite">AFRODITE · Validação</div>
-          <p>Precisamos ser honestos sobre as premissas do funil. <strong>8% de conversão visitante→signup</strong> é otimista para B2B técnico sem brand recognition. SaaS dev tools early stage geralmente fica em 2–4%. Se chegarmos a 8%, ou o produto é excepcional ou estamos medindo errado (contando bots/crawlers).</p>
-          <p>Minha proposta: trabalhar com <strong>cenário base de 4%</strong> e <strong>upside de 8%</strong> — e monitorar a qualidade dos signups (orgs que completam o perfil vs. emails descartáveis).</p>
+      <div class="funnel-step">
+        <div class="funnel-inner">
+          <div class="funnel-name">Signup Free</div>
+          <div class="funnel-rate">10%</div>
+          <div class="funnel-desc">Awareness → cadastro</div>
+          <span class="funnel-tag">hipótese</span>
         </div>
       </div>
 
-      <div class="message right">
-        <div class="avatar avatar-gaia">G</div>
-        <div class="bubble bubble-gaia">
-          <div class="speaker speaker-gaia">GAIA · Estratégia</div>
-          <p>Concordo com a ressalva, mas o 8% não é aleatório — é <strong>baseado em tráfego qualificado</strong>. Se o Rafael distribui o Forja em comunidades dev onde já tem autoridade (Twitter/X, GitHub, comunidades de engenharia), a qualidade do tráfego é alta. Não é tráfego genérico.</p>
-          <p>A questão estratégica mais relevante não é o 8% vs. 4% — é <strong>se o Time-to-Value de &lt;8 minutos é real</strong>. Se o primeiro agente rodar em menos de 8 minutos e entregar algo útil, a conversão acompanha naturalmente.</p>
+      <div class="funnel-step">
+        <div class="funnel-inner">
+          <div class="funnel-name">Ativação</div>
+          <div class="funnel-rate">60%</div>
+          <div class="funnel-desc">Signup → 1º invoke_agent</div>
+          <span class="funnel-tag">hipótese</span>
         </div>
       </div>
 
-      <div class="message">
-        <div class="avatar avatar-afrodite">A</div>
-        <div class="bubble bubble-afrodite">
-          <div class="speaker speaker-afrodite">AFRODITE · Validação</div>
-          <p>Ponto justo sobre tráfego qualificado. Mas vou pressionar no <strong>custo de infra</strong>: R$15-30/usuário ativo/mês de inferência significa que um usuário Free que usa muito custa mais do que um Pro que usa pouco.</p>
-          <p>O free tier precisa de <strong>hard limits</strong>: sugestão de <code>50 agent calls/mês</code> no free. Caso contrário, a margem bruta do Pro (65-70% estimado) está inflada — o free subsidia o custo de aquisição mas também erosiona a margem antes da conversão.</p>
-          <p>Métrica que precisamos criar: <strong>custo-por-org por tier</strong>, não só custo médio. Usuário heavy-free pode custar R$25/mês sem gerar receita.</p>
+      <div class="funnel-step">
+        <div class="funnel-inner">
+          <div class="funnel-name">Pro Upgrade</div>
+          <div class="funnel-rate">15%</div>
+          <div class="funnel-desc">Ativação → Pro</div>
+          <span class="funnel-tag">hipótese · pós-Q3</span>
         </div>
       </div>
 
-      <div class="message right">
-        <div class="avatar avatar-gaia">G</div>
-        <div class="bubble bubble-gaia">
-          <div class="speaker speaker-gaia">GAIA · Estratégia</div>
-          <p>Hard limits no Free fazem sentido, mas o <strong>threshold de 50 calls/mês é arriscado</strong>. Um dev que usa Forja como ferramenta de onboarding atinge 50 calls na primeira semana. O limite correto deveria ser por <em>tipo de agente</em>, não por volume bruto.</p>
-          <p>Estrategicamente prefiro: <strong>agentes básicos ilimitados no free + agentes avançados (orchestrate, invoke com memória) somente no Pro</strong>. Isso cria a fricção certa: o usuário vê valor, bate no teto qualitativo (não quantitativo), e converte.</p>
-          <p>O teto quantitativo faz o usuário sentir punição. O teto qualitativo faz o usuário sentir ambição.</p>
-        </div>
-      </div>
-
-      <div class="message">
-        <div class="avatar avatar-afrodite">A</div>
-        <div class="bubble bubble-afrodite">
-          <div class="speaker speaker-afrodite">AFRODITE · Validação</div>
-          <p>Excelente distinção. Aceito o teto qualitativo — mas precisamos <strong>definir o contrato de capability por tier</strong> antes do lançamento, não depois. Descobrir em produção que o free "ilimitado" custou R$40k de Bedrock em um mês de viral é um evento de sobrevivência.</p>
-          <p>Outro ponto: o <strong>churn de 4,5% para Pro</strong> implica ~47% de retenção anual (1 - 0.955^12 ≈ 0.57, então ~57% retém após 12 meses). Para um produto de valor comprovado, isso é <em>aceitável mas não bom</em>. Precisamos de um modelo de intervenção antes do mês 3 — que é quando o churn precoce se concentra.</p>
-        </div>
-      </div>
-
-      <div class="message right">
-        <div class="avatar avatar-gaia">G</div>
-        <div class="bubble bubble-gaia">
-          <div class="speaker speaker-gaia">GAIA · Estratégia</div>
-          <p>Concordo que 4,5%/mês é aceitável apenas se o <strong>NDR &gt; 100%</strong>. A estratégia de longo prazo do Forja não é reter assinaturas individuais — é <strong>inflar o valor por conta via expansão de assentos Team</strong>.</p>
-          <p>Uma org que começa com 1 assento Pro (R$99) e expande para 4 assentos Team (R$476/mês) em 6 meses teve "churn" no sentido do plano original, mas aumentou a receita 4,8x. Isso é o que o modelo de NDR captura. Por isso nossa North Star ser <strong>WAACO</strong> e não MRR bruto — WAACO alto prediz expansão.</p>
-          <p>O Rafael construiu algo raro: <strong>um produto onde o upsell é natural</strong> (convidar o time). Precisamos proteger essa mecânica acima de tudo.</p>
-        </div>
-      </div>
-
-      <div class="message">
-        <div class="avatar avatar-afrodite">A</div>
-        <div class="bubble bubble-afrodite">
-          <div class="speaker speaker-afrodite">AFRODITE · Validação</div>
-          <p>Ponto final sobre os targets de MRR: o salto de <strong>R$5k (M3) → R$20k (M6) é crescimento de 4x em 3 meses</strong>. Isso exige que o produto esteja funcionando E o canal de aquisição esteja rodando ao mesmo tempo. Historicamente, SaaS early stage tem um dos dois, raramente os dois.</p>
-          <p>Recomendo construir dois cenários: <strong>base</strong> (R$12k M6, R$50k M12) e <strong>upside</strong> (R$20k M6, R$80k M12) — e comunicar o base internamente para gestão de caixa, e o upside externamente para fundraising.</p>
-        </div>
-      </div>
-
-      <div class="message right">
-        <div class="avatar avatar-gaia">G</div>
-        <div class="bubble bubble-gaia">
-          <div class="speaker speaker-gaia">GAIA · Estratégia</div>
-          <p>Aceito o conservadorismo para o base case. Mas a <strong>visão de M24 de R$300k MRR (R$3,6M ARR) é estrategicamente correta</strong> como alvo para justificar Série A em um mercado de AaaS que ainda não tem um player dominante no Brasil.</p>
-          <p>A questão que a Afrodite não perguntou e eu vou perguntar: <strong>o Rafael tem 18–24 meses de runway para chegar lá?</strong> Se não, os targets precisam ser revisados para priorizar break-even antes de crescimento. Essa é a variável que mais importa e que este documento não pode calcular sem ver o custo fixo mensal da operação.</p>
-        </div>
-      </div>
-
-      <div class="message">
-        <div class="avatar avatar-afrodite">A</div>
-        <div class="bubble bubble-afrodite">
-          <div class="speaker speaker-afrodite">AFRODITE · Validação</div>
-          <p>Ponto justo e honesto. Break-even depende do custo fixo (EC2, Neon, salários se houver, ferramentas). Com stack atual EC2+Neon+Bedrock provavelmente entre R$3–8k/mês fixo + variável de R$15-30/user. Com 150 usuários pagos Pro gerando ~R$15k MRR, o break-even operacional pode ser alcançado em <strong>torno do M6–M8</strong> se o custo fixo estiver controlado.</p>
-          <p>Isso é <strong>antes do target de R$80k do M12</strong> — o que significa que o Forja pode crescer sem queimar capital, o que é uma vantagem competitiva enorme.</p>
-        </div>
-      </div>
-
-      <div class="message right">
-        <div class="avatar avatar-gaia">G</div>
-        <div class="bubble bubble-gaia">
-          <div class="speaker speaker-gaia">GAIA · Estratégia</div>
-          <p>Aí está o diferencial real: <strong>bootstrap viável</strong>. Diferente de 99% dos AaaS, o Forja não precisa de R$2M de capital para chegar à prova de conceito. A Ayla já existe, o Olimpo já existe, o EC2 já roda. O custo marginal de adicionar um cliente é R$15-30/mês.</p>
-          <p>Isso muda o posicionamento para investidores: não é "nos financie para construir", é "o produto está rodando, nos financie para escalar o canal". São rodadas com valuations muito melhores.</p>
-          <p><strong>Conclusão estratégica:</strong> foque nos primeiros 50 clientes pagos com obsessão. Cada um é um case de sucesso, um potencial upsell Team, e a prova que o modelo funciona. O resto segue.</p>
+      <div class="funnel-step">
+        <div class="funnel-inner">
+          <div class="funnel-name">Team Upgrade</div>
+          <div class="funnel-rate">20%</div>
+          <div class="funnel-desc">Pro → Team</div>
+          <span class="funnel-tag">hipótese</span>
         </div>
       </div>
 
     </div>
+    <p style="margin-top:12px;font-size:.78rem;color:var(--subtle);">
+      Todas as taxas são hipóteses de trabalho. Validação empírica começa quando N ≥ 30 signups por coorte.
+    </p>
+  </section>
 
-    <!-- Verdict -->
-    <div class="verdict-card mt-24">
-      <div class="verdict-title">⚖️ Consenso War Room — Afrodite × Gaia</div>
-      <div class="verdict-items">
-        <div class="verdict-item">North Star = <strong>WAACO</strong>: consenso total. Prediz expansão, churn e saúde do produto melhor que MRR sozinho.</div>
-        <div class="verdict-item">Targets MRR: trabalhar com <strong>cenário base</strong> (R$12k M6, R$50k M12) internamente e <strong>upside</strong> (R$20k / R$80k) no documento público.</div>
-        <div class="verdict-item">Free tier: <strong>cap qualitativo</strong> (agentes avançados = Pro), não quantitativo — protege margem sem frustrar usuários.</div>
-        <div class="verdict-item">Monitorar <strong>custo-por-org por tier</strong> desde o primeiro mês; heavy-free users precisam de flag automático.</div>
-        <div class="verdict-item">Break-even operacional é alcançável <strong>antes do M9</strong> com ~150 pagantes — grow sem diluição é possível.</div>
-        <div class="verdict-item">Prioridade imediata: <strong>primeiros 50 clientes pagos + onboarding &lt;8 minutos</strong>. Tudo mais é secundário até chegar lá.</div>
+  <!-- CURRENT STATE v0.5.0 -->
+  <section>
+    <h2 class="section-title">⚡ Estado Atual — v0.5.0</h2>
+    <div class="current-state">
+      <div class="cs-grid">
+        <div class="cs-stat">
+          <div class="cs-value">R$297</div>
+          <div class="cs-label">MRR</div>
+        </div>
+        <div class="cs-stat">
+          <div class="cs-value">3</div>
+          <div class="cs-label">Usuários<br><span style="font-size:.68rem;color:var(--subtle)">2 founders + 1 externo</span></div>
+        </div>
+        <div class="cs-stat">
+          <div class="cs-value">100%</div>
+          <div class="cs-label">Retenção</div>
+        </div>
+        <div class="cs-stat">
+          <div class="cs-value">2</div>
+          <div class="cs-label">WAACO</div>
+        </div>
+      </div>
+      <div class="cs-disclaimer">
+        <strong>⚠️ Aviso estatístico:</strong> N=3 é estatisticamente insignificante. Retenção 100% é early signal, não prova de PMF. Validação real começa em M3 quando N ≥ 15 com pelo menos 30 dias de ciclo ativo.
       </div>
     </div>
-  </div>
-</section>
+  </section>
+
+  <!-- NOT YET METRICS -->
+  <section>
+    <h2 class="section-title">🔵 O que NÃO é métrica ainda</h2>
+    <div class="not-yet">
+      <p style="font-size:.88rem;color:var(--muted);">
+        As seguintes métricas são frequentemente citadas em pitches, mas <strong style="color:var(--blue)">ainda não são dados reais</strong> no estágio atual do Forja:
+      </p>
+      <div class="not-yet-grid">
+
+        <div class="nym-item">
+          <div class="nym-title">CAC Real</div>
+          <div class="nym-text">Hoje é R$0 (founder time não conta como budget de marketing). CAC real só é calculável com budget de marketing dedicado — Q3 em diante.</div>
+        </div>
+
+        <div class="nym-item">
+          <div class="nym-title">LTV (Lifetime Value)</div>
+          <div class="nym-text">Churn histórico = 0 em 3 usuários. LTV é projeção baseada em assumções de churn, não dado real. Requer pelo menos 6 meses de coortes.</div>
+        </div>
+
+        <div class="nym-item">
+          <div class="nym-title">NPS (Net Promoter Score)</div>
+          <div class="nym-text">N=3 não gera NPS estatisticamente válido. Qualquer número de NPS hoje é anedota, não métrica. Aplicar somente quando N ≥ 30.</div>
+        </div>
+
+        <div class="nym-item">
+          <div class="nym-title">Virality (k-factor)</div>
+          <div class="nym-text">Growth loop existe (Free → Pro → Team com convites), mas k-factor real só é mensurável após PLG ativo e tracking de referral — Q3 em diante.</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
 
 </div>
 
-<!-- ─────────────────── FOOTER ─────────────────── -->
-<footer class="footer">
-  <div class="wrapper">
-    Gerado pela war room <span class="agents">Afrodite + Gaia</span> · Ecossistema Olimpo · 2026-06-17 ·
-    Forja AaaS — Métricas v1.0 · Todos os valores são projeções baseadas em premissas declaradas
-  </div>
+<footer>
+  <strong>LavitaCode</strong> · Forja · Métricas &amp; KPIs · 2026
 </footer>
 
 </body>
