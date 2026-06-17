@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forja — Regras de Negócio</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
+            background: #020617;
+            color: #e2e8f0;
+            line-height: 1.6;
+            padding: 2rem 1rem;
+        }
+        .container { max-width: 1200px; margin: 0 auto; }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 4rem;
+            padding: 2rem 0;
+            border-bottom: 1px solid #1e293b;
+        }
+        .logo { display: inline-flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .logo-text { font-size: 2rem; font-weight: 700; color: #f97316; letter-spacing: -0.02em; }
+        .header h1 { font-size: 2.5rem; font-weight: 700; color: #f1f5f9; margin-bottom: 0.75rem; }
+        .header p { font-size: 1.125rem; color: #94a3b8; max-width: 700px; margin: 0 auto; }
+
+        /* Section */
+        .section { margin-bottom: 4rem; }
+        .section-title {
+            font-size: 1.875rem; font-weight: 700; color: #f1f5f9;
+            margin-bottom: 0.5rem; display: flex; align-items: center; gap: 0.75rem;
+        }
+        .section-title::before {
+            content: ''; width: 4px; height: 32px;
+            background: linear-gradient(to bottom, #f97316, #ea580c); border-radius: 2px;
+        }
+        .section-subtitle { color: #94a3b8; margin-bottom: 2rem; font-size: 1rem; }
+
+        /* Badge */
+        .badge {
+            display: inline-block; padding: 0.25rem 0.75rem; border-radius: 9999px;
+            font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;
+        }
+        .badge-free { background: #334155; color: #cbd5e1; }
+        .badge-pro { background: rgba(249,115,22,.15); color: #f97316; border: 1px solid rgba(249,115,22,.3); }
+        .badge-team { background: rgba(196,181,253,.15); color: #c4b5fd; border: 1px solid rgba(196,181,253,.3); }
+
+        /* Tiers grid */
+        .comparison-table {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .tier-card {
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;
+            padding: 2rem; position: relative; transition: all 0.3s ease;
+        }
+        .tier-card:hover { border-color: #334155; transform: translateY(-2px); }
+        .tier-card.featured { border-color: #f97316; box-shadow: 0 0 0 1px rgba(249,115,22,.2); }
+        .tier-header { margin-bottom: 1.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid #1e293b; }
+        .tier-name { font-size: 1.5rem; font-weight: 700; color: #f1f5f9; margin: .4rem 0 .5rem; }
+        .tier-price { font-size: 2rem; font-weight: 700; color: #f97316; margin-bottom: 0.25rem; }
+        .tier-price-sub { font-size: 0.875rem; color: #64748b; }
+        .tier-features { list-style: none; }
+        .tier-features li {
+            padding: 0.65rem 0; display: flex; align-items: flex-start; gap: 0.75rem;
+            color: #cbd5e1; font-size: 0.938rem; border-bottom: 1px solid #1e293b11;
+        }
+        .tier-features li::before { content: '✓'; color: #4ade80; font-weight: 700; flex-shrink: 0; }
+        .tier-features li.disabled { color: #475569; }
+        .tier-features li.disabled::before { content: '✕'; color: #334155; }
+
+        /* Reset flow */
+        .reset-flow {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem; margin-bottom: 2rem;
+        }
+        .reset-card {
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 1.5rem;
+        }
+        .reset-card-label { font-size: .7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: #475569; margin-bottom: .5rem; }
+        .reset-card-value { font-size: 1.25rem; font-weight: 700; color: #f97316; margin-bottom: .4rem; }
+        .reset-card-desc { font-size: .8rem; color: #64748b; line-height: 1.5; }
+        .reset-card.block { border-left: 3px solid #ef4444; }
+        .reset-card.ok { border-left: 3px solid #4ade80; }
+
+        /* Quota flow horizontal */
+        .quota-flow { display: flex; gap: 0; margin-bottom: 2rem; overflow-x: auto; }
+        .qf-step {
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;
+            padding: 1.25rem; min-width: 200px; flex: 1; position: relative;
+        }
+        .qf-step + .qf-step { margin-left: 2.5rem; }
+        .qf-step::before {
+            content: '→'; position: absolute; left: -1.6rem; top: 50%; transform: translateY(-50%);
+            color: #f97316; font-size: 1.4rem; font-weight: 700;
+        }
+        .qf-step:first-child::before { display: none; }
+        .qf-step-title { font-weight: 700; color: #f1f5f9; font-size: .9rem; margin-bottom: .35rem; }
+        .qf-step-desc { color: #64748b; font-size: .78rem; line-height: 1.4; }
+        .qf-step-tag {
+            display: inline-block; margin-top: .6rem; font-size: .7rem; font-weight: 700;
+            padding: .2rem .55rem; border-radius: .3rem;
+        }
+        .tag-ok { background: #052e16; color: #4ade80; }
+        .tag-block { background: #450a0a; color: #f87171; }
+        .tag-warn { background: #431407; color: #fb923c; }
+
+        /* Memory timeline */
+        .memory-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem; margin-bottom: 2rem;
+        }
+        .mem-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 1.5rem; }
+        .mem-card-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .mem-card-name { font-weight: 700; color: #f1f5f9; }
+        .mem-bar-track { height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; margin-bottom: .9rem; }
+        .mem-bar-fill { height: 100%; border-radius: 4px; }
+        .mem-stages { display: flex; flex-direction: column; gap: .5rem; }
+        .mem-stage { display: flex; align-items: center; gap: .55rem; font-size: .8rem; color: #64748b; }
+        .mem-dot { width: 7px; height: 7px; border-radius: 50%; background: #1e293b; flex-shrink: 0; }
+        .mem-dot.on { background: #4ade80; }
+        .mem-token { color: #f97316; font-weight: 600; }
+
+        /* Context table */
+        .ctx-table { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; overflow: hidden; margin-bottom: 2rem; }
+        .ctx-table table { width: 100%; border-collapse: collapse; }
+        .ctx-table th { background: #1e293b; color: #f1f5f9; font-weight: 700; text-align: left; padding: .9rem 1.25rem; font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+        .ctx-table td { padding: .9rem 1.25rem; color: #cbd5e1; border-top: 1px solid #1e293b; font-size: .9rem; }
+        .ctx-table tr:hover td { background: rgba(249,115,22,.04); }
+        .val { color: #f97316; font-weight: 600; }
+
+        /* Agents grid */
+        .agents-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: .85rem; margin-bottom: 2rem;
+        }
+        .agent-card {
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 8px;
+            padding: 1rem; text-align: center; position: relative; transition: all .2s;
+        }
+        .agent-card:hover { border-color: #334155; }
+        .agent-card.locked { opacity: .45; }
+        .agent-icon {
+            width: 40px; height: 40px; margin: 0 auto .6rem;
+            background: linear-gradient(135deg,#f97316,#ea580c);
+            border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: 800; color: #fff; font-size: 1rem;
+        }
+        .agent-card.locked .agent-icon { background: #1e293b; color: #475569; }
+        .agent-name { font-weight: 600; color: #f1f5f9; font-size: .78rem; margin-bottom: .2rem; }
+        .agent-role { font-size: .68rem; color: #475569; }
+        .lock-badge {
+            position: absolute; top: .4rem; right: .4rem;
+            background: #1e293b; border-radius: 3px; font-size: .6rem; padding: .1rem .3rem; color: #475569;
+        }
+        .war-room-card { grid-column: span 2; border-color: #2e1065; background: linear-gradient(135deg,#0d0a1a,#0f172a); }
+        .war-room-card .agent-icon { background: linear-gradient(135deg,#7c3aed,#6d28d9); width: 48px; height: 48px; font-size: 1.2rem; }
+        .war-room-card .agent-name { color: #c4b5fd; }
+
+        /* Model routing */
+        .routing-diagram {
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;
+            padding: 2rem; margin-bottom: 2rem;
+        }
+        .routing-row { display: flex; align-items: stretch; gap: .5rem; margin-bottom: .75rem; flex-wrap: wrap; }
+        .rt-node {
+            background: #1e293b; border: 1px solid #334155; border-radius: 8px;
+            padding: .85rem 1.1rem; flex: 1; min-width: 140px;
+        }
+        .rt-node.model-box { border-color: #f97316; background: rgba(249,115,22,.08); }
+        .rt-node.model-box.qwen { border-color: #34d399; background: rgba(52,211,153,.08); }
+        .rt-node.model-box.opus { border-color: #c4b5fd; background: rgba(196,181,253,.08); }
+        .rt-node-title { font-weight: 700; color: #f1f5f9; font-size: .85rem; margin-bottom: .25rem; }
+        .rt-node-desc { font-size: .75rem; color: #64748b; line-height: 1.4; }
+        .rt-arrow { color: #f97316; font-size: 1.2rem; display: flex; align-items: center; font-weight: 700; }
+        .rt-decision { background: #0f172a; border: 1px dashed #334155; border-radius: 6px; padding: .7rem 1rem; flex: 1; min-width: 140px; }
+        .rt-decision-q { font-size: .78rem; color: #94a3b8; font-style: italic; margin-bottom: .2rem; }
+        .rt-yes { font-size: .72rem; color: #4ade80; font-weight: 700; }
+        .rt-no { font-size: .72rem; color: #f87171; font-weight: 700; }
+
+        /* Gates */
+        .gates-list { display: flex; flex-direction: column; gap: .85rem; margin-bottom: 2rem; }
+        .gate-row {
+            background: #0f172a; border: 1px solid #1e293b; border-left: 3px solid #475569;
+            border-radius: 8px; padding: 1.25rem; display: flex; gap: 1rem; align-items: flex-start;
+        }
+        .gate-row.danger { border-left-color: #ef4444; }
+        .gate-row.warn { border-left-color: #f97316; }
+        .gate-row.ok { border-left-color: #4ade80; }
+        .gate-num {
+            width: 30px; height: 30px; background: #1e293b; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; color: #f97316; flex-shrink: 0; font-size: .85rem;
+        }
+        .gate-body { flex: 1; }
+        .gate-title { font-weight: 700; color: #f1f5f9; margin-bottom: .3rem; font-size: .9rem; }
+        .gate-desc { color: #64748b; font-size: .8rem; line-height: 1.5; }
+        .gate-chip {
+            display: inline-block; margin-top: .5rem; font-size: .7rem; font-weight: 700;
+            padding: .2rem .55rem; border-radius: .3rem; background: #1e293b; color: #94a3b8;
+        }
+
+        /* Invoke flow sequence */
+        .invoke-seq {
+            background: #0f172a; border: 1px solid #1e293b; border-radius: 12px;
+            padding: 1.75rem; margin-bottom: 2rem; font-family: 'Courier New', monospace;
+        }
+        .invoke-seq-title { font-family: inherit; font-weight: 700; color: #f1f5f9; font-size: .95rem; margin-bottom: 1.25rem; font-family: -apple-system, sans-serif; }
+        .seq-line { display: flex; align-items: flex-start; gap: .6rem; margin-bottom: .5rem; font-size: .8rem; }
+        .seq-step { color: #f97316; font-weight: 700; min-width: 18px; }
+        .seq-text { color: #cbd5e1; }
+        .seq-fail { color: #f87171; font-weight: 600; }
+        .seq-ok { color: #4ade80; font-weight: 600; }
+        .seq-connector { color: #334155; margin-left: 2px; }
+
+        /* Edge cases */
+        .edge-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1rem; margin-bottom: 2rem;
+        }
+        .edge-card {
+            background: #0f172a; border: 1px solid #1e293b;
+            border-left: 3px solid #f97316; border-radius: 8px; padding: 1.25rem;
+        }
+        .edge-title { font-weight: 700; color: #f1f5f9; margin-bottom: .4rem; font-size: .88rem; }
+        .edge-desc { color: #64748b; font-size: .8rem; line-height: 1.5; }
+        .edge-rule { margin-top: .5rem; font-size: .78rem; font-weight: 700; }
+        .edge-rule.yes { color: #4ade80; }
+        .edge-rule.no { color: #f87171; }
+
+        /* Decisions */
+        .decisions-table { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; overflow: hidden; margin-bottom: 2rem; }
+        .decisions-table table { width: 100%; border-collapse: collapse; }
+        .decisions-table th { background: #1e293b; color: #94a3b8; font-weight: 700; text-align: left; padding: .8rem 1.1rem; font-size: .75rem; text-transform: uppercase; letter-spacing: .06em; }
+        .decisions-table td { padding: .85rem 1.1rem; color: #cbd5e1; border-top: 1px solid #1e293b; font-size: .82rem; vertical-align: top; }
+        .decisions-table tr:hover td { background: rgba(249,115,22,.03); }
+        .dr-id { color: #f97316; font-weight: 700; font-family: monospace; }
+        .dr-rule { color: #f1f5f9; font-weight: 600; }
+        .dr-discard { color: #475569; font-style: italic; }
+
+        /* LGPD */
+        .lgpd-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; }
+        .lgpd-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 1.25rem; }
+        .lgpd-title { font-weight: 700; color: #7dd3fc; margin-bottom: .4rem; font-size: .88rem; }
+        .lgpd-desc { color: #64748b; font-size: .8rem; line-height: 1.5; }
+
+        /* Footer */
+        .foot { text-align: center; color: #334155; font-size: .72rem; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #1e293b; }
+
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.75rem; }
+            .section-title { font-size: 1.35rem; }
+            .quota-flow { flex-direction: column; }
+            .qf-step { margin-left: 0 !important; }
+            .qf-step::before { display: none; }
+            .routing-row { flex-direction: column; }
+            .rt-arrow { transform: rotate(90deg); align-self: center; }
+            .war-room-card { grid-column: span 1; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <svg width="44" height="44" viewBox="0 0 44 44" fill="none">
+        <rect width="44" height="44" rx="10" fill="#f97316"/>
+        <path d="M11 10h22v6H18v5h13v6H18v12h-7V10z" fill="#fff"/>
+        <path d="M33 10l6 5-6 5V10z" fill="#ea580c" opacity=".7"/>
+      </svg>
+      <span class="logo-text">Forja</span>
+    </div>
+    <h1>Regras de Negócio</h1>
+    <p>Documento canônico das políticas, quotas, limites e comportamentos operacionais do Forja (AaaS). Olimpo = motor interno invisível — nunca exposto ao usuário.</p>
+  </header>
+
+  <!-- 1. Tiers -->
+  <section class="section">
+    <h2 class="section-title">Comparativo de Tiers</h2>
+    <p class="section-subtitle">Free · Pro · Team — recursos, limites e acesso por plano</p>
+    <div class="comparison-table">
+      <div class="tier-card">
+        <div class="tier-header">
+          <span class="badge badge-free">Free</span>
+          <div class="tier-name">Free</div>
+          <div class="tier-price">R$ 0</div>
+          <div class="tier-price-sub">sempre gratuito · sem cartão</div>
+        </div>
+        <ul class="tier-features">
+          <li><strong>10 invocações/mês</strong> (reset dia 1º)</li>
+          <li><strong>1 agente</strong> — Ayla (default, orquestradora)</li>
+          <li>Qwen (casual) + Sonnet (técnico)</li>
+          <li>32k tokens de contexto</li>
+          <li>20 turns por invoke</li>
+          <li>Memória 30 dias inatividade</li>
+          <li>Catálogo visível com lock (Pro/Team)</li>
+          <li class="disabled">Opus (Pro+)</li>
+          <li class="disabled">War Room (Team)</li>
+          <li class="disabled">Pool compartilhado (Team)</li>
+        </ul>
+      </div>
+      <div class="tier-card featured">
+        <div class="tier-header">
+          <span class="badge badge-pro">★ Pro</span>
+          <div class="tier-name">Pro</div>
+          <div class="tier-price">R$ 99</div>
+          <div class="tier-price-sub">por usuário / mês</div>
+        </div>
+        <ul class="tier-features">
+          <li><strong>Janela rolling 5h</strong> após última invoke</li>
+          <li>50 Sonnet <em>ou</em> 20 Opus por janela</li>
+          <li><strong>Todos os 15 agentes</strong></li>
+          <li>100k tokens de contexto</li>
+          <li>20 turns por invoke</li>
+          <li>Memória 180 dias inatividade</li>
+          <li>Opus habilitado (heavy tasks)</li>
+          <li class="disabled">War Room (Team)</li>
+          <li class="disabled">Pool compartilhado (Team)</li>
+        </ul>
+      </div>
+      <div class="tier-card">
+        <div class="tier-header">
+          <span class="badge badge-team">Team</span>
+          <div class="tier-name">Team</div>
+          <div class="tier-price">R$ 119</div>
+          <div class="tier-price-sub">por assento / mês · mín 3 assentos</div>
+        </div>
+        <ul class="tier-features">
+          <li><strong>Pool rolling 8h</strong> compartilhado</li>
+          <li>150 Sonnet <em>ou</em> 60 Opus (pool total)</li>
+          <li><strong>Todos os 15 agentes</strong></li>
+          <li>200k tokens de contexto</li>
+          <li>20 turns por invoke</li>
+          <li>Memória 365 dias inatividade</li>
+          <li>Opus habilitado</li>
+          <li><strong>War Room</strong> — orquestração multi-agente</li>
+          <li>Audit log + admin dashboard</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. Reset flow -->
+  <section class="section">
+    <h2 class="section-title">Fluxo de Quotas & Reset</h2>
+    <p class="section-subtitle">Quando as invocações são contadas, quando resetam e o que acontece no limite</p>
+    <div class="quota-flow">
+      <div class="qf-step">
+        <div class="qf-step-title">Invoke iniciado</div>
+        <div class="qf-step-desc">Usuário dispara POST /invoke_agent</div>
+        <span class="qf-step-tag tag-ok">Request inicia</span>
+      </div>
+      <div class="qf-step">
+        <div class="qf-step-title">Gate de quota</div>
+        <div class="qf-step-desc">count &lt; max? Tier verificado.</div>
+        <span class="qf-step-tag tag-warn">Checar billing</span>
+      </div>
+      <div class="qf-step">
+        <div class="qf-step-title">Dentro do limite</div>
+        <div class="qf-step-desc">Agente processa, turn salvo, count +1</div>
+        <span class="qf-step-tag tag-ok">HTTP 200</span>
+      </div>
+      <div class="qf-step">
+        <div class="qf-step-title">Limite atingido</div>
+        <div class="qf-step-desc">11ª Free: hard block. Pro/Team: pausa janela.</div>
+        <span class="qf-step-tag tag-block">HTTP 429</span>
+      </div>
+    </div>
+
+    <div class="reset-flow">
+      <div class="reset-card">
+        <div class="reset-card-label">Free — reset</div>
+        <div class="reset-card-value">Dia 1º do mês</div>
+        <div class="reset-card-desc">00:00 UTC-3 (horário Brasília). Cron job diário verifica e reseta se chegou a data. Email D-1 avisando.</div>
+      </div>
+      <div class="reset-card">
+        <div class="reset-card-label">Pro — reset</div>
+        <div class="reset-card-value">5h após última invoke</div>
+        <div class="reset-card-desc">Janela rolling. Redis counter TTL=5h. A cada invoke o TTL renova. 50 Sonnet ou 20 Opus.</div>
+      </div>
+      <div class="reset-card">
+        <div class="reset-card-label">Team — reset</div>
+        <div class="reset-card-value">8h após última invoke</div>
+        <div class="reset-card-desc">Pool da org. Qualquer membro que invocar renova o TTL. 150 Sonnet ou 60 Opus compartilhados.</div>
+      </div>
+      <div class="reset-card block">
+        <div class="reset-card-label">11ª invoke Free</div>
+        <div class="reset-card-value">Hard block</div>
+        <div class="reset-card-desc">HTTP 429. Sem fallback para Qwen. Sem degradação de qualidade. CTA de upgrade.</div>
+      </div>
+      <div class="reset-card ok">
+        <div class="reset-card-label">Upgrade mid-ciclo</div>
+        <div class="reset-card-value">Goodwill imediato</div>
+        <div class="reset-card-desc">Janela/pool cheia imediatamente após upgrade. Não espera próximo ciclo.</div>
+      </div>
+      <div class="reset-card ok">
+        <div class="reset-card-label">Downgrade</div>
+        <div class="reset-card-value">Grace period</div>
+        <div class="reset-card-desc">Novos limites só no próximo ciclo. Tier atual mantido até fim do período pago.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Memória -->
+  <section class="section">
+    <h2 class="section-title">Política de Memória & TTL</h2>
+    <p class="section-subtitle">Retenção cross-sessão, arquivamento e purge por tier — o moat do Forja</p>
+    <div class="memory-grid">
+      <div class="mem-card">
+        <div class="mem-card-head">
+          <span class="mem-card-name">Free</span>
+          <span class="badge badge-free">30d → 180d</span>
+        </div>
+        <div class="mem-bar-track">
+          <div class="mem-bar-fill" style="width:16%;background:linear-gradient(90deg,#475569,#334155);"></div>
+        </div>
+        <div class="mem-stages">
+          <div class="mem-stage"><span class="mem-dot on"></span>Ativo enquanto usa</div>
+          <div class="mem-stage"><span class="mem-dot on"></span>30 dias inatividade → soft archive</div>
+          <div class="mem-stage"><span class="mem-dot"></span>180 dias total → hard delete</div>
+          <div class="mem-stage"><span class="mem-dot"></span>Contexto: <span class="mem-token">32k tokens · 20 turns</span></div>
+        </div>
+      </div>
+      <div class="mem-card">
+        <div class="mem-card-head">
+          <span class="mem-card-name">Pro</span>
+          <span class="badge badge-pro">180d</span>
+        </div>
+        <div class="mem-bar-track">
+          <div class="mem-bar-fill" style="width:50%;background:linear-gradient(90deg,#f97316,#ea580c);"></div>
+        </div>
+        <div class="mem-stages">
+          <div class="mem-stage"><span class="mem-dot on"></span>Ativo enquanto usa</div>
+          <div class="mem-stage"><span class="mem-dot on"></span>180 dias inatividade → soft archive</div>
+          <div class="mem-stage"><span class="mem-dot on"></span>+180d archive → hard delete (com aviso D-7)</div>
+          <div class="mem-stage"><span class="mem-dot"></span>Contexto: <span class="mem-token">100k tokens · 20 turns</span></div>
+        </div>
+      </div>
+      <div class="mem-card">
+        <div class="mem-card-head">
+          <span class="mem-card-name">Team</span>
+          <span class="badge badge-team">365d</span>
+        </div>
+        <div class="mem-bar-track">
+          <div class="mem-bar-fill" style="width:100%;background:linear-gradient(90deg,#c4b5fd,#a78bfa);"></div>
+        </div>
+        <div class="mem-stages">
+          <div class="mem-stage"><span class="mem-dot on"></span>Ativo enquanto usa</div>
+          <div class="mem-stage"><span class="mem-dot on"></span>365 dias inatividade → soft archive</div>
+          <div class="mem-stage"><span class="mem-dot on"></span>Sessões compartilhadas no workspace</div>
+          <div class="mem-stage"><span class="mem-dot"></span>Contexto: <span class="mem-token">200k tokens · 20 turns</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ctx-table">
+      <table>
+        <thead>
+          <tr>
+            <th>Tier</th>
+            <th>Tokens de contexto</th>
+            <th>Turns por invoke</th>
+            <th>TTL inatividade</th>
+            <th>Hard delete</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="badge badge-free">Free</span></td>
+            <td><span class="val">32.000 tokens</span></td>
+            <td><span class="val">20 turns</span></td>
+            <td>30 dias</td>
+            <td>180 dias</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-pro">Pro</span></td>
+            <td><span class="val">100.000 tokens</span></td>
+            <td><span class="val">20 turns</span></td>
+            <td>180 dias</td>
+            <td>+180d archive</td>
+          </tr>
+          <tr>
+            <td><span class="badge badge-team">Team</span></td>
+            <td><span class="val">200.000 tokens</span></td>
+            <td><span class="val">20 turns</span></td>
+            <td>365 dias</td>
+            <td>+180d archive</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 4. Agentes -->
+  <section class="section">
+    <h2 class="section-title">Agentes por Tier</h2>
+    <p class="section-subtitle">Free = Ayla exclusivo. Catálogo completo visível com lock (FOMO intencional). Pro/Team = todos os 15.</p>
+    <div class="agents-grid">
+      <div class="agent-card">
+        <div class="agent-icon">A</div>
+        <div class="agent-name">Ayla</div>
+        <div class="agent-role">Orquestradora · todos</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Ap</div>
+        <div class="agent-name">Apolo</div>
+        <div class="agent-role">Backend · APIs</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Ar</div>
+        <div class="agent-name">Artemis</div>
+        <div class="agent-role">Segurança · audit</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">At</div>
+        <div class="agent-name">Atena</div>
+        <div class="agent-role">Arquitetura · design</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Af</div>
+        <div class="agent-name">Afrodite</div>
+        <div class="agent-role">Contratos · specs</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">G</div>
+        <div class="agent-name">Gaia</div>
+        <div class="agent-role">Docs · consolidação</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">H</div>
+        <div class="agent-name">Hefesto</div>
+        <div class="agent-role">QA · CI/CD</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">He</div>
+        <div class="agent-name">Hera</div>
+        <div class="agent-role">Supervisora · finance</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Hr</div>
+        <div class="agent-name">Hermes</div>
+        <div class="agent-role">Market intel · scan</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Í</div>
+        <div class="agent-name">Íris</div>
+        <div class="agent-role">Frontend · UX</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">M</div>
+        <div class="agent-name">Musa</div>
+        <div class="agent-role">Audit · gateway</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Q</div>
+        <div class="agent-name">Quiron</div>
+        <div class="agent-role">Clínico · neuro</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Y</div>
+        <div class="agent-name">Yara</div>
+        <div class="agent-role">Dados · analytics</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Z</div>
+        <div class="agent-name">Zeus</div>
+        <div class="agent-role">Estratégia · visão</div>
+      </div>
+      <div class="agent-card locked">
+        <div class="lock-badge">Pro</div>
+        <div class="agent-icon">Tl</div>
+        <div class="agent-name">Atlas</div>
+        <div class="agent-role">Infra · devops</div>
+      </div>
+      <div class="agent-card locked war-room-card">
+        <div class="lock-badge" style="color:#c4b5fd;background:#2e1065;">Team</div>
+        <div class="agent-icon">⚔️</div>
+        <div class="agent-name" style="color:#c4b5fd;">War Room</div>
+        <div class="agent-role" style="color:#7c3aed;">Orquestração multi-agente · Team tier</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Roteamento de modelo -->
+  <section class="section">
+    <h2 class="section-title">Roteamento de Modelo (LLM)</h2>
+    <p class="section-subtitle">Decisão automática — Forja escolhe o modelo certo sem o usuário configurar</p>
+    <div class="routing-diagram">
+      <div class="routing-row">
+        <div class="rt-node">
+          <div class="rt-node-title">Request recebida</div>
+          <div class="rt-node-desc">POST /invoke_agent com prompt</div>
+        </div>
+        <div class="rt-arrow">→</div>
+        <div class="rt-decision">
+          <div class="rt-decision-q">É papo casual?</div>
+          <div class="rt-yes">SIM: &lt;200 chars, sem código</div>
+          <div class="rt-no">NÃO: código, arquitetura</div>
+        </div>
+      </div>
+      <div class="routing-row">
+        <div class="rt-node model-box qwen">
+          <div class="rt-node-title" style="color:#34d399;">Qwen 2.5 Coder 32B</div>
+          <div class="rt-node-desc">Casual · todos os tiers · rápido + econômico</div>
+        </div>
+        <div class="rt-arrow">←</div>
+        <div class="rt-decision">
+          <div class="rt-decision-q">É heavy task?</div>
+          <div class="rt-yes">SIM: war room, refactor &gt;500 linhas</div>
+          <div class="rt-no">NÃO: técnico padrão</div>
+        </div>
+      </div>
+      <div class="routing-row">
+        <div class="rt-node model-box">
+          <div class="rt-node-title" style="color:#7dd3fc;">Claude Sonnet 4.6</div>
+          <div class="rt-node-desc">Default técnico · todos os tiers · &gt;80% das invocações</div>
+        </div>
+        <div class="rt-arrow">←</div>
+        <div class="rt-node model-box opus" style="flex:.6;">
+          <div class="rt-node-title" style="color:#c4b5fd;">Claude Opus 4.8</div>
+          <div class="rt-node-desc">Heavy tasks · Pro/Team apenas · War Room</div>
+        </div>
+      </div>
+      <div style="margin-top:1rem;font-size:.78rem;color:#475569;line-height:1.6;">
+        <strong style="color:#94a3b8;">Fallback:</strong> Opus indisponível → Sonnet + warning · Sonnet indisponível → Qwen + aviso "degraded mode"
+      </div>
+    </div>
+  </section>
+
+  <!-- 6. Gates & invoke sequence -->
+  <section class="section">
+    <h2 class="section-title">Gates & Sequência de Invoke</h2>
+    <p class="section-subtitle">Ordem obrigatória de verificações a cada chamada ao agente</p>
+
+    <div class="invoke-seq">
+      <div class="invoke-seq-title">POST /api/v1/invoke_agent — sequência de gates</div>
+      <div class="seq-line"><span class="seq-step">1.</span><span class="seq-text">Auth (JWT válido?) <span class="seq-fail">→ 401 se não autenticado</span></span></div>
+      <div class="seq-line"><span class="seq-step">  </span><span class="seq-connector">│</span></div>
+      <div class="seq-line"><span class="seq-step">2.</span><span class="seq-text">Plan check → effectivePlan(userId) ∈ {FREE, PRO, TEAM}</span></div>
+      <div class="seq-line"><span class="seq-step">  </span><span class="seq-connector">│</span></div>
+      <div class="seq-line"><span class="seq-step">3.</span><span class="seq-text">Agent whitelist → agentId ∈ allowedAgents[plan] <span class="seq-fail">→ 403 se não</span></span></div>
+      <div class="seq-line"><span class="seq-step">  </span><span class="seq-connector">│</span></div>
+      <div class="seq-line"><span class="seq-step">4.</span><span class="seq-text">Usage check → count &lt; maxPerWindow <span class="seq-fail">→ 429 se excedido</span></span></div>
+      <div class="seq-line"><span class="seq-step">  </span><span class="seq-connector">│</span></div>
+      <div class="seq-line"><span class="seq-step">5.</span><span class="seq-text">Invoke agent (core/olimpo) ← <span class="seq-ok">lógica do agente aqui</span></span></div>
+      <div class="seq-line"><span class="seq-step">  </span><span class="seq-connector">│</span></div>
+      <div class="seq-line"><span class="seq-step">6.</span><span class="seq-text">incrementUsage() — <strong>FAIL-CLOSED</strong>: se falhar <span class="seq-fail">→ NÃO retorna resposta</span></span></div>
+      <div class="seq-line"><span class="seq-step">  </span><span class="seq-connector">│</span></div>
+      <div class="seq-line"><span class="seq-step">7.</span><span class="seq-text">saveSessionTurn() — fail-open: retorna com <span class="seq-fail">⚠️ context not saved</span> se falhar</span></div>
+      <div class="seq-line"><span class="seq-step">  </span><span class="seq-connector">│</span></div>
+      <div class="seq-line"><span class="seq-step">8.</span><span class="seq-text"><span class="seq-ok">HTTP 200 + streaming output ao usuário</span></span></div>
+    </div>
+
+    <div class="gates-list">
+      <div class="gate-row danger">
+        <div class="gate-num">!</div>
+        <div class="gate-body">
+          <div class="gate-title">11ª invocação Free — Hard Block</div>
+          <div class="gate-desc">Sem fallback para Qwen. Sem degradação. Free tier = acquisition tool, não produto degradado.</div>
+          <span class="gate-chip">HTTP 429 · mensagem: "Renova dia {data}" · CTA Pro</span>
+        </div>
+      </div>
+      <div class="gate-row danger">
+        <div class="gate-num">!</div>
+        <div class="gate-body">
+          <div class="gate-title">Billing fail-closed</div>
+          <div class="gate-desc">Se incrementUsage() falhar (Neon inacessível, race condition), a resposta do agente NÃO é entregue. Log BILLING_INCONSISTENCY. Usuário vê 500 "Billing error — try again".</div>
+          <span class="gate-chip">Fail-closed · billing inconsistente = dívida técnica acumulada</span>
+        </div>
+      </div>
+      <div class="gate-row warn">
+        <div class="gate-num">⚠</div>
+        <div class="gate-body">
+          <div class="gate-title">Cartão recusado (Stripe)</div>
+          <div class="gate-desc">Grace period 7 dias. 3 retries (D+0, D+3, D+5). Emails: D+0 (falha), D+3 (aviso), D+6 (downgrade iminente), D+7 (downgraded para Free).</div>
+          <span class="gate-chip">D+7 sem pagamento → downgrade Free automático</span>
+        </div>
+      </div>
+      <div class="gate-row ok">
+        <div class="gate-num">✓</div>
+        <div class="gate-body">
+          <div class="gate-title">Upgrade mid-ciclo — goodwill</div>
+          <div class="gate-desc">Janela/pool resetado para cheio imediatamente após confirmação do Stripe. Não espera próximo ciclo.</div>
+          <span class="gate-chip">Quota cheia na hora · goodwill</span>
+        </div>
+      </div>
+      <div class="gate-row ok">
+        <div class="gate-num">✓</div>
+        <div class="gate-body">
+          <div class="gate-title">Downgrade — grace period</div>
+          <div class="gate-desc">Novos limites aplicam-se apenas no próximo ciclo de billing (não imediato). Usuário mantém tier pago até fim do período.</div>
+          <span class="gate-chip">Novos limites no próximo ciclo</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Edge Cases -->
+  <section class="section">
+    <h2 class="section-title">Edge Cases & Regras Especiais</h2>
+    <p class="section-subtitle">O que acontece em situações não-óbvias — documento para produto, QA e backend</p>
+    <div class="edge-grid">
+      <div class="edge-card">
+        <div class="edge-title">O que é uma "invocação"?</div>
+        <div class="edge-desc">Request iniciado pelo usuário e aceito pelo backend (POST aceito). Streaming conta como 1 invocação, independente de duração.</div>
+        <div class="edge-rule yes">✓ Conta: request user-initiated aceita</div>
+      </div>
+      <div class="edge-card">
+        <div class="edge-title">Cancel mid-flight</div>
+        <div class="edge-desc">Usuário cancela a request durante processamento (ctrl+C, fechar aba). A invocação JÁ foi iniciada — conta no quota.</div>
+        <div class="edge-rule yes">✓ Conta: request já iniciada</div>
+      </div>
+      <div class="edge-card">
+        <div class="edge-title">Retry 5xx servidor</div>
+        <div class="edge-desc">Retry automático por erro de infraestrutura (500, 502, 503) não consome quota. É falha do sistema, não do usuário.</div>
+        <div class="edge-rule no">✗ Não conta: falha do sistema</div>
+      </div>
+      <div class="edge-card">
+        <div class="edge-title">Retry manual pelo usuário</div>
+        <div class="edge-desc">Usuário que re-tenta manualmente (nova request, não retry automático) é uma nova invocação e conta.</div>
+        <div class="edge-rule yes">✓ Conta: nova request iniciada</div>
+      </div>
+      <div class="edge-card">
+        <div class="edge-title">Warm-up de memória timeout</div>
+        <div class="edge-desc">Se carregar contexto do Neon demora &gt;5s (timeout), invoke continua stateless sem contexto. NÃO conta como invocação se o agente não chegou a processar.</div>
+        <div class="edge-rule no">✗ Não conta: overhead interno</div>
+      </div>
+      <div class="edge-card">
+        <div class="edge-title">Sessão arquivada — restore</div>
+        <div class="edge-desc">Se usuário invoca com --session de sessão arquivada (TTL expirado), restore silencioso automático + TTL reinicia. Não interrompe o fluxo.</div>
+        <div class="edge-rule yes">✓ Restore automático silencioso</div>
+      </div>
+      <div class="edge-card">
+        <div class="edge-title">War Room — pool por invoke</div>
+        <div class="edge-desc">Cada invoke no War Room = 1 do pool do tier, independente de quantos agentes respondem internamente. Orquestração interna não multiplica o custo.</div>
+        <div class="edge-rule yes">✓ 1 invoke = 1 do pool (sempre)</div>
+      </div>
+      <div class="edge-card">
+        <div class="edge-title">Limites simultâneos</div>
+        <div class="edge-desc">Se dois gates falham ao mesmo tempo (ex: quota + cartão recusado), a precedência é: Auth → Whitelist → Quota. Mensagem específica ao gate ativo.</div>
+        <div class="edge-rule yes">✓ Precedência: auth → whitelist → quota</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8. Decisões BR -->
+  <section class="section">
+    <h2 class="section-title">Decisões do War Room (BR-01 a BR-10)</h2>
+    <p class="section-subtitle">Decisões tomadas com rationale e alternativa descartada — não alterar sem novo war room</p>
+    <div class="decisions-table">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Regra</th>
+            <th>Decisão</th>
+            <th>Alternativa descartada</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="dr-id">BR-01</span></td>
+            <td>Reset Free</td>
+            <td><span class="dr-rule">Mensal (dia 1º)</span><br><span style="font-size:.75rem;color:#64748b;">ICP faz sprints — reset diário puniria uso legítimo</span></td>
+            <td><span class="dr-discard">Diário (punitive p/ sprints)</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-02</span></td>
+            <td>TTL Free</td>
+            <td><span class="dr-rule">30 dias inatividade</span><br><span style="font-size:.75rem;color:#64748b;">ICP some por semanas e volta — 7d mataria o AHA</span></td>
+            <td><span class="dr-discard">7 dias (mataria moat) / Infinito (COGS)</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-03</span></td>
+            <td>Contexto Free vs Pro</td>
+            <td><span class="dr-rule">Mesmo contexto (gate por volume)</span><br><span style="font-size:.75rem;color:#64748b;">ICP técnico detecta contexto castrado e desconfia</span></td>
+            <td><span class="dr-discard">Contexto menor no Free (antipadrão Copilot)</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-04</span></td>
+            <td>Agente Free</td>
+            <td><span class="dr-rule">Ayla exclusivo + catálogo com lock</span><br><span style="font-size:.75rem;color:#64748b;">Ayla = rosto. Catálogo visível = FOMO específico</span></td>
+            <td><span class="dr-discard">Escolha de 1 entre 15 / esconder catálogo</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-05</span></td>
+            <td>11ª invoke Free</td>
+            <td><span class="dr-rule">Hard block 429</span><br><span style="font-size:.75rem;color:#64748b;">Free = acquisition tool. Qwen-only dilui moat e canibaliza Pro</span></td>
+            <td><span class="dr-discard">Qwen-only fallback após limite</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-06</span></td>
+            <td>Janela Pro</td>
+            <td><span class="dr-rule">5h rolling após última invoke</span><br><span style="font-size:.75rem;color:#64748b;">Sprints não são punidos. Familiar para ICP (modelo Claude)</span></td>
+            <td><span class="dr-discard">5h fixed desde meia-noite</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-07</span></td>
+            <td>Catálogo UI</td>
+            <td><span class="dr-rule">Todos visíveis com lock</span><br><span style="font-size:.75rem;color:#64748b;">"Não sabia que tinha isso" = churn post-launch</span></td>
+            <td><span class="dr-discard">Esconder locked (Vercel-style)</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-08</span></td>
+            <td>Billing fail</td>
+            <td><span class="dr-rule">Fail-closed (sem resposta)</span><br><span style="font-size:.75rem;color:#64748b;">Billing inconsistente acumulado = dívida técnica severa</span></td>
+            <td><span class="dr-discard">Fail-open + corrigir depois</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-09</span></td>
+            <td>Definição de invocação</td>
+            <td><span class="dr-rule">Request iniciada pelo usuário</span><br><span style="font-size:.75rem;color:#64748b;">Previsível. Alinhado com OpenAI. Retry 5xx servidor = não conta.</span></td>
+            <td><span class="dr-discard">Só contar se response completa</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-10</span></td>
+            <td>Downgrade</td>
+            <td><span class="dr-rule">Grace period até próximo ciclo</span><br><span style="font-size:.75rem;color:#64748b;">Usuário que pagou até fim do mês mantém o tier</span></td>
+            <td><span class="dr-discard">Downgrade imediato (Vercel: gerou reclamações)</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- 9. LGPD -->
+  <section class="section">
+    <h2 class="section-title">Compliance & LGPD</h2>
+    <p class="section-subtitle">Direitos do usuário, retenção de dados e localização</p>
+    <div class="lgpd-grid">
+      <div class="lgpd-card">
+        <div class="lgpd-title">Direito de Esquecimento</div>
+        <div class="lgpd-desc">Usuário pode solicitar via dashboard ou suporte@forja.dev. Hard delete em 48h. Escopo: sessões, índice de projeto, perfil. Exceção: logs de billing (5 anos — obrigação fiscal BR).</div>
+      </div>
+      <div class="lgpd-card">
+        <div class="lgpd-title">Portabilidade de Dados</div>
+        <div class="lgpd-desc">`forja session export --all --format json`. Inclui: session_id, agent_id, turns (prompt + response), timestamps. Não inclui: dados de billing, logs internos.</div>
+      </div>
+      <div class="lgpd-card">
+        <div class="lgpd-title">Auto-Archive & Purge</div>
+        <div class="lgpd-desc">Email D-7 antes de auto-archive. Email D-7 antes de hard delete. Restauração sempre disponível até hard delete (self-serve).</div>
+      </div>
+      <div class="lgpd-card">
+        <div class="lgpd-title">Localização de Dados</div>
+        <div class="lgpd-desc">Neon us-east-1 (atual). Migração sa-east-1 em Q3+. Disclosure no signup e na privacy policy.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="foot">
+    Forja · Business Rules v1.0 · War Room 2026-06-17 · Canônico — não alterar sem novo war room.<br>
+    Decisores: Ayla · Atena · Íris · Artemis · Hermes · Gaia
+  </div>
+
+</div>
+</body>
+</html>
