@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Fit Staircase — Ayla Commander</title>
+  <title>Forja — Fit Staircase</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
       --bg:        #0f172a;
       --surface:   #1e293b;
-      --surface2:  #263349;
       --border:    #334155;
       --text:      #e2e8f0;
       --muted:     #94a3b8;
@@ -22,9 +21,9 @@
       --purple-dim:#5b21b6;
       --green:     #4ade80;
       --step-w:    260px;
-      --step-h:    220px;
-      --riser:     56px;   /* vertical offset per step */
-      --tread:     40px;   /* horizontal overlap */
+      --step-h:    230px;
+      --riser:     56px;
+      --tread:     40px;
     }
 
     body {
@@ -35,33 +34,23 @@
       padding: 0 0 80px;
     }
 
-    /* ── HEADER ─────────────────────────────────────────────── */
+    /* ── HEADER ── */
     header {
       display: flex;
       align-items: center;
-      gap: 20px;
-      padding: 28px 40px 24px;
+      gap: 16px;
+      padding: 24px 40px;
       border-bottom: 1px solid var(--border);
       background: linear-gradient(135deg, #0f172a 60%, #1a2744);
     }
-    header img {
-      width: 52px; height: 52px;
-      border-radius: 12px;
-      object-fit: contain;
-      background: var(--surface);
-      padding: 4px;
+    .hdr-logo { display:flex; align-items:center; gap:.6rem; }
+    .hdr-logo svg { width:44px; height:44px; }
+    .hdr-logo-name {
+      font-size: 1.4rem; font-weight: 800;
+      background: linear-gradient(135deg,#fbbf24,#f97316);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
     }
-    .header-text h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: -0.3px;
-    }
-    .header-text h1 span { color: var(--cyan); }
-    .header-text p {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-top: 3px;
-    }
+    .hdr-sub { font-size:.78rem; color:var(--muted); margin-top:2px; }
     .badge {
       margin-left: auto;
       background: var(--surface);
@@ -75,237 +64,136 @@
     }
     .badge strong { color: var(--text); display: block; font-size: 0.85rem; }
 
-    /* ── SECTION TITLE ──────────────────────────────────────── */
+    /* ── SECTION TITLE ── */
     .section-title {
       text-align: center;
-      margin: 40px 40px 8px;
+      margin: 36px 40px 8px;
     }
-    .section-title h2 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--text);
-    }
+    .section-title h2 { font-size: 1.2rem; font-weight: 700; }
     .section-title p {
-      margin-top: 6px;
-      font-size: 0.82rem;
-      color: var(--muted);
-      max-width: 640px;
-      margin-left: auto;
-      margin-right: auto;
+      margin-top: 6px; font-size: 0.82rem; color: var(--muted);
+      max-width: 640px; margin-left: auto; margin-right: auto;
     }
 
-    /* ── LEGEND ─────────────────────────────────────────────── */
+    /* ── LEGEND ── */
     .legend {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      justify-content: center;
-      margin: 20px 40px;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 24px;
+      justify-content: center; margin: 20px 40px; flex-wrap: wrap;
     }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.78rem;
-      color: var(--muted);
-    }
-    .legend-dot {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-    .legend-line {
-      width: 28px; height: 2px;
-      flex-shrink: 0;
-      border-radius: 2px;
-    }
-    .conversion-flag {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: linear-gradient(90deg, rgba(245,158,11,0.15), transparent);
-      border-left: 3px solid var(--amber);
-      border-radius: 4px;
-      padding: 6px 12px;
-      font-size: 0.78rem;
-      color: var(--amber);
-      font-weight: 600;
-    }
+    .legend-item { display:flex; align-items:center; gap:8px; font-size:.78rem; color:var(--muted); }
+    .legend-dot { width:12px; height:12px; border-radius:50%; flex-shrink:0; }
+    .legend-line { width:28px; height:2px; flex-shrink:0; border-radius:2px; }
 
-    /* ── STAIRCASE SCROLL CONTAINER ─────────────────────────── */
-    .staircase-outer {
-      overflow-x: auto;
-      padding: 0 40px;
-      margin-top: 16px;
-    }
+    /* ── STAIRCASE ── */
+    .staircase-outer { overflow-x: auto; padding: 0 40px; margin-top: 16px; }
     .staircase-inner {
       position: relative;
-      /* width = 7 steps * step-w + some padding for arrow overflows */
-      width: calc(7 * (var(--step-w) + var(--tread)) + var(--step-w) + 60px);
-      /* height = header offset + 7 risers + card height */
-      height: calc(7 * var(--riser) + var(--step-h) + 120px);
+      width: calc(7 * (260px + 40px) + 260px + 60px);
+      height: calc(7 * 56px + 230px + 120px);
       margin: 0 auto;
     }
-
-    /* ── STAIR GROUND LINE ───────────────────────────────────── */
     .ground-line {
-      position: absolute;
-      bottom: 20px;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: var(--border);
-      border-radius: 1px;
+      position: absolute; bottom: 20px; left: 0; right: 0;
+      height: 2px; background: var(--border); border-radius: 1px;
     }
 
-    /* ── STEP CARD ──────────────────────────────────────────── */
+    /* ── STEP CARD ── */
     .step {
-      position: absolute;
-      width: var(--step-w);
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 18px 18px 16px;
-      transition: transform 0.2s, box-shadow 0.2s;
-      cursor: default;
+      position: absolute; width: 260px;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 14px; padding: 16px 16px 14px;
+      transition: transform 0.2s, box-shadow 0.2s; cursor: default;
     }
-    .step:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
-      z-index: 10;
-    }
-    .step.free  { border-color: var(--cyan-dim);   }
-    .step.paid  { border-color: var(--amber-dim);  }
-    .step.evan  { border-color: var(--purple-dim); }
+    .step:hover { transform: translateY(-4px); box-shadow: 0 12px 32px rgba(0,0,0,.5); z-index: 10; }
+    .step.free  { border-color: var(--cyan-dim); }
+    .step.paid  { border-color: var(--amber-dim); }
+    .step.team  { border-color: var(--purple-dim); }
 
     .step-number {
-      width: 28px; height: 28px;
-      border-radius: 50%;
+      width: 26px; height: 26px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; font-weight: 700;
-      margin-bottom: 10px;
-      flex-shrink: 0;
+      font-size: 0.72rem; font-weight: 700; margin-bottom: 8px;
     }
-    .free  .step-number { background: var(--cyan-dim);   color: var(--cyan); }
-    .paid  .step-number { background: var(--amber-dim);  color: var(--amber); }
-    .evan  .step-number { background: var(--purple-dim); color: var(--purple); }
+    .free .step-number  { background: var(--cyan-dim);   color: var(--cyan); }
+    .paid .step-number  { background: var(--amber-dim);  color: var(--amber); }
+    .team .step-number  { background: var(--purple-dim); color: var(--purple); }
 
-    .step-title {
-      font-size: 0.95rem;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .free  .step-title { color: var(--cyan); }
-    .paid  .step-title { color: var(--amber); }
-    .evan  .step-title { color: var(--purple); }
+    .step-title { font-size: .92rem; font-weight: 700; margin-bottom: 6px; }
+    .free .step-title { color: var(--cyan); }
+    .paid .step-title { color: var(--amber); }
+    .team .step-title { color: var(--purple); }
 
-    .step-row {
-      display: flex;
-      gap: 6px;
-      margin-bottom: 5px;
-      align-items: flex-start;
-    }
+    .step-row { display:flex; gap:6px; margin-bottom:5px; align-items:flex-start; }
     .step-label {
-      font-size: 0.62rem;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.4px;
-      padding: 2px 5px;
-      border-radius: 4px;
-      flex-shrink: 0;
-      margin-top: 1px;
+      font-size: .6rem; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .4px; padding: 2px 5px; border-radius: 4px;
+      flex-shrink: 0; margin-top: 1px;
     }
-    .lbl-job    { background: rgba(148,163,184,0.15); color: var(--muted); }
-    .lbl-offer  { background: rgba(34,211,238,0.12);  color: var(--cyan);  }
-    .lbl-offer.paid { background: rgba(245,158,11,0.12); color: var(--amber); }
-    .lbl-offer.evan { background: rgba(196,181,253,0.12); color: var(--purple); }
-    .lbl-up     { background: rgba(74,222,128,0.12);  color: var(--green); }
+    .lbl-job   { background: rgba(148,163,184,.15); color: var(--muted); }
+    .lbl-free  { background: rgba(34,211,238,.12);  color: var(--cyan); }
+    .lbl-pro   { background: rgba(245,158,11,.12);  color: var(--amber); }
+    .lbl-team  { background: rgba(196,181,253,.12); color: var(--purple); }
+    .lbl-up    { background: rgba(74,222,128,.12);  color: var(--green); }
 
-    .step-text {
-      font-size: 0.74rem;
-      color: var(--muted);
-      line-height: 1.45;
-    }
+    .step-text { font-size: .72rem; color: var(--muted); line-height: 1.45; }
 
-    /* ── CONVERSION MARKER ──────────────────────────────────── */
-    .conversion-marker {
-      position: absolute;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-      z-index: 5;
-    }
-    .conversion-marker .marker-line {
-      width: 2px;
-      height: 60px;
-      background: linear-gradient(to bottom, var(--amber), transparent);
-      border-radius: 1px;
-    }
-    .conversion-marker .marker-label {
-      background: var(--amber);
-      color: #000;
-      font-size: 0.65rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      padding: 3px 8px;
-      border-radius: 4px;
-      white-space: nowrap;
-    }
+    /* ── SVG arrows ── */
+    .stair-svg { position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none; }
 
-    /* ── DIAGONAL ARROWS (SVG overlay) ─────────────────────── */
-    .stair-svg {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-    }
-
-    /* ── BOTTOM CALLOUT STRIP ───────────────────────────────── */
+    /* ── CALLOUTS ── */
     .callouts {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin: 40px 40px 0;
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px; margin: 40px 40px 0;
     }
-    .callout {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 18px 20px;
+    .callout { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 18px 20px; }
+    .callout h3 { font-size:.82rem; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+    .callout p  { font-size:.75rem; color:var(--muted); line-height:1.55; }
+    .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+
+    /* ICP disclaimer */
+    .disclaimer {
+      margin: 24px 40px 0;
+      padding: 12px 18px;
+      background: #1a1408;
+      border: 1px solid #92400e;
+      border-radius: 8px;
+      font-size: .75rem;
+      color: #d97706;
+      line-height: 1.6;
     }
-    .callout h3 {
-      font-size: 0.82rem;
-      font-weight: 700;
-      margin-bottom: 8px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .callout p {
-      font-size: 0.75rem;
-      color: var(--muted);
-      line-height: 1.55;
-    }
-    .callout .dot {
-      width: 8px; height: 8px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
+    .disclaimer strong { color: #fbbf24; }
   </style>
 </head>
 <body>
 
-<!-- ── HEADER ───────────────────────────────────────────────── -->
+<!-- HEADER -->
 <header>
-  <img src="https://lavitacode.github.io/forja/olimpianos.png"
-       alt="Ayla Commander logo"
-       onerror="this.style.display='none'" />
-  <div class="header-text">
-    <h1>Ayla <span>Commander</span></h1>
-    <p>Fit Staircase — Value Proposition Design · War Room IRC com Agentes IA</p>
+  <div class="hdr-logo">
+    <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="14" y="14" width="92" height="92" rx="22" fill="#0a1220" stroke="#1e293b" stroke-width="1.5"/>
+      <defs>
+        <linearGradient id="emberH" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stop-color="#fbbf24"/><stop offset="55%" stop-color="#f97316"/><stop offset="100%" stop-color="#9a3412"/>
+        </linearGradient>
+        <linearGradient id="steelH" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#cbd5e1"/><stop offset="100%" stop-color="#64748b"/>
+        </linearGradient>
+        <radialGradient id="glowH" cx="50%" cy="50%" r="55%">
+          <stop offset="0%" stop-color="#f97316" stop-opacity=".35"/><stop offset="100%" stop-color="#f97316" stop-opacity="0"/>
+        </radialGradient>
+      </defs>
+      <circle cx="60" cy="60" r="40" fill="url(#glowH)"/>
+      <rect x="40" y="34" width="14" height="52" rx="3" fill="url(#steelH)"/>
+      <rect x="40" y="34" width="42" height="14" rx="3" fill="url(#emberH)"/>
+      <rect x="40" y="54" width="30" height="13" rx="3" fill="url(#emberH)"/>
+      <rect x="40" y="34" width="14" height="3" rx="1.5" fill="#fbbf24" opacity=".8"/>
+      <circle cx="86" cy="40" r="2" fill="#fbbf24"/>
+      <circle cx="74" cy="60" r="1.8" fill="#fbbf24"/>
+    </svg>
+    <div>
+      <div class="hdr-logo-name">Forja</div>
+      <div class="hdr-sub">Fit Staircase — Value Proposition Design</div>
+    </div>
   </div>
   <div class="badge">
     <strong>Value Proposition Design</strong>
@@ -314,248 +202,193 @@
   </div>
 </header>
 
-<!-- ── SECTION ──────────────────────────────────────────────── -->
+<!-- SECTION TITLE -->
 <div class="section-title">
-  <h2>Jornada do Usuário — Do Descoberta ao Evangelista</h2>
-  <p>
-    Cada degrau representa um estágio de comprometimento do usuário. O produto entrega
-    um ganho ou alivia uma dor específica em cada etapa, criando o gatilho para a subida.
-  </p>
+  <h2>Jornada do Usuário — Da Descoberta ao Evangelista</h2>
+  <p>Cada degrau representa um estágio de comprometimento. O produto entrega um ganho ou alivia uma dor específica em cada etapa, criando o gatilho para a subida.</p>
 </div>
 
-<!-- ── LEGEND ───────────────────────────────────────────────── -->
+<!-- ICP DISCLAIMER -->
+<div class="disclaimer">
+  <strong>ICP hoje (v0.5.0):</strong> Founder técnico solo ou dupla, pré-seed a seed. N=1 externo validado + 2 founders internos. ICP target (CTO/VP Eng Series A-B) = hypothesis — validar Q3+.
+</div>
+
+<!-- LEGEND -->
 <div class="legend">
-  <div class="legend-item">
-    <div class="legend-dot" style="background:var(--cyan)"></div>
-    Free Tier — IRC + 15 Agentes
-  </div>
-  <div class="legend-item">
-    <div class="legend-dot" style="background:var(--amber)"></div>
-    Paid Tier — War Room + ROOT/DEV + Execução
-  </div>
-  <div class="legend-item">
-    <div class="legend-dot" style="background:var(--purple)"></div>
-    Evangelista — Time inteiro + configuração
-  </div>
-  <div class="legend-item">
-    <div class="legend-line" style="background:var(--amber);height:2px;border:1px dashed var(--amber);background:transparent"></div>
-    Momento de conversão Free → Paid
-  </div>
-  <div class="legend-item">
-    <div class="legend-line" style="background:var(--green)"></div>
-    Gatilho de subida de degrau
-  </div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--cyan)"></div>Free — 10 invocações · 1 agente</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--amber)"></div>Pro R$99/mês — ilimitado · todos agentes</div>
+  <div class="legend-item"><div class="legend-dot" style="background:var(--purple)"></div>Team R$119/assento — workspace · audit log</div>
+  <div class="legend-item"><div class="legend-line" style="border:1px dashed var(--amber);background:transparent"></div>Conversão Free → Pro</div>
+  <div class="legend-item"><div class="legend-line" style="background:var(--green)"></div>Gatilho de subida</div>
 </div>
 
-<!-- ── STAIRCASE ─────────────────────────────────────────────── -->
+<!-- STAIRCASE -->
 <div class="staircase-outer">
   <div class="staircase-inner" id="stair">
-
-    <!-- SVG arrows drawn by JS -->
     <svg class="stair-svg" id="arrows-svg"></svg>
-
-    <!-- Ground line -->
     <div class="ground-line"></div>
 
-    <!-- Step 1 — Descoberta -->
+    <!-- 1 — Descoberta -->
     <div class="step free" id="s1">
       <div class="step-number">1</div>
       <div class="step-title">Descoberta</div>
       <div class="step-row">
         <span class="step-label lbl-job">Job</span>
-        <span class="step-text">Dev ouve falar pelo Twitter/Slack, quer experimentar IA no fluxo de trabalho sem custo.</span>
+        <span class="step-text">Founder ouve falar no Twitter/Slack. Quer testar IA no fluxo sem custo nem setup.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-offer">Oferta</span>
-        <span class="step-text">Cadastro grátis em 30s. Canal público imediato com os 15 agentes Olimpo.</span>
+        <span class="step-label lbl-free">Free</span>
+        <span class="step-text">npm install + 10 invocações grátis. Sem cartão. Agente responde na hora.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-up">↑ Gatilho</span>
-        <span class="step-text">Entra no canal, vê os agentes respondendo ao vivo para outros devs.</span>
+        <span class="step-label lbl-up">↑</span>
+        <span class="step-text">Primeira resposta útil em &lt;10s. Percebe que não é chatbot genérico.</span>
       </div>
     </div>
 
-    <!-- Step 2 — Primeiro Contato -->
+    <!-- 2 — Primeiro Valor -->
     <div class="step free" id="s2">
       <div class="step-number">2</div>
-      <div class="step-title">Primeiro Contato</div>
+      <div class="step-title">Primeiro Valor</div>
       <div class="step-row">
         <span class="step-label lbl-job">Job</span>
-        <span class="step-text">Precisa entender um trecho de código ou debugar erro em produção sem contexto.</span>
+        <span class="step-text">Precisa debugar erro em produção ou entender trecho de código sem contexto.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-offer">Oferta</span>
-        <span class="step-text">@Atena explica arquitetura. @Afrodite revisa fluxo clínico/lógico. @Hermes varre deps.</span>
+        <span class="step-label lbl-free">Free</span>
+        <span class="step-text">Agente especialista responde com contexto do projeto. Lembra a decisão anterior.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-up">↑ Gatilho</span>
-        <span class="step-text">Resposta útil em &lt;10s — percebe que não é chatbot genérico.</span>
+        <span class="step-label lbl-up">↑</span>
+        <span class="step-text">Memória cross-sessão funciona — retoma de onde parou no dia seguinte.</span>
       </div>
     </div>
 
-    <!-- Step 3 — Habituação -->
+    <!-- 3 — Habituação -->
     <div class="step free" id="s3">
       <div class="step-number">3</div>
       <div class="step-title">Habituação</div>
       <div class="step-row">
         <span class="step-label lbl-job">Job</span>
-        <span class="step-text">Quer centralizar discussões técnicas do time num lugar com memória e contexto persistente.</span>
+        <span class="step-text">Usa todo dia. Começa a depender do contexto persistente entre sessões de trabalho.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-offer">Oferta</span>
-        <span class="step-text">Cria canal privado #backend-team. Agentes lembram decisões anteriores do canal.</span>
+        <span class="step-label lbl-free">Free</span>
+        <span class="step-text">Memória episódica Neon acumula decisões, arquitetura, preferências do projeto.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-up">↑ Gatilho</span>
-        <span class="step-text">Usa todo dia. Começa a depender do histórico e da memória dos agentes.</span>
+        <span class="step-label lbl-up">↑</span>
+        <span class="step-text">Esgota as 10 invocações. Sente a trava. Quer mais sem limite.</span>
       </div>
     </div>
 
-    <!-- Step 4 — Momento AHA -->
+    <!-- 4 — Momento AHA -->
     <div class="step free" id="s4">
       <div class="step-number">4</div>
       <div class="step-title">Momento AHA</div>
       <div class="step-row">
         <span class="step-label lbl-job">Job</span>
-        <span class="step-text">"E se o agente pudesse FAZER a correção, não só apontar?"</span>
+        <span class="step-text">"E se o agente pudesse fazer a correção, não só apontar?"</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-offer">Oferta</span>
-        <span class="step-text">Vê Artemis abrir PR automático num canal público. Percebe que execução real existe.</span>
+        <span class="step-label lbl-free">Free</span>
+        <span class="step-text">Vê agente abrir PR automático. Percebe que execução real existe no plano Pro.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-up">↑ Gatilho</span>
-        <span class="step-text">Quer isso para o próprio repo. Botão "Fazer Upgrade para DEV" aparece em contexto.</span>
+        <span class="step-label lbl-up">↑</span>
+        <span class="step-text">Quer isso para o próprio repo. "Upgrade para Pro" aparece no momento certo.</span>
       </div>
     </div>
 
-    <!-- Conversion marker — between s4 and s5 (drawn by JS) -->
-
-    <!-- Step 5 — Conversão -->
+    <!-- 5 — Conversão Pro -->
     <div class="step paid" id="s5">
       <div class="step-number">5</div>
-      <div class="step-title">Conversão</div>
+      <div class="step-title">Conversão Pro</div>
       <div class="step-row">
         <span class="step-label lbl-job">Job</span>
-        <span class="step-text">Quer delegar tarefas reais: "nova demanda", PR automático, revisão de diff.</span>
+        <span class="step-text">Quer delegar tarefas reais: nova demanda, PR automático, revisão de diff.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-offer paid">Oferta</span>
-        <span class="step-text">FAB "Nova Demanda" liberado. Artemis executa no repo. Apolo roda testes. Atena arquiteta.</span>
+        <span class="step-label lbl-pro">Pro R$99</span>
+        <span class="step-text">invoke_agent liberado. Todos os agentes. Invocações ilimitadas. 1 user.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-up">↑ Gatilho</span>
-        <span class="step-text">Primeira demanda entregue com PR limpo e testes passando. ROI imediato visível.</span>
+        <span class="step-label lbl-up">↑</span>
+        <span class="step-text">Primeira demanda entregue com PR limpo e testes passando. ROI imediato.</span>
       </div>
     </div>
 
-    <!-- Step 6 — War Room -->
+    <!-- 6 — Mobile War Room -->
     <div class="step paid" id="s6">
       <div class="step-number">6</div>
-      <div class="step-title">War Room</div>
+      <div class="step-title">Mobile War Room</div>
       <div class="step-row">
         <span class="step-label lbl-job">Job</span>
         <span class="step-text">Está fora, é tarde, PR crítico esperando — não quer abrir laptop para revisar.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-offer paid">Oferta</span>
-        <span class="step-text">Revisa diff completo pelo celular. Aprova ou rejeita com comentário inline. Ayla orquestra o time.</span>
+        <span class="step-label lbl-pro">Pro</span>
+        <span class="step-text">Revisa diff completo pelo celular. Aprova ou rejeita com comentário inline.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-up">↑ Gatilho</span>
-        <span class="step-text">Aprova PR às 23h direto do iPhone. Volta pra cama. Time continua trabalhando.</span>
+        <span class="step-label lbl-up">↑</span>
+        <span class="step-text">Aprova PR às 23h direto do iPhone. Quer o mesmo para o time todo.</span>
       </div>
     </div>
 
-    <!-- Step 7 — Evangelista -->
-    <div class="step evan" id="s7">
+    <!-- 7 — Evangelista Team -->
+    <div class="step team" id="s7">
       <div class="step-number">7</div>
-      <div class="step-title">Evangelista</div>
+      <div class="step-title">Evangelista Team</div>
       <div class="step-row">
         <span class="step-label lbl-job">Job</span>
-        <span class="step-text">Quer que todo o time use. Precisa configurar agentes, permissões e fluxo para a empresa.</span>
+        <span class="step-text">Quer que todo o time use. Precisa de workspace compartilhado, roles e audit log.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-offer evan">Oferta</span>
-        <span class="step-text">Vira ROOT. Convida o time. Configura knobs e permissões por agente. Canal corporativo.</span>
+        <span class="step-label lbl-team">Team R$119/assento</span>
+        <span class="step-text">Convida o time. Workspace compartilhado. Audit log de quem invocou o quê.</span>
       </div>
       <div class="step-row">
-        <span class="step-label lbl-up">↑ Gatilho</span>
-        <span class="step-text">Indica para amigos. Compartilha prints no Twitter. Vira referência na empresa.</span>
+        <span class="step-label lbl-up">↑</span>
+        <span class="step-text">Indica para outros founders. Vira referência no ecossistema. Loop viral orgânico.</span>
       </div>
     </div>
 
-  </div><!-- /staircase-inner -->
-</div><!-- /staircase-outer -->
-
-<!-- ── CALLOUTS ────────────────────────────────────────────── -->
-<div class="callouts">
-  <div class="callout">
-    <h3>
-      <div class="dot" style="background:var(--cyan)"></div>
-      Free Tier — Escada de Valor
-    </h3>
-    <p>
-      Os degraus 1–4 constroem o hábito sem custo. O usuário investe tempo e contexto no produto
-      antes de abrir a carteira. O risco percebido é zero — e a percepção de valor cresce a cada degrau.
-    </p>
-  </div>
-  <div class="callout">
-    <h3>
-      <div class="dot" style="background:var(--amber)"></div>
-      Momento de Conversão — Degrau 4→5
-    </h3>
-    <p>
-      A conversão acontece no pico da tensão: o usuário <em>viu</em> a execução real nos outros,
-      já depende do produto no dia a dia, e o próximo passo natural é "quero isso para mim".
-      O upgrade não é push — é pull.
-    </p>
-  </div>
-  <div class="callout">
-    <h3>
-      <div class="dot" style="background:var(--purple)"></div>
-      Evangelista — Multiplicador de Crescimento
-    </h3>
-    <p>
-      O degrau 7 não é só retenção: é aquisição. Cada evangelista traz o time inteiro.
-      O loop de indicação orgânica substitui a maioria dos investimentos em topo de funil.
-    </p>
-  </div>
-  <div class="callout">
-    <h3>
-      <div class="dot" style="background:var(--green)"></div>
-      Gatilhos de Subida — Jobs Not Done
-    </h3>
-    <p>
-      Cada gatilho é um "Job to be Done" que o degrau atual ainda não resolve completamente.
-      O produto sinaliza o próximo degrau <em>no momento exato</em> em que o usuário sente essa fricção.
-    </p>
   </div>
 </div>
 
-<!-- ── SCRIPT: position steps + draw arrows ───────────────────── -->
+<!-- CALLOUTS -->
+<div class="callouts">
+  <div class="callout">
+    <h3><div class="dot" style="background:var(--cyan)"></div>Free — Escada de Valor Sem Risco</h3>
+    <p>10 invocações grátis, 1 agente — suficiente para sentir o valor da memória episódica. O usuário investe tempo e contexto antes de abrir a carteira. Risco percebido zero, valor percebido cresce a cada degrau.</p>
+  </div>
+  <div class="callout">
+    <h3><div class="dot" style="background:var(--amber)"></div>Conversão Degrau 4→5 — Pull, Não Push</h3>
+    <p>A conversão acontece no pico da tensão: o usuário viu execução real, já depende da memória persistente, e esgotou o free. O upgrade é pull — "quero isso para mim" — não push de vendas. Ciclo 30–60 dias.</p>
+  </div>
+  <div class="callout">
+    <h3><div class="dot" style="background:var(--purple)"></div>Team — Multiplicador de Crescimento</h3>
+    <p>O degrau 7 é aquisição, não só retenção. Cada evangelista traz o time. CAC cai para próximo de zero. Loop: founder usa → conta pro time → team assina → indica outros founders.</p>
+  </div>
+  <div class="callout">
+    <h3><div class="dot" style="background:var(--green)"></div>Gate Q3 — PLG Desbloqueia Aqui</h3>
+    <p>Os degraus 1–4 (free tier viral, self-serve signup, onboarding guiado) dependem do Q3 Foundation. Até lá: founder-solo outbound direto para 3–5 contas, sem PLG. PLG começa somente pós-Q3.</p>
+  </div>
+</div>
+
 <script>
   (function () {
-    const STEP_W   = 260;
-    const STEP_H   = 220;
-    const RISER    = 56;   // px higher per step
-    const TREAD    = 40;   // px right per step (gap between cards)
-    const STEPS    = 7;
-    const PAD_TOP  = 20;   // top padding inside staircase-inner
-    const PAD_LEFT = 20;
-
+    const STEP_W = 260, STEP_H = 230, RISER = 56, TREAD = 40, STEPS = 7;
+    const PAD_TOP = 20, PAD_LEFT = 20;
     const inner = document.getElementById('stair');
     const svg   = document.getElementById('arrows-svg');
 
-    // Total container height = PAD_TOP + STEPS*RISER + STEP_H + some bottom room
     const totalH = PAD_TOP + STEPS * RISER + STEP_H + 40;
     const totalW = PAD_LEFT + STEPS * (STEP_W + TREAD) + STEP_W + 60;
     inner.style.height = totalH + 'px';
     inner.style.width  = totalW + 'px';
 
-    // Position each step card
-    // Step i (1-indexed): left = PAD_LEFT + (i-1)*(STEP_W+TREAD)
-    //                     top  = PAD_TOP + (STEPS - i) * RISER
     const positions = [];
     for (let i = 1; i <= STEPS; i++) {
       const el   = document.getElementById('s' + i);
@@ -566,75 +399,47 @@
       positions.push({ left, top, w: STEP_W, h: STEP_H });
     }
 
-    // Draw SVG arrows between consecutive steps
     svg.setAttribute('viewBox', `0 0 ${totalW} ${totalH}`);
-    svg.setAttribute('width',   totalW);
-    svg.setAttribute('height',  totalH);
+    svg.setAttribute('width',  totalW);
+    svg.setAttribute('height', totalH);
 
-    // Arrowhead marker def
-    svg.innerHTML = `
-      <defs>
-        <marker id="arr-free"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#22d3ee" />
-        </marker>
-        <marker id="arr-conv"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b" />
-        </marker>
-        <marker id="arr-paid"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b" />
-        </marker>
-        <marker id="arr-evan"   markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
-          <path d="M0,0 L6,3 L0,6 Z" fill="#c4b5fd" />
-        </marker>
-        <!-- dashed conversion line -->
-      </defs>
-    `;
+    svg.innerHTML = `<defs>
+      <marker id="arr-free" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#22d3ee"/></marker>
+      <marker id="arr-conv" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/></marker>
+      <marker id="arr-paid" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#f59e0b"/></marker>
+      <marker id="arr-team" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#c4b5fd"/></marker>
+    </defs>`;
 
-    function arrowColor(from, to) {
-      // 1-4 free, 5-6 paid, 7 evan
+    function arrowColor(to) {
       if (to === 5) return { stroke: '#f59e0b', marker: 'arr-conv', dash: '6,3' };
       if (to <= 4)  return { stroke: '#22d3ee', marker: 'arr-free', dash: null };
-      if (to === 7) return { stroke: '#c4b5fd', marker: 'arr-evan', dash: null };
+      if (to === 7) return { stroke: '#c4b5fd', marker: 'arr-team', dash: null };
       return { stroke: '#f59e0b', marker: 'arr-paid', dash: null };
     }
 
     for (let i = 0; i < STEPS - 1; i++) {
-      const from = positions[i];
-      const to   = positions[i + 1];
-
-      // Arrow from right-center of 'from' to left-center of 'to'
-      const x1 = from.left + from.w;
-      const y1 = from.top  + from.h / 2;
-      const x2 = to.left;
-      const y2 = to.top    + to.h / 2;
-
-      // Cubic bezier control points
-      const cx1 = x1 + (x2 - x1) * 0.55;
-      const cy1 = y1;
-      const cx2 = x1 + (x2 - x1) * 0.45;
-      const cy2 = y2;
-
-      const col  = arrowColor(i + 1, i + 2);
-      const dash = col.dash ? `stroke-dasharray="${col.dash}"` : '';
-
+      const from = positions[i], to = positions[i + 1];
+      const x1 = from.left + from.w, y1 = from.top + from.h / 2;
+      const x2 = to.left,            y2 = to.top   + to.h   / 2;
+      const cx1 = x1 + (x2-x1)*.55, cy1 = y1;
+      const cx2 = x1 + (x2-x1)*.45, cy2 = y2;
+      const col  = arrowColor(i + 2);
       const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
       path.setAttribute('d', `M${x1},${y1} C${cx1},${cy1} ${cx2},${cy2} ${x2},${y2}`);
       path.setAttribute('fill', 'none');
       path.setAttribute('stroke', col.stroke);
       path.setAttribute('stroke-width', '1.8');
       path.setAttribute('marker-end', `url(#${col.marker})`);
-      if (col.dash) path.setAttribute('stroke-dasharray', col.dash);
       path.setAttribute('opacity', '0.7');
+      if (col.dash) path.setAttribute('stroke-dasharray', col.dash);
       svg.appendChild(path);
     }
 
-    // Conversion marker line between step 4 and 5
-    const s4 = positions[3];
-    const s5 = positions[4];
+    // Conversion marker between s4 and s5
+    const s4 = positions[3], s5 = positions[4];
     const convX = (s4.left + s4.w + s5.left) / 2;
     const convYtop = Math.min(s4.top, s5.top) - 10;
     const convYbot = Math.max(s4.top + s4.h, s5.top + s5.h) + 16;
-
     const vline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
     vline.setAttribute('x1', convX); vline.setAttribute('y1', convYtop);
     vline.setAttribute('x2', convX); vline.setAttribute('y2', convYbot);
@@ -644,27 +449,11 @@
     vline.setAttribute('opacity', '0.6');
     svg.appendChild(vline);
 
-    // Conversion label
     const fo = document.createElementNS('http://www.w3.org/2000/svg', 'foreignObject');
-    fo.setAttribute('x', convX - 52);
-    fo.setAttribute('y', convYtop - 26);
-    fo.setAttribute('width', '104');
-    fo.setAttribute('height', '24');
-    fo.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" style="
-      background:#f59e0b;
-      color:#000;
-      font-size:0.62rem;
-      font-weight:800;
-      text-transform:uppercase;
-      letter-spacing:0.5px;
-      padding:3px 8px;
-      border-radius:4px;
-      text-align:center;
-      white-space:nowrap;
-      font-family:Segoe UI,system-ui,sans-serif;
-    ">FREE → PAID</div>`;
+    fo.setAttribute('x', convX - 52); fo.setAttribute('y', convYtop - 26);
+    fo.setAttribute('width', '104');  fo.setAttribute('height', '24');
+    fo.innerHTML = `<div xmlns="http://www.w3.org/1999/xhtml" style="background:#f59e0b;color:#000;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;padding:3px 8px;border-radius:4px;text-align:center;white-space:nowrap;font-family:system-ui,sans-serif;">FREE → PRO</div>`;
     svg.appendChild(fo);
-
   })();
 </script>
 
