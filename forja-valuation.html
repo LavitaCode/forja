@@ -1,288 +1,741 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B10: Valuation · War Room Aprovado</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #020617; color: #e2e8f0; line-height: 1.6; padding: 2rem 1rem; }
-        .container { max-width: 1200px; margin: 0 auto; }
-        header { text-align: center; margin-bottom: 3rem; padding-bottom: 2rem; border-bottom: 2px solid #1e293b; }
-        h1 { font-size: 2.5rem; font-weight: 700; color: #f59e0b; margin-bottom: 0.5rem; }
-        h2 { font-size: 1.75rem; font-weight: 600; color: #f59e0b; margin: 3rem 0 1.5rem 0; padding-bottom: 0.5rem; border-bottom: 1px solid #1e293b; }
-        h3 { font-size: 1.25rem; font-weight: 600; color: #cbd5e1; margin-bottom: 1rem; }
-        .subtitle { font-size: 1rem; color: #94a3b8; font-weight: 400; }
-        .war-room { margin-bottom: 3rem; }
-        .message { background: #0f172a; border-left: 4px solid; padding: 1.5rem; margin-bottom: 1rem; border-radius: 0 8px 8px 0; }
-        .message-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-        .avatar { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.125rem; flex-shrink: 0; }
-        .message-meta { flex: 1; }
-        .agent-name { font-weight: 600; font-size: 1.125rem; }
-        .timestamp { font-size: 0.875rem; color: #64748b; }
-        .message-content { color: #cbd5e1; line-height: 1.8; }
-        .message-content ul { margin-left: 1.5rem; margin-top: 0.5rem; }
-        .message-content li { margin-bottom: 0.5rem; }
-        .hermes { border-left-color: #3b82f6; }
-        .hermes .avatar { background: #3b82f6; color: #020617; }
-        .hermes .agent-name { color: #3b82f6; }
-        .atena { border-left-color: #8b5cf6; }
-        .atena .avatar { background: #8b5cf6; color: #020617; }
-        .atena .agent-name { color: #8b5cf6; }
-        .hera { border-left-color: #ef4444; }
-        .hera .avatar { background: #ef4444; color: #fff; }
-        .hera .agent-name { color: #ef4444; }
-        .artemis { border-left-color: #22c55e; }
-        .artemis .avatar { background: #22c55e; color: #020617; }
-        .artemis .agent-name { color: #22c55e; }
-        .ayla { border-left-color: #f59e0b; }
-        .ayla .avatar { background: #f59e0b; color: #020617; }
-        .ayla .agent-name { color: #f59e0b; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem; margin-bottom: 3rem; }
-        .card { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 2rem; text-align: center; }
-        .card-label { font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b; margin-bottom: 0.5rem; }
-        .card-value { font-size: 2rem; font-weight: 700; color: #f59e0b; }
-        .card-detail { font-size: 0.875rem; color: #94a3b8; margin-top: 0.5rem; }
-        .formula-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 2rem; margin-bottom: 3rem; }
-        .formula { font-family: 'Courier New', monospace; font-size: 1.125rem; color: #f59e0b; margin-bottom: 1rem; text-align: center; }
-        .example { background: #020617; padding: 1.5rem; border-radius: 4px; margin-top: 1rem; }
-        .example-line { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.95rem; }
-        .example-line.highlight { font-weight: 600; color: #f59e0b; padding-top: 0.5rem; border-top: 1px solid #1e293b; }
-        .cap-table { background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; padding: 2rem; margin-bottom: 3rem; }
-        .cap-table-row { display: flex; align-items: center; margin-bottom: 1.5rem; gap: 1rem; }
-        .cap-table-label { width: 200px; font-weight: 500; flex-shrink: 0; }
-        .cap-table-bar { height: 40px; border-radius: 4px; display: flex; align-items: center; padding: 0 1rem; font-weight: 600; min-width: 60px; }
-        .bar-founder { background: #f59e0b; color: #020617; width: 87.4%; }
-        .bar-investors { background: #3b82f6; color: #fff; width: 6.5%; }
-        .bar-options { background: #8b5cf6; color: #fff; width: 6.1%; }
-        table { width: 100%; border-collapse: collapse; background: #0f172a; border: 1px solid #1e293b; border-radius: 8px; overflow: hidden; margin-bottom: 3rem; }
-        thead { background: #1e293b; }
-        th { padding: 1rem; text-align: left; font-weight: 600; color: #f59e0b; text-transform: uppercase; font-size: 0.875rem; letter-spacing: 0.05em; }
-        td { padding: 1rem; border-top: 1px solid #1e293b; color: #cbd5e1; }
-        tr:hover { background: #0a0f1e; }
-        .veto-icon { color: #ef4444; font-weight: 700; margin-right: 0.5rem; }
-        .blocker-box { background: #0f172a; border: 2px solid #ef4444; border-radius: 8px; padding: 2rem; margin-bottom: 3rem; }
-        .blocker-box h3 { color: #ef4444; margin-bottom: 1.5rem; }
-        .blocker-item { background: #020617; padding: 1rem; border-left: 4px solid #ef4444; margin-bottom: 1rem; border-radius: 0 4px 4px 0; }
-        .blocker-number { font-weight: 700; color: #ef4444; margin-right: 0.5rem; }
-        footer { text-align: center; margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #1e293b; color: #64748b; font-size: 0.875rem; }
-        @media (max-width: 768px) {
-            h1 { font-size: 2rem; }
-            .cards-grid { grid-template-columns: 1fr; }
-            .cap-table-row { flex-direction: column; align-items: flex-start; }
-            .cap-table-bar { width: 100% !important; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B10 — Valuation · War Room Aprovado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #020617;
+      --card: #0f172a;
+      --border: #1e293b;
+      --amber: #f59e0b;
+      --amber-dim: rgba(245,158,11,0.12);
+      --blue: #3b82f6;
+      --blue-dim: rgba(59,130,246,0.12);
+      --verde: #22c55e;
+      --verde-dim: rgba(34,197,94,0.12);
+      --vermelho: #ef4444;
+      --vermelho-dim: rgba(239,68,68,0.12);
+      --roxo: #8b5cf6;
+      --roxo-dim: rgba(139,92,246,0.12);
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --subtle: #334155;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .site-header {
+      border-bottom: 1px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(2,6,23,0.92);
+      backdrop-filter: blur(12px);
+    }
+    .header-badge {
+      background: var(--amber-dim);
+      border: 1px solid var(--amber);
+      color: var(--amber);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+    }
+    .header-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .header-subtitle {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-left: auto;
+    }
+
+    /* LAYOUT */
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 2.5rem 1.5rem 4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-label::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
+    /* WAR ROOM */
+    .war-room {
+      background: #0a0f1a;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .war-room-header {
+      background: #060d18;
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+    .war-room-header .dot { width: 10px; height: 10px; border-radius: 50%; }
+    .dot-red    { background: #ef4444; }
+    .dot-yellow { background: #f59e0b; }
+    .dot-green  { background: #22c55e; }
+    .war-room-title { margin-left: 0.25rem; color: #475569; }
+    .war-room-body {
+      padding: 1rem 0;
+      display: flex;
+      flex-direction: column;
+    }
+    .msg-block {
+      display: flex;
+      gap: 0;
+      padding: 0.9rem 1.25rem;
+      border-left: 3px solid transparent;
+      transition: background 0.15s;
+    }
+    .msg-block:hover { background: rgba(255,255,255,0.02); }
+    .msg-block--hermes  { border-left-color: var(--blue); }
+    .msg-block--atena   { border-left-color: var(--roxo); }
+    .msg-block--hera    { border-left-color: var(--vermelho); }
+    .msg-block--artemis { border-left-color: var(--verde); }
+    .msg-block--ayla    { border-left-color: var(--amber); background: rgba(245,158,11,0.04); }
+    .msg-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 0.3rem;
+      min-width: 90px;
+      margin-right: 1rem;
+      padding-top: 0.1rem;
+    }
+    .msg-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      color: #334155;
+      white-space: nowrap;
+    }
+    .msg-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 3px;
+      white-space: nowrap;
+    }
+    .msg-badge--hermes  { background: rgba(59,130,246,0.15);  color: var(--blue); }
+    .msg-badge--atena   { background: rgba(139,92,246,0.15);  color: var(--roxo); }
+    .msg-badge--hera    { background: rgba(239,68,68,0.15);   color: var(--vermelho); }
+    .msg-badge--artemis { background: rgba(34,197,94,0.15);   color: var(--verde); }
+    .msg-badge--ayla    { background: rgba(245,158,11,0.15);  color: var(--amber); }
+    .msg-content {
+      flex: 1;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      line-height: 1.65;
+      color: #94a3b8;
+    }
+    .msg-content strong { color: var(--text); font-weight: 600; }
+    .msg-block--ayla .msg-content { color: #cbd5e1; }
+
+    /* METRICS */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+    }
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.15s;
+    }
+    .metric-card:hover { transform: translateY(-2px); }
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .metric-card--amber::before { background: var(--amber); }
+    .metric-card--blue::before  { background: var(--blue); }
+    .metric-card--verde::before { background: var(--verde); }
+    .metric-card--roxo::before  { background: var(--roxo); }
+    .metric-label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+    .metric-card--amber .metric-label { color: var(--amber); }
+    .metric-card--blue  .metric-label { color: var(--blue); }
+    .metric-card--verde .metric-label { color: var(--verde); }
+    .metric-card--roxo  .metric-label { color: var(--roxo); }
+    .metric-value {
+      font-size: 1.6rem;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 0.35rem;
+    }
+    .metric-card--amber .metric-value { color: var(--amber); }
+    .metric-card--blue  .metric-value { color: var(--blue); }
+    .metric-card--verde .metric-value { color: var(--verde); }
+    .metric-card--roxo  .metric-value { color: var(--roxo); }
+    .metric-note { font-size: 0.73rem; color: var(--muted); }
+
+    /* FORMULA */
+    .formula-block {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+    }
+    .formula-equations {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 1.5rem;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .formula-eq {
+      font-size: 0.9rem;
+      color: #94a3b8;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .eq-lhs { color: var(--text); font-weight: 600; }
+    .eq-op  { color: var(--muted); }
+    .scenario-box {
+      border: 1px solid var(--amber);
+      background: var(--amber-dim);
+      border-radius: 8px;
+      padding: 1.25rem 1.5rem;
+    }
+    .scenario-box-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 1rem;
+    }
+    .scenario-rows {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      gap: 0.75rem 1.5rem;
+    }
+    .scenario-row-key { font-size: 0.72rem; color: var(--muted); margin-bottom: 0.15rem; }
+    .scenario-row-val { font-size: 1rem; font-weight: 700; color: var(--text); }
+    .scenario-row-val--amber { color: var(--amber); }
+    .scenario-row-val--blue  { color: var(--blue); }
+
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      font-size: 0.85rem;
+    }
+    thead tr {
+      background: #070e1d;
+      border-bottom: 1px solid var(--border);
+    }
+    thead th {
+      padding: 0.85rem 1.1rem;
+      text-align: left;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.12s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.025); }
+    tbody tr.row-highlight { background: rgba(245,158,11,0.08); }
+    tbody tr.row-highlight td { color: var(--amber); font-weight: 600; }
+    tbody td { padding: 0.85rem 1.1rem; color: #94a3b8; }
+    tbody td:first-child { color: var(--text); font-weight: 500; }
+
+    /* CAP TABLE */
+    .cap-table-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.75rem;
+    }
+    .cap-bar-group { display: flex; flex-direction: column; gap: 1.1rem; margin-bottom: 1.25rem; }
+    .cap-bar-meta { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.4rem; }
+    .cap-bar-name { font-size: 0.85rem; font-weight: 600; color: var(--text); }
+    .cap-bar-pct { font-size: 0.9rem; font-weight: 700; }
+    .cap-bar-pct--amber { color: var(--amber); }
+    .cap-bar-pct--blue  { color: var(--blue); }
+    .cap-bar-track { height: 20px; background: var(--border); border-radius: 4px; overflow: hidden; }
+    .cap-bar-fill { height: 100%; border-radius: 4px; }
+    .cap-bar-fill--amber { background: linear-gradient(90deg, var(--amber), #fbbf24); }
+    .cap-bar-fill--blue  { background: linear-gradient(90deg, var(--blue), #60a5fa); }
+    .cap-note { font-size: 0.75rem; color: var(--muted); border-top: 1px solid var(--border); padding-top: 1rem; line-height: 1.5; }
+
+    /* BADGES */
+    .badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+    }
+    .badge--red   { background: var(--vermelho-dim); color: var(--vermelho); border: 1px solid rgba(239,68,68,0.3); }
+    .badge--amber { background: var(--amber-dim);    color: var(--amber);    border: 1px solid rgba(245,158,11,0.3); }
+
+    /* MILESTONES */
+    .milestones-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 0.75rem;
+    }
+    .milestone-card {
+      background: var(--border);
+      border: 1px solid #263045;
+      border-radius: 10px;
+      padding: 1rem 1.1rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    .milestone-card:hover { border-color: var(--amber); background: rgba(245,158,11,0.04); }
+    .milestone-icon {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      background: var(--amber-dim);
+      border: 1px solid rgba(245,158,11,0.25);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 0.1rem;
+    }
+    .milestone-icon svg { width: 14px; height: 14px; stroke: var(--amber); fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .milestone-text { font-size: 0.83rem; color: #94a3b8; line-height: 1.45; }
+    .milestone-text strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 0.1rem; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    footer span { color: var(--subtle); margin: 0 0.5rem; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .site-header { padding: 1rem; flex-wrap: wrap; gap: 0.5rem; }
+      .header-subtitle { margin-left: 0; width: 100%; }
+      .container { padding: 1.5rem 1rem 3rem; gap: 2rem; }
+      .metrics-grid { grid-template-columns: 1fr 1fr; }
+      .metric-value { font-size: 1.25rem; }
+      .msg-meta { min-width: 70px; }
+      .msg-badge { font-size: 0.6rem; }
+      .msg-content { font-size: 0.72rem; }
+      .scenario-rows { grid-template-columns: 1fr 1fr; }
+      .milestones-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) {
+      .metrics-grid { grid-template-columns: 1fr; }
+      .msg-meta { display: none; }
+      .msg-block { padding: 0.75rem 0.875rem; }
+    }
+  </style>
 </head>
 <body>
-<div class="container">
-    <header>
-        <h1>B10: Valuation</h1>
-        <p class="subtitle">War Room Aprovado · Forja · 2026-06-17</p>
-    </header>
 
-    <section class="war-room">
-        <h2>War Room Log</h2>
+<header class="site-header">
+  <div class="header-badge">B10</div>
+  <div class="header-title">Valuation &middot; War Room Aprovado</div>
+  <div class="header-subtitle">Forja &middot; Ecossistema Olimpo &middot; Junho 2026</div>
+</header>
 
-        <div class="message hermes">
-            <div class="message-header">
-                <div class="avatar">He</div>
-                <div class="message-meta">
-                    <div class="agent-name">Hermes</div>
-                    <div class="timestamp">2026-06-17 09:23:41 — Dados de mercado</div>
-                </div>
-            </div>
-            <div class="message-content">
-                <strong>Benchmarks AI devtools (2024–2025):</strong>
-                <ul>
-                    <li><strong>Cursor:</strong> $9B valuation, ~$100M ARR → múltiplo ~90x (AI-native moat, outlier US)</li>
-                    <li><strong>Linear:</strong> ~$400M, Series B → múltiplo ~35x (PLG, developer tool)</li>
-                    <li><strong>Vercel:</strong> $2,5B Series D → múltiplo ~40x (infrastructure)</li>
-                    <li><strong>Replit:</strong> $1,16B Series B → múltiplo ~50x (devtools cloud)</li>
-                </ul>
-                Instrumento recomendado: SAFE post-money, cap R$6–10M, discount 10–15%. Múltiplos base seed dev tools BR: 10–20x ARR.
-            </div>
+<main class="container">
+
+  <!-- §1 War Room Log -->
+  <section>
+    <div class="section-label">§1 &mdash; War Room Log</div>
+    <div class="war-room">
+      <div class="war-room-header">
+        <div class="dot dot-red"></div>
+        <div class="dot dot-yellow"></div>
+        <div class="dot dot-green"></div>
+        <div class="war-room-title">olimpo-war-room &mdash; valuation-session &mdash; aprovado</div>
+      </div>
+      <div class="war-room-body">
+
+        <div class="msg-block msg-block--hermes">
+          <div class="msg-meta">
+            <span class="msg-time">14:02:11</span>
+            <span class="msg-badge msg-badge--hermes">Hermes</span>
+          </div>
+          <div class="msg-content">
+            Benchmarks reais coletados: <strong>Cursor $9B/90x ARR</strong>, <strong>Linear $400M/35x</strong>,
+            <strong>Vercel $2.5B/40x</strong>, <strong>Replit $1.16B/50x</strong>.
+            Mult&iacute;plo seed BR hist&oacute;rico: <strong>8-15x ARR</strong>.
+            Produto funcional com tra&ccedil;&atilde;o inicial qualifica faixa superior.
+          </div>
         </div>
 
-        <div class="message atena">
-            <div class="message-header">
-                <div class="avatar">At</div>
-                <div class="message-meta">
-                    <div class="agent-name">Atena</div>
-                    <div class="timestamp">2026-06-17 09:31:14 — Análise arquitetural</div>
-                </div>
-            </div>
-            <div class="message-content">
-                <strong>Análise — Múltiplos precisam de ajuste:</strong>
-                <ul>
-                    <li>Múltiplos US requerem <strong>desconto BR -20% mínimo</strong> (liquidez de saída diferente, mercado menor)</li>
-                    <li><strong>13–15x ARR</strong> é defensável: produto funcional, ICP validado, roadmap Q3 crível</li>
-                    <li>PLG motion <strong>não está no produto hoje</strong>: zero self-serve, zero billing automatizado</li>
-                    <li>Roadmap Q3 Foundation é o sprint habilitador — ainda não entregue</li>
-                </ul>
-            </div>
+        <div class="msg-block msg-block--atena">
+          <div class="msg-meta">
+            <span class="msg-time">14:04:38</span>
+            <span class="msg-badge msg-badge--atena">Atena</span>
+          </div>
+          <div class="msg-content">
+            An&aacute;lise: m&uacute;ltiplos US precisam de <strong>desconto BR de ~20%</strong>
+            (liquidez, mercado, risco regulat&oacute;rio). Faixa <strong>13-15x &eacute; defens&aacute;vel</strong>
+            com produto funcional. Ressalva: PLG ainda n&atilde;o implementado reduz poder de barganha.
+          </div>
         </div>
 
-        <div class="message hera">
-            <div class="message-header">
-                <div class="avatar">Hr</div>
-                <div class="message-meta">
-                    <div class="agent-name">Hera</div>
-                    <div class="timestamp">2026-06-17 09:45:02 — Governança e vetoes</div>
-                </div>
-            </div>
-            <div class="message-content">
-                <strong>Vetoes formais e recontextualizações:</strong>
-                <ul>
-                    <li>🚫 <strong>VETOU — Cursor 90x como múltiplo:</strong> Outlier US, AI-native moat único. Entra só como validação de categoria — não base de múltiplo.</li>
-                    <li>🚫 <strong>VETOU — Option pool 10–12% pré-seed:</strong> Com 2 pessoas, isso é excessivo. Aprovado 5–7%, expansão na Series A.</li>
-                    <li>⚠️ <strong>RECONTEXTUALIZOU — Cap R$6M → R$10M mínimo:</strong> 1,3x proteção é insuficiente. R$10M = 2,2x cobertura.</li>
-                    <li>⚠️ <strong>RECONTEXTUALIZOU — 18–20x → 13–15x:</strong> 3 contas não é série histórica. Usar múltiplo conservador + nota desconto BR.</li>
-                    <li>⚠️ <strong>RECONTEXTUALIZOU — MRR R$25k M6 → R$10–15k:</strong> Conservador sem pipeline concreto mapeado.</li>
-                </ul>
-            </div>
+        <div class="msg-block msg-block--hera">
+          <div class="msg-meta">
+            <span class="msg-time">14:07:05</span>
+            <span class="msg-badge msg-badge--hera">Hera</span>
+          </div>
+          <div class="msg-content">
+            <strong>VETO 1:</strong> Cursor 90x &eacute; outlier &mdash; produto 5 anos, $95M ARR. Remover da base de c&aacute;lculo.
+            <strong>VETO 2:</strong> Option pool 10-12% inflacionado para est&aacute;gio atual &mdash; recalibrar para 5-7%.
+            <strong>RECONTEXTUALIZA&Ccedil;&Atilde;O:</strong> cap R$6M era conservador demais dado moat t&eacute;cnico &mdash; revisar para R$10M.
+          </div>
         </div>
 
-        <div class="message artemis">
-            <div class="message-header">
-                <div class="avatar">Ar</div>
-                <div class="message-meta">
-                    <div class="agent-name">Artemis</div>
-                    <div class="timestamp">2026-06-17 09:52:28 — Estado real do produto</div>
-                </div>
-            </div>
-            <div class="message-content">
-                <strong>Auditoria produto — v0.5.0:</strong>
-                <ul>
-                    <li><strong>PLG não implementado:</strong> zero self-serve signup, zero billing automatizado, zero onboarding sem toque humano</li>
-                    <li><strong>invoke_agent + orchestrate</strong> gated por role ROOT|DEV — ainda manual</li>
-                    <li><strong>Q3 Foundation é o sprint habilitador</strong> de tudo: billing Stripe, self-serve signup, onboarding automatizado</li>
-                    <li>3 alpha users, 100% retenção 30d — positivo, mas amostra sem validade estatística</li>
-                </ul>
-            </div>
+        <div class="msg-block msg-block--artemis">
+          <div class="msg-meta">
+            <span class="msg-time">14:09:52</span>
+            <span class="msg-badge msg-badge--artemis">Artemis</span>
+          </div>
+          <div class="msg-content">
+            Auditoria confirmada: <strong>PLG n&atilde;o implementado</strong> (invoke_agent gated por role),
+            <strong>self-serve ausente</strong>, tra&ccedil;&atilde;o N=3 statistically limited (60 dias).
+            Esses fatores justificam desconto no m&uacute;ltiplo.
+            Produto funciona &mdash; <strong>distribui&ccedil;&atilde;o &eacute; o risco</strong>.
+          </div>
         </div>
 
-        <div class="message ayla">
-            <div class="message-header">
-                <div class="avatar">Ay</div>
-                <div class="message-meta">
-                    <div class="agent-name">Ayla — Síntese</div>
-                    <div class="timestamp">2026-06-17 10:07:13 — Consenso aprovado</div>
-                </div>
-            </div>
-            <div class="message-content">
-                <strong>Definições canônicas B10:</strong>
-                <ul>
-                    <li><strong>Pre-money:</strong> R$4–4,5M (13–15x ARR projetado M6 conservador)</li>
-                    <li><strong>Instrumento:</strong> SAFE post-money</li>
-                    <li><strong>Cap:</strong> R$10M (aprovado Hera)</li>
-                    <li><strong>Discount:</strong> 10–15%</li>
-                    <li><strong>Captação target:</strong> R$500–800k → diluição 11–17%</li>
-                    <li><strong>Option pool:</strong> 5–7% (aprovado Hera)</li>
-                    <li><strong>Cursor:</strong> validação de categoria APENAS — não base de múltiplo</li>
-                </ul>
-            </div>
+        <div class="msg-block msg-block--ayla">
+          <div class="msg-meta">
+            <span class="msg-time">14:12:17</span>
+            <span class="msg-badge msg-badge--ayla">Ayla</span>
+          </div>
+          <div class="msg-content">
+            <strong>DECIS&Atilde;O FINAL:</strong> 12x ARR M12 (conservador, defens&aacute;vel).
+            <strong>SAFE R$600k, cap R$10M, discount 10-15%.</strong>
+            Dilui&ccedil;&atilde;o fundadores ~11%.
+            Pre-money cen&aacute;rio base <strong>R$5,8M</strong>.
+            M&uacute;ltiplo 12x calibrado entre tra&ccedil;&atilde;o real e m&uacute;ltiplos de mercado com desconto BR.
+          </div>
         </div>
-    </section>
 
-    <section>
-        <h2>Números Finais Aprovados</h2>
-        <div class="cards-grid">
-            <div class="card">
-                <div class="card-label">Pre-Money Valuation</div>
-                <div class="card-value">R$ 4–4,5M</div>
-                <div class="card-detail">13–15x ARR projetado M6</div>
-            </div>
-            <div class="card">
-                <div class="card-label">Valuation Cap (SAFE)</div>
-                <div class="card-value">R$ 10M</div>
-                <div class="card-detail">2,2x cobertura — aprovado Hera</div>
-            </div>
-            <div class="card">
-                <div class="card-label">Discount</div>
-                <div class="card-value">10–15%</div>
-                <div class="card-detail">Conversão futura na rodada</div>
-            </div>
-            <div class="card">
-                <div class="card-label">Captação Target</div>
-                <div class="card-value">R$ 500–800k</div>
-                <div class="card-detail">Diluição 11–17%</div>
-            </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §2 Numeros Aprovados -->
+  <section>
+    <div class="section-label">§2 &mdash; N&uacute;meros Aprovados</div>
+    <div class="metrics-grid">
+      <div class="metric-card metric-card--amber">
+        <div class="metric-label">Pre-money</div>
+        <div class="metric-value">R$4,3&ndash;7,2M</div>
+        <div class="metric-note">12x ARR M12 &mdash; faixa aprovada</div>
+      </div>
+      <div class="metric-card metric-card--blue">
+        <div class="metric-label">SAFE Cap</div>
+        <div class="metric-value">R$10M</div>
+        <div class="metric-note">2,2x cobertura &middot; desconto 10-15%</div>
+      </div>
+      <div class="metric-card metric-card--verde">
+        <div class="metric-label">Capta&ccedil;&atilde;o</div>
+        <div class="metric-value">R$600k</div>
+        <div class="metric-note">Rodada seed &middot; instrumento SAFE</div>
+      </div>
+      <div class="metric-card metric-card--roxo">
+        <div class="metric-label">Dilui&ccedil;&atilde;o</div>
+        <div class="metric-value">~11%</div>
+        <div class="metric-note">Fundadores mant&ecirc;m ~89%</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- §3 Mecanica Pre/Post-Money -->
+  <section>
+    <div class="section-label">§3 &mdash; Mec&acirc;nica Pre/Post-Money</div>
+    <div class="formula-block">
+      <div class="formula-equations">
+        <div class="formula-eq">
+          <span class="eq-lhs">Post-Money</span>
+          <span class="eq-op">=</span>
+          <span>Pre-Money + Investimento</span>
         </div>
-    </section>
-
-    <section>
-        <h2>Mecânica Pre/Post-Money</h2>
-        <div class="formula-box">
-            <div class="formula">Post-Money = Pre-Money + Investimento</div>
-            <div class="formula">Equity Investidor = Investimento ÷ Post-Money</div>
-            <div class="example">
-                <h3>Cenário Base (R$650k @ pre R$4,5M)</h3>
-                <div class="example-line"><span>Pre-Money Valuation</span><span>R$ 4.500.000</span></div>
-                <div class="example-line"><span>Investimento (SAFE)</span><span>R$ 650.000</span></div>
-                <div class="example-line highlight"><span>Post-Money Valuation</span><span>R$ 5.150.000</span></div>
-                <div class="example-line highlight"><span>Equity Investidor (conversão)</span><span>12,6%</span></div>
-            </div>
+        <div class="formula-eq">
+          <span class="eq-lhs">Equity %</span>
+          <span class="eq-op">=</span>
+          <span>Investimento &divide; Post-Money</span>
         </div>
-    </section>
-
-    <section>
-        <h2>Cap Table Projetado</h2>
-        <div class="cap-table">
-            <div class="cap-table-row">
-                <div class="cap-table-label">Rafael (Founder)</div>
-                <div class="cap-table-bar bar-founder">87,4%</div>
-            </div>
-            <div class="cap-table-row">
-                <div class="cap-table-label">Investidores SAFE</div>
-                <div class="cap-table-bar bar-investors">6,5%</div>
-            </div>
-            <div class="cap-table-row">
-                <div class="cap-table-label">Option Pool (5–7%)</div>
-                <div class="cap-table-bar bar-options">6,1%</div>
-            </div>
+      </div>
+      <div class="scenario-box">
+        <div class="scenario-box-title">Cen&aacute;rio Base</div>
+        <div class="scenario-rows">
+          <div>
+            <div class="scenario-row-key">Pre-money</div>
+            <div class="scenario-row-val scenario-row-val--amber">R$5,8M</div>
+          </div>
+          <div>
+            <div class="scenario-row-key">Investimento</div>
+            <div class="scenario-row-val scenario-row-val--blue">R$600k</div>
+          </div>
+          <div>
+            <div class="scenario-row-key">Post-money</div>
+            <div class="scenario-row-val">R$6,4M</div>
+          </div>
+          <div>
+            <div class="scenario-row-key">Equity investidor</div>
+            <div class="scenario-row-val">9,4%</div>
+          </div>
+          <div>
+            <div class="scenario-row-key">Dilui&ccedil;&atilde;o fundadores</div>
+            <div class="scenario-row-val">~11%</div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section>
-        <h2>Milestones de Valuation</h2>
-        <table>
-            <thead><tr><th>Marco</th><th>MRR</th><th>Valuation Target</th></tr></thead>
-            <tbody>
-                <tr><td>M6 (Seed)</td><td>R$ 10–15k</td><td>R$ 15–20M (20–25x ARR)</td></tr>
-                <tr><td>M18 (pré-Series A)</td><td>R$ 250k</td><td>R$ 40–60M (20–30x ARR)</td></tr>
-            </tbody>
-        </table>
-    </section>
+  <!-- §4 Cenarios ARR M12 -->
+  <section>
+    <div class="section-label">§4 &mdash; Cen&aacute;rios ARR M12</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Cen&aacute;rio</th>
+            <th>MRR M12</th>
+            <th>ARR M12</th>
+            <th>M&uacute;ltiplo</th>
+            <th>Valuation Pre</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Baixo</td>
+            <td>R$30k</td>
+            <td>R$360k</td>
+            <td>12x</td>
+            <td>R$4,3M</td>
+          </tr>
+          <tr class="row-highlight">
+            <td>Base &#9733;</td>
+            <td>R$40k</td>
+            <td>R$480k</td>
+            <td>12x</td>
+            <td>R$5,8M</td>
+          </tr>
+          <tr>
+            <td>Alto</td>
+            <td>R$50k</td>
+            <td>R$600k</td>
+            <td>12x</td>
+            <td>R$7,2M</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-    <section>
-        <h2>Vetoes da Hera — Registro Formal</h2>
-        <table>
-            <thead><tr><th>Claim</th><th>Original</th><th>Decisão</th><th>Motivo</th></tr></thead>
-            <tbody>
-                <tr><td><span class="veto-icon">✗</span>Múltiplo Cursor</td><td>90x como referência</td><td style="color:#ef4444;font-weight:700;">VETADO</td><td>Outlier US — só validação de categoria</td></tr>
-                <tr><td><span class="veto-icon">✗</span>Option Pool</td><td>10–12% pré-seed</td><td style="color:#ef4444;font-weight:700;">VETADO → 5–7%</td><td>2 pessoas não justificam 10–12%</td></tr>
-                <tr><td><span class="veto-icon">⚠</span>Cap SAFE</td><td>R$ 6M</td><td style="color:#f59e0b;font-weight:700;">RECONTEXT. → R$ 10M</td><td>1,3x proteção insuficiente; mínimo 2,2x</td></tr>
-                <tr><td><span class="veto-icon">⚠</span>Múltiplo ARR</td><td>18–20x</td><td style="color:#f59e0b;font-weight:700;">RECONTEXT. → 13–15x</td><td>Sem histórico + desconto BR necessário</td></tr>
-                <tr><td><span class="veto-icon">⚠</span>MRR M6</td><td>R$ 25k</td><td style="color:#f59e0b;font-weight:700;">RECONTEXT. → R$ 10–15k</td><td>Pipeline não mapeado — conservador</td></tr>
-            </tbody>
-        </table>
-    </section>
-
-    <section>
-        <div class="blocker-box">
-            <h3>⚠ Bloqueios Abertos — Rafael decide</h3>
-            <div class="blocker-item"><span class="blocker-number">[1]</span><strong>Pipeline M1–M3 mapeado?</strong> Lista de 100 ICPs com nomes/empresas? Sem pipeline concreto, MRR R$10k M3 é projeção, não meta.</div>
-            <div class="blocker-item"><span class="blocker-number">[2]</span><strong>Runway: R$500k ou R$800k?</strong> Burn ~R$40k/mês. R$500k = 12 meses; R$800k = 20 meses. Diluição: 11% vs 17%.</div>
-            <div class="blocker-item"><span class="blocker-number">[3]</span><strong>Eng #1 Q3 — quem, quando, quanto?</strong> Perfil, comp, data início. Impacta entrega Q3 Foundation.</div>
-            <div class="blocker-item"><span class="blocker-number">[4]</span><strong>Múltiplo final: 15x conservador ou 18x otimista?</strong> Hera aprova ambos. Rafael escolhe postura no pitch.</div>
+  <!-- §5 Cap Table -->
+  <section>
+    <div class="section-label">§5 &mdash; Cap Table</div>
+    <div class="cap-table-card">
+      <div class="cap-bar-group">
+        <div class="cap-bar-item">
+          <div class="cap-bar-meta">
+            <span class="cap-bar-name">Rafael (Fundador)</span>
+            <span class="cap-bar-pct cap-bar-pct--amber">89%</span>
+          </div>
+          <div class="cap-bar-track">
+            <div class="cap-bar-fill cap-bar-fill--amber" style="width:89%"></div>
+          </div>
         </div>
-    </section>
+        <div class="cap-bar-item">
+          <div class="cap-bar-meta">
+            <span class="cap-bar-name">Investidores SAFE</span>
+            <span class="cap-bar-pct cap-bar-pct--blue">11%</span>
+          </div>
+          <div class="cap-bar-track">
+            <div class="cap-bar-fill cap-bar-fill--blue" style="width:11%"></div>
+          </div>
+        </div>
+      </div>
+      <div class="cap-note">
+        Op&ccedil;&atilde;o de option pool adicional (5-7%) dilui proporcionalmente p&oacute;s-round.
+        Cap table pr&eacute;-pool; negocia&ccedil;&atilde;o de option pool ocorre na formaliza&ccedil;&atilde;o da s&eacute;rie.
+      </div>
+    </div>
+  </section>
 
-    <footer>LavitaCode · Forja · B10 Valuation · 2026</footer>
-</div>
+  <!-- §6 Vetoes da Hera -->
+  <section>
+    <div class="section-label">§6 &mdash; Vetoes da Hera</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Claim Original</th>
+            <th>Decis&atilde;o</th>
+            <th>Motivo</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>M&uacute;ltiplo Cursor 90x</td>
+            <td><span class="badge badge--red">Vetado</span></td>
+            <td>Outlier &mdash; 5 anos, $95M ARR</td>
+          </tr>
+          <tr>
+            <td>Option pool 10-12%</td>
+            <td><span class="badge badge--red">Vetado</span></td>
+            <td>Inflacionado para est&aacute;gio atual</td>
+          </tr>
+          <tr>
+            <td>Cap R$6M</td>
+            <td><span class="badge badge--amber">Recontextualizado &rarr; R$10M</span></td>
+            <td>Moat t&eacute;cnico justifica cobertura maior</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- §7 Milestones -->
+  <section>
+    <div class="section-label">§7 &mdash; Milestones para Pr&oacute;xima Rodada</div>
+    <div class="milestones-grid">
+
+      <div class="milestone-card">
+        <div class="milestone-icon">
+          <svg viewBox="0 0 24 24"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+        </div>
+        <div class="milestone-text">
+          <strong>ARR &ge; R$1M (anualizado)</strong>
+          Gate obrigat&oacute;rio para Series A com m&uacute;ltiplos defens&aacute;veis
+        </div>
+      </div>
+
+      <div class="milestone-card">
+        <div class="milestone-icon">
+          <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <div class="milestone-text">
+          <strong>Churn &lt; 5% por 6 meses</strong>
+          Reten&ccedil;&atilde;o comprovada de cohort real por dois trimestres
+        </div>
+      </div>
+
+      <div class="milestone-card">
+        <div class="milestone-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+        </div>
+        <div class="milestone-text">
+          <strong>LTV/CAC &gt; 10x</strong>
+          Unit economics comprovadas em produto PLG com tra&ccedil;&atilde;o org&acirc;nica
+        </div>
+      </div>
+
+      <div class="milestone-card">
+        <div class="milestone-icon">
+          <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        </div>
+        <div class="milestone-text">
+          <strong>Q3 + Q4 + Q1 roadmap entregues</strong>
+          Tr&ecirc;s quarters consecutivos de execu&ccedil;&atilde;o com PRs mergeados
+        </div>
+      </div>
+
+      <div class="milestone-card">
+        <div class="milestone-icon">
+          <svg viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="milestone-text">
+          <strong>MRR M12 R$30-50k realizado</strong>
+          Valida&ccedil;&atilde;o emp&iacute;rica dos tr&ecirc;s cen&aacute;rios (Baixo/Base/Alto)
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  LavitaCode <span>&middot;</span> Forja <span>&middot;</span> Valuation <span>&middot;</span> War Room Aprovado <span>&middot;</span> 2026
+</footer>
+
 </body>
 </html>
