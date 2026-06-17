@@ -1,211 +1,1307 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Forja — Managed AI Agent Platform</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        :root {
-            --bg-primary: #020617; --bg-card: #0f172a; --border-color: #1e293b;
-            --text-primary: #f1f5f9; --text-secondary: #94a3b8;
-            --accent-amber: #f59e0b; --accent-blue: #3b82f6; --accent-slate: #64748b;
-        }
-        body { font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; background: var(--bg-primary); color: var(--text-primary); line-height: 1.6; overflow-x: hidden; }
-        .container { max-width: 1200px; margin: 0 auto; padding: 0 24px; }
-        section { padding: 80px 0; }
-        h1, h2, h3 { line-height: 1.2; }
-        h1 { font-size: 3.5rem; font-weight: 800; margin-bottom: 24px; }
-        h2 { font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: 48px; }
-        h3 { font-size: 1.5rem; font-weight: 700; margin-bottom: 12px; }
-        .hero { padding: 120px 0; text-align: center; }
-        .hero p { font-size: 1.25rem; color: var(--text-secondary); margin-bottom: 40px; max-width: 600px; margin-left: auto; margin-right: auto; }
-        .cta-group { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
-        .btn { padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: all 0.2s; text-decoration: none; display: inline-block; border: none; }
-        .btn-primary { background: var(--accent-amber); color: var(--bg-primary); }
-        .btn-primary:hover { background: #d97706; transform: translateY(-2px); }
-        .btn-secondary { background: transparent; color: var(--text-primary); border: 2px solid var(--border-color); }
-        .btn-secondary:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
-        .card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 32px; transition: all 0.3s; }
-        .card:hover { border-color: var(--accent-slate); transform: translateY(-4px); }
-        .grid { display: grid; gap: 24px; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-        .problem-icon { font-size: 3rem; margin-bottom: 16px; display: block; }
-        .agent-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 48px; }
-        .agent-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 10px; padding: 24px; text-align: center; transition: all 0.3s; }
-        .agent-card:hover { transform: translateY(-4px); border-color: var(--accent-blue); }
-        .agent-icon { font-size: 2.5rem; margin-bottom: 12px; display: block; }
-        .agent-name { font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
-        .agent-role { font-size: 0.875rem; color: var(--text-secondary); }
-        .steps { display: flex; gap: 40px; margin-top: 48px; flex-wrap: wrap; justify-content: center; }
-        .step { flex: 1; min-width: 250px; text-align: center; }
-        .step-number { display: inline-block; width: 48px; height: 48px; background: var(--accent-amber); color: var(--bg-primary); border-radius: 50%; font-weight: 800; font-size: 1.5rem; line-height: 48px; margin-bottom: 16px; }
-        .comparison-table { overflow-x: auto; margin-top: 48px; }
-        table { width: 100%; border-collapse: collapse; background: var(--bg-card); border-radius: 12px; overflow: hidden; }
-        th, td { padding: 16px; text-align: center; border-bottom: 1px solid var(--border-color); }
-        th { background: #1e293b; font-weight: 700; color: var(--accent-amber); }
-        td { color: var(--text-secondary); }
-        tr:last-child td { border-bottom: none; }
-        .check { color: #22c55e; font-size: 1.5rem; }
-        .cross { color: #64748b; font-size: 1.5rem; }
-        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; margin-top: 48px; }
-        .pricing-card { background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; padding: 40px 32px; text-align: center; transition: all 0.3s; position: relative; }
-        .pricing-card:hover { border-color: var(--accent-amber); transform: scale(1.05); }
-        .pricing-card.featured { border-color: var(--accent-amber); }
-        .pricing-badge { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: var(--accent-amber); color: var(--bg-primary); padding: 4px 16px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
-        .price { font-size: 3rem; font-weight: 800; color: var(--accent-amber); margin: 16px 0; }
-        .price-period { font-size: 1rem; color: var(--text-secondary); font-weight: 400; }
-        .feature-list { list-style: none; margin: 24px 0; text-align: left; }
-        .feature-list li { padding: 8px 0; color: var(--text-secondary); position: relative; padding-left: 24px; }
-        .feature-list li:before { content: "✓"; position: absolute; left: 0; color: var(--accent-amber); font-weight: 700; }
-        .metrics { display: flex; gap: 40px; justify-content: center; flex-wrap: wrap; margin-top: 48px; }
-        .metric { text-align: center; }
-        .metric-value { font-size: 3rem; font-weight: 800; color: var(--accent-amber); display: block; }
-        .metric-label { color: var(--text-secondary); font-size: 0.875rem; text-transform: uppercase; letter-spacing: 1px; }
-        .cta-final { background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid var(--border-color); border-radius: 16px; padding: 60px 40px; text-align: center; margin-top: 48px; }
-        footer { text-align: center; padding: 40px 0; color: var(--text-secondary); border-top: 1px solid var(--border-color); margin-top: 80px; }
-        .code { background: #1e293b; padding: 16px 20px; border-radius: 8px; font-family: 'Courier New', monospace; color: var(--accent-amber); display: inline-block; margin-top: 16px; font-size: 0.875rem; }
-        @media (max-width: 768px) {
-            h1 { font-size: 2.5rem; } h2 { font-size: 2rem; }
-            section { padding: 60px 0; } .hero { padding: 80px 0; }
-            .agent-grid, .steps { grid-template-columns: 1fr; flex-direction: column; }
-            table { font-size: 0.875rem; } th, td { padding: 12px 8px; }
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forja — Produto Consolidado</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #020617;
+      --card: #0f172a;
+      --border: #1e293b;
+      --amber: #f59e0b;
+      --amber-light: #fbbf24;
+      --blue: #3b82f6;
+      --verde: #22c55e;
+      --vermelho: #ef4444;
+      --roxo: #8b5cf6;
+      --text: #f1f5f9;
+      --muted: #64748b;
+      --subtle: #94a3b8;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 24px;
+    }
+
+    .nav-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .nav-logo {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--amber);
+      letter-spacing: -0.03em;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--subtle);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: color 0.2s;
+    }
+
+    .nav-links a:hover { color: var(--text); }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-outline {
+      padding: 8px 18px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: transparent;
+      color: var(--subtle);
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-outline:hover {
+      border-color: var(--amber);
+      color: var(--amber);
+    }
+
+    .btn-amber {
+      padding: 8px 18px;
+      border: 1px solid var(--amber);
+      border-radius: 8px;
+      background: var(--amber);
+      color: #000;
+      font-size: 0.875rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-amber:hover {
+      background: var(--amber-light);
+      border-color: var(--amber-light);
+    }
+
+    /* ── LAYOUT ── */
+    section {
+      padding: 96px 24px;
+    }
+
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 100px;
+      background: rgba(245, 158, 11, 0.08);
+      color: var(--amber);
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: var(--subtle);
+      max-width: 600px;
+      margin-bottom: 64px;
+      line-height: 1.7;
+    }
+
+    .text-center { text-align: center; }
+    .text-center .section-subtitle { margin-left: auto; margin-right: auto; }
+
+    /* ── HERO ── */
+    #hero {
+      padding: 128px 24px 96px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #hero::before {
+      content: '';
+      position: absolute;
+      top: -40%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 900px;
+      background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-h1 {
+      font-size: clamp(2.5rem, 7vw, 5rem);
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      line-height: 1.05;
+      margin-bottom: 8px;
+    }
+
+    .hero-h1-gradient {
+      background: linear-gradient(135deg, var(--amber) 0%, #fb923c 50%, var(--amber-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1rem, 2.5vw, 1.25rem);
+      color: var(--subtle);
+      max-width: 640px;
+      margin: 24px auto 8px;
+      line-height: 1.7;
+    }
+
+    .hero-note {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin: 8px auto 40px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-amber-lg {
+      padding: 14px 32px;
+      border: 1px solid var(--amber);
+      border-radius: 10px;
+      background: var(--amber);
+      color: #000;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      letter-spacing: -0.01em;
+    }
+
+    .btn-amber-lg:hover {
+      background: var(--amber-light);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 24px rgba(245, 158, 11, 0.25);
+    }
+
+    .btn-code {
+      padding: 14px 24px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: var(--card);
+      color: var(--verde);
+      font-size: 0.9rem;
+      font-weight: 600;
+      font-family: 'Courier New', monospace;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+      letter-spacing: -0.02em;
+    }
+
+    .btn-code:hover {
+      border-color: var(--verde);
+      background: rgba(34, 197, 94, 0.05);
+    }
+
+    .hero-social {
+      margin-top: 32px;
+      font-size: 0.8rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .hero-social span {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 5px 12px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      background: var(--card);
+      font-size: 0.75rem;
+      color: var(--subtle);
+    }
+
+    /* ── CARDS ── */
+    .cards-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      border-color: rgba(245, 158, 11, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .card-icon {
+      font-size: 2rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--subtle);
+      line-height: 1.6;
+    }
+
+    /* ── MOAT ── */
+    #solucao {
+      background: linear-gradient(180deg, var(--bg) 0%, #050d1a 100%);
+    }
+
+    .moat-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .moat-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 36px 32px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.2s;
+    }
+
+    .moat-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--amber), transparent);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .moat-card:hover::before { opacity: 1; }
+    .moat-card:hover { border-color: rgba(245, 158, 11, 0.2); transform: translateY(-3px); }
+
+    .moat-icon {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      display: block;
+    }
+
+    .moat-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .moat-desc {
+      font-size: 0.9rem;
+      color: var(--subtle);
+      line-height: 1.65;
+    }
+
+    /* ── STEPS ── */
+    #como-funciona { background: var(--bg); }
+
+    .note-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      border-radius: 8px;
+      background: rgba(59, 130, 246, 0.08);
+      color: var(--blue);
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 48px;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 32px;
+      position: relative;
+    }
+
+    .steps::before {
+      content: '';
+      position: absolute;
+      top: 28px;
+      left: calc(16.66% + 12px);
+      right: calc(16.66% + 12px);
+      height: 1px;
+      background: linear-gradient(90deg, var(--amber) 0%, var(--border) 50%, var(--amber) 100%);
+      opacity: 0.3;
+    }
+
+    .step {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .step-num {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--amber);
+      color: #000;
+      font-size: 1.2rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 1;
+      box-shadow: 0 0 24px rgba(245, 158, 11, 0.3);
+    }
+
+    .step-code {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: var(--verde);
+      background: rgba(34, 197, 94, 0.08);
+      border: 1px solid rgba(34, 197, 94, 0.2);
+      border-radius: 8px;
+      padding: 10px 14px;
+      width: 100%;
+      white-space: pre-line;
+    }
+
+    .step-title {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .step-desc {
+      font-size: 0.9rem;
+      color: var(--subtle);
+      line-height: 1.6;
+    }
+
+    /* ── TABLE ── */
+    #comparativo { background: #050d1a; }
+
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 700px;
+    }
+
+    thead th {
+      background: var(--card);
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--muted);
+      border-bottom: 1px solid var(--border);
+    }
+
+    thead th:first-child { text-align: left; }
+
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background 0.15s;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,0.02); }
+
+    tbody tr.forja-row {
+      background: rgba(245, 158, 11, 0.05);
+      border-left: 3px solid var(--amber);
+    }
+
+    td {
+      padding: 16px 20px;
+      text-align: center;
+      font-size: 0.9rem;
+      color: var(--subtle);
+    }
+
+    td:first-child {
+      text-align: left;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .forja-row td:first-child { color: var(--amber); }
+
+    .check-yes { color: var(--verde); font-size: 1.1rem; }
+    .check-no { color: var(--vermelho); font-size: 1.1rem; }
+    .check-partial { color: var(--amber); font-size: 1.1rem; }
+
+    /* ── PRICING ── */
+    #pricing { background: var(--bg); }
+
+    .pricing-note {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border: 1px solid rgba(139, 92, 246, 0.3);
+      border-radius: 8px;
+      background: rgba(139, 92, 246, 0.08);
+      color: var(--roxo);
+      font-size: 0.78rem;
+      font-weight: 600;
+      margin-bottom: 48px;
+    }
+
+    .pricing-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .pricing-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 36px 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      transition: all 0.2s;
+    }
+
+    .pricing-card:hover { transform: translateY(-2px); }
+
+    .pricing-card.highlighted {
+      border-color: var(--amber);
+      background: linear-gradient(180deg, rgba(245, 158, 11, 0.07) 0%, var(--card) 100%);
+      position: relative;
+    }
+
+    .pricing-card.highlighted::before {
+      content: 'Popular';
+      position: absolute;
+      top: -12px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--amber);
+      color: #000;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+
+    .plan-tier {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    .plan-price {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    .plan-price .amount {
+      font-size: 2.5rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--text);
+    }
+
+    .plan-price .period {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .plan-desc {
+      font-size: 0.85rem;
+      color: var(--subtle);
+      margin-top: -12px;
+    }
+
+    .plan-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      flex: 1;
+    }
+
+    .plan-features li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.875rem;
+      color: var(--subtle);
+    }
+
+    .plan-features li::before {
+      content: '✓';
+      color: var(--verde);
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .btn-plan-amber {
+      padding: 12px 24px;
+      border: 1px solid var(--amber);
+      border-radius: 10px;
+      background: var(--amber);
+      color: #000;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s;
+      display: block;
+    }
+
+    .btn-plan-amber:hover {
+      background: var(--amber-light);
+      transform: translateY(-1px);
+    }
+
+    .btn-plan-outline {
+      padding: 12px 24px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--subtle);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      text-align: center;
+      transition: all 0.2s;
+      display: block;
+    }
+
+    .btn-plan-outline:hover {
+      border-color: var(--text);
+      color: var(--text);
+    }
+
+    .enterprise-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 36px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+      flex-wrap: wrap;
+    }
+
+    .enterprise-info h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .enterprise-info p {
+      font-size: 0.875rem;
+      color: var(--subtle);
+    }
+
+    .enterprise-btn {
+      padding: 12px 24px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--subtle);
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+
+    .enterprise-btn:hover { border-color: var(--text); color: var(--text); }
+
+    /* ── TRAÇÃO ── */
+    #tracao { background: #050d1a; }
+
+    .disclaimer-box {
+      background: rgba(245, 158, 11, 0.08);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      border-radius: 12px;
+      padding: 18px 24px;
+      margin-bottom: 48px;
+      font-size: 0.875rem;
+      color: var(--amber);
+      line-height: 1.6;
+    }
+
+    .disclaimer-box strong { font-weight: 700; }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      margin-bottom: 32px;
+    }
+
+    .metric-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 32px 24px;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .metric-card:hover {
+      border-color: rgba(245, 158, 11, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .metric-value {
+      font-size: 2.25rem;
+      font-weight: 900;
+      letter-spacing: -0.04em;
+      color: var(--amber);
+      margin-bottom: 6px;
+    }
+
+    .metric-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    .tracao-note {
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    /* ── ROADMAP ── */
+    #roadmap { background: var(--bg); }
+
+    .roadmap-cards {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+
+    .roadmap-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px 24px;
+      transition: all 0.2s;
+    }
+
+    .roadmap-card:hover {
+      border-color: rgba(245, 158, 11, 0.2);
+      transform: translateY(-2px);
+    }
+
+    .roadmap-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .badge-gate { background: rgba(239, 68, 68, 0.15); color: var(--vermelho); border: 1px solid rgba(239, 68, 68, 0.3); }
+    .badge-plg  { background: rgba(59, 130, 246, 0.15); color: var(--blue);     border: 1px solid rgba(59, 130, 246, 0.3); }
+    .badge-collab { background: rgba(139, 92, 246, 0.15); color: var(--roxo);   border: 1px solid rgba(139, 92, 246, 0.3); }
+    .badge-scale  { background: rgba(34, 197, 94, 0.15);  color: var(--verde);  border: 1px solid rgba(34, 197, 94, 0.3); }
+
+    .roadmap-quarter {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 8px;
+    }
+
+    .roadmap-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .roadmap-desc {
+      font-size: 0.85rem;
+      color: var(--subtle);
+      line-height: 1.6;
+    }
+
+    /* ── CTA FINAL ── */
+    #cta-final {
+      background: linear-gradient(180deg, var(--bg) 0%, #050d1a 100%);
+      text-align: center;
+      padding: 128px 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #cta-final::before {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 800px;
+      height: 800px;
+      background: radial-gradient(ellipse at center, rgba(245, 158, 11, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .cta-title {
+      font-size: clamp(1.75rem, 4vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      max-width: 700px;
+      margin: 0 auto 40px;
+    }
+
+    .cta-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-cta-outline {
+      padding: 14px 32px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      background: transparent;
+      color: var(--subtle);
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+
+    .btn-cta-outline:hover {
+      border-color: var(--text);
+      color: var(--text);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+    }
+
+    .footer-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-logo {
+      font-weight: 800;
+      color: var(--amber);
+    }
+
+    /* ── DIVIDER ── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      section { padding: 72px 20px; }
+      #hero { padding: 96px 20px 72px; }
+      #cta-final { padding: 96px 20px; }
+
+      .nav-links { display: none; }
+      .nav-actions .btn-outline { display: none; }
+
+      .cards-3,
+      .moat-cards,
+      .steps,
+      .pricing-cards,
+      .metrics-grid,
+      .roadmap-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .steps::before { display: none; }
+
+      .enterprise-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .enterprise-btn { width: 100%; text-align: center; }
+    }
+  </style>
 </head>
 <body>
-    <section class="hero">
-        <div class="container">
-            <h1>Stop building agents.<br>Start using the best one.</h1>
-            <p>Forja é a primeira Managed AI Agent Platform com 15 agentes especialistas, memória real e zero infra. Engine Ayla, cognição proprietária — não wrapper de LLM.</p>
-            <div class="cta-group">
-                <a href="#" class="btn btn-primary">Ver demo</a>
-                <a href="#" class="btn btn-secondary">Instalar CLI</a>
-            </div>
-        </div>
-    </section>
 
-    <section>
-        <div class="container">
-            <h2>O problema que você já conhece</h2>
-            <div class="grid grid-3">
-                <div class="card"><span class="problem-icon">⏱️</span><h3>40% do tempo perdido</h3><p>Seu time gasta 40% do tempo em tarefas que IA já resolve: migrations, refactors, testes, documentação.</p></div>
-                <div class="card"><span class="problem-icon">💸</span><h3>Agente custom = 6–12 meses</h3><p>Construir um agente interno leva meio ano, custa caro e você ainda precisa manter infraestrutura.</p></div>
-                <div class="card"><span class="problem-icon">🧩</span><h3>Ferramentas incompletas</h3><p>Devin, Cursor, Copilot: ou são single-agent, ou não têm memória real, ou exigem infra própria.</p></div>
-            </div>
-        </div>
-    </section>
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">Forja</a>
+    <ul class="nav-links">
+      <li><a href="#solucao">Produto</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="#roadmap">Roadmap</a></li>
+      <li><a href="#como-funciona">Docs</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a href="#" class="btn-outline">Login</a>
+      <a href="#" class="btn-amber">Começar Free</a>
+    </div>
+  </div>
+</nav>
 
-    <section style="background: #0a0f1e;">
-        <div class="container">
-            <h2>15 agentes especialistas. 1 comando.</h2>
-            <p style="text-align:center;color:var(--text-secondary);max-width:700px;margin:0 auto 40px;">Orquestrados pela Ayla, cada agente domina seu domínio. Do Apolo (backend) à Íris (design systems), do Quiron (acessibilidade) ao Hermes (APIs).</p>
-            <div class="agent-grid">
-                <div class="agent-card"><span class="agent-icon">🎯</span><div class="agent-name">Atena</div><div class="agent-role">Strategy & Planning</div></div>
-                <div class="agent-card"><span class="agent-icon">📡</span><div class="agent-name">Hermes</div><div class="agent-role">APIs & Integration</div></div>
-                <div class="agent-card"><span class="agent-icon">⚡</span><div class="agent-name">Apolo</div><div class="agent-role">Backend Engineering</div></div>
-                <div class="agent-card"><span class="agent-icon">💎</span><div class="agent-name">Afrodite</div><div class="agent-role">UX & Product</div></div>
-                <div class="agent-card"><span class="agent-icon">🎨</span><div class="agent-name">Íris</div><div class="agent-role">Frontend & Design Systems</div></div>
-                <div class="agent-card"><span class="agent-icon">🏹</span><div class="agent-name">Artemis</div><div class="agent-role">Testing & QA</div></div>
-                <div class="agent-card"><span class="agent-icon">🌍</span><div class="agent-name">Gaia</div><div class="agent-role">Data & Infrastructure</div></div>
-                <div class="agent-card"><span class="agent-icon">🔨</span><div class="agent-name">Hefesto</div><div class="agent-role">DevOps & Build</div></div>
-                <div class="agent-card"><span class="agent-icon">👑</span><div class="agent-name">Hera</div><div class="agent-role">Governance & Compliance</div></div>
-                <div class="agent-card"><span class="agent-icon">♿</span><div class="agent-name">Quiron</div><div class="agent-role">Accessibility</div></div>
-            </div>
-        </div>
-    </section>
+<!-- HERO -->
+<section id="hero">
+  <div class="section-inner">
+    <div class="section-tag">AaaS — Agent as a Service</div>
+    <h1 class="hero-h1">Stop building agents.</h1>
+    <h1 class="hero-h1"><span class="hero-h1-gradient">Start using the best one.</span></h1>
+    <p class="hero-subtitle">Memória episódica nativa + personas psicométricas evolutivas. O agente que lembra quem você é e evolui com você.</p>
+    <p class="hero-note">v0.5.0 — produto funciona · self-serve disponível Q3 2026</p>
+    <div class="hero-ctas">
+      <a href="#" class="btn-amber-lg">Ver Demo →</a>
+      <a href="#como-funciona" class="btn-code">npm install -g forja</a>
+    </div>
+    <div class="hero-social">
+      <span>👥 3 alpha users</span>
+      <span>💰 MRR R$297</span>
+      <span>📈 Retenção 100% (N=3, early signal)</span>
+    </div>
+  </div>
+</section>
 
-    <section>
-        <div class="container">
-            <h2>Como funciona</h2>
-            <div class="steps">
-                <div class="step"><span class="step-number">1</span><h3>Instale o CLI</h3><div class="code">$ npx forja init</div><p style="margin-top:16px;color:var(--text-secondary);">Local-first. Roda no seu PC, fallback EC2 automático.</p></div>
-                <div class="step"><span class="step-number">2</span><h3>Invoque o agente</h3><div class="code">$ forja invoke apolo "migrate users to Prisma"</div><p style="margin-top:16px;color:var(--text-secondary);">Ayla orquestra os agentes certos para sua task.</p></div>
-                <div class="step"><span class="step-number">3</span><h3>PR pronto</h3><div class="code">✓ Branch criado · Tests pass · PR opened</div><p style="margin-top:16px;color:var(--text-secondary);">Revise, aprove, mergeia. Memória cross-sessão incluída.</p></div>
-            </div>
-        </div>
-    </section>
+<div class="divider"></div>
 
-    <section style="background: #0a0f1e;">
-        <div class="container">
-            <h2>Por que Forja é Blue Ocean</h2>
-            <div class="comparison-table">
-                <table>
-                    <thead><tr><th>Recurso</th><th>Forja</th><th>Devin</th><th>Cursor</th><th>Copilot Workspace</th></tr></thead>
-                    <tbody>
-                        <tr><td style="text-align:left;font-weight:600;">CLI local-first</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td></tr>
-                        <tr><td style="text-align:left;font-weight:600;">Mobile remote-first</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td></tr>
-                        <tr><td style="text-align:left;font-weight:600;">Multi-agent (15+)</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td></tr>
-                        <tr><td style="text-align:left;font-weight:600;">Memória cross-sessão</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td></tr>
-                        <tr><td style="text-align:left;font-weight:600;">Managed (zero infra)</td><td><span class="check">✓</span></td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="check">✓</span></td></tr>
-                        <tr><td style="text-align:left;font-weight:600;">LatAm-first (BRL, PT-BR)</td><td><span class="check">✓</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td><td><span class="cross">✗</span></td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </section>
+<!-- PROBLEMA -->
+<section id="problema">
+  <div class="section-inner">
+    <p class="section-label text-center">O problema</p>
+    <h2 class="section-title text-center">O problema que ninguém resolveu</h2>
+    <p class="section-subtitle text-center">Ferramentas incríveis. Resultados fragmentados. Contexto sempre perdido.</p>
+    <div class="cards-3">
+      <div class="card">
+        <span class="card-icon">💭</span>
+        <h3 class="card-title">LLMs esquecem tudo</h3>
+        <p class="card-desc">Cada sessão começa do zero. Contexto perdido. Repetição infinita. Você explica o mesmo projeto pela décima vez.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⚙️</span>
+        <h3 class="card-title">Ferramentas orquestram parcialmente</h3>
+        <p class="card-desc">ChatGPT, Cursor, Copilot resolvem partes. Ninguém integra o ciclo completo de decisão, execução e memória.</p>
+      </div>
+      <div class="card">
+        <span class="card-icon">⏱️</span>
+        <h3 class="card-title">Agente custom = 6–12 meses</h3>
+        <p class="card-desc">Infra, memória, personas, veto logic. Você constrói; o concorrente lança. O tempo virou o maior risco do produto.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <section>
-        <div class="container">
-            <h2>Pricing transparente, sem surpresas</h2>
-            <div class="pricing-grid">
-                <div class="pricing-card">
-                    <h3>Free</h3>
-                    <div class="price">R$0<span class="price-period">/mês</span></div>
-                    <ul class="feature-list"><li>50 agent calls/mês</li><li>Todos os 15 agentes</li><li>CLI + Mobile</li><li>Memória 7 dias</li></ul>
-                    <a href="#" class="btn btn-secondary" style="width:100%;margin-top:16px;">Começar grátis</a>
-                </div>
-                <div class="pricing-card featured">
-                    <span class="pricing-badge">Mais popular</span>
-                    <h3>Pro</h3>
-                    <div class="price">R$99<span class="price-period">/mês</span></div>
-                    <ul class="feature-list"><li>Agent calls ilimitados</li><li>Todos os 15 agentes</li><li>CLI + Mobile + Web</li><li>Memória permanente</li><li>Prioridade no suporte</li></ul>
-                    <a href="#" class="btn btn-primary" style="width:100%;margin-top:16px;">Assinar Pro</a>
-                </div>
-                <div class="pricing-card">
-                    <h3>Team</h3>
-                    <div class="price">R$119<span class="price-period">/assento/mês</span></div>
-                    <ul class="feature-list"><li>Tudo do Pro +</li><li>Workspace compartilhado</li><li>Roles e permissões</li><li>Audit log completo</li><li>Onboarding dedicado</li></ul>
-                    <a href="#" class="btn btn-secondary" style="width:100%;margin-top:16px;">Falar com vendas</a>
-                </div>
-            </div>
-            <p style="text-align:center;margin-top:32px;color:var(--text-secondary);"><strong>Enterprise?</strong> Pricing customizado, SLA dedicado, deploy on-premise. <a href="#" style="color:var(--accent-amber);">Fale conosco →</a></p>
-        </div>
-    </section>
+<!-- MOAT -->
+<section id="solucao">
+  <div class="section-inner">
+    <p class="section-label text-center">O moat</p>
+    <h2 class="section-title text-center">O moat que importa</h2>
+    <p class="section-subtitle text-center">Não são os 15 agentes. É o que torna qualquer agente melhor.</p>
+    <div class="moat-cards">
+      <div class="moat-card">
+        <span class="moat-icon">🧠</span>
+        <h3 class="moat-title">Memória Episódica Nativa</h3>
+        <p class="moat-desc">O Forja lembra o que você fez, decidiu e aprendeu. Cada sessão continua de onde parou — sem repetição, sem reconstrução de contexto.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🎯</span>
+        <h3 class="moat-title">Psicometria DISC/Eneagrama</h3>
+        <p class="moat-desc">Agentes com perfil psicométrico que adapta tom, foco e tolerância a risco ao seu estilo de trabalho. Não é personalização superficial — é adaptação estrutural.</p>
+      </div>
+      <div class="moat-card">
+        <span class="moat-icon">🛡️</span>
+        <h3 class="moat-title">Veto Hierarchy</h3>
+        <p class="moat-desc">Hierarquia de veto com auditoria completa. Controle granular sobre o que agentes podem e não podem fazer — com log imutável de cada decisão.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <section style="background: #0a0f1e;">
-        <div class="container">
-            <h2>Tração real (alpha v0.5.0)</h2>
-            <div class="metrics">
-                <div class="metric"><span class="metric-value">3</span><span class="metric-label">Alpha users pagantes</span></div>
-                <div class="metric"><span class="metric-value">R$297</span><span class="metric-label">MRR atual</span></div>
-                <div class="metric"><span class="metric-value">100%</span><span class="metric-label">Retenção 30 dias</span></div>
-                <div class="metric"><span class="metric-value">WAACO</span><span class="metric-label">North Star Metric</span></div>
-            </div>
-            <p style="text-align:center;margin-top:48px;color:var(--text-secondary);max-width:700px;margin-left:auto;margin-right:auto;">
-                <strong>Roadmap:</strong> Q3 Foundation (billing, self-serve) → Q4 Growth (100 contas) → Q1 Scale (MRR R$500k) → Q2 Enterprise (Series A)
-            </p>
-        </div>
-    </section>
+<div class="divider"></div>
 
-    <section>
-        <div class="container">
-            <div class="cta-final">
-                <h2 style="margin-bottom:24px;">Pronto para parar de construir e começar a usar?</h2>
-                <p style="color:var(--text-secondary);margin-bottom:32px;max-width:600px;margin-left:auto;margin-right:auto;">15 agentes especialistas, engine proprietária, zero infra. Instale o CLI em 30 segundos ou fale com a equipe.</p>
-                <div class="cta-group">
-                    <a href="#" class="btn btn-primary">Começar agora — Free</a>
-                    <a href="#" class="btn btn-secondary">Falar com a equipe</a>
-                </div>
-            </div>
-        </div>
-    </section>
+<!-- COMO FUNCIONA -->
+<section id="como-funciona">
+  <div class="section-inner">
+    <p class="section-label text-center">Como funciona</p>
+    <h2 class="section-title text-center">Três passos para ter um agente<br>que realmente funciona</h2>
+    <div style="display:flex;justify-content:center;">
+      <div class="note-badge">🚀 self-serve e onboarding guiado disponíveis em Q3 2026</div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-code">npm install -g forja</div>
+        <h3 class="step-title">Instale e conecte</h3>
+        <p class="step-desc">Instale a CLI. Conecte ao seu workspace. Autentique em 30 segundos. Sem configuração de infra, sem YAML de pipeline.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-code">forja invoke --agent ayla&#10;'revisa meu PR'</div>
+        <h3 class="step-title">Invoque com contexto real</h3>
+        <p class="step-desc">Invoque qualquer agente com contexto real do seu projeto. O agente já sabe quem você é, o que você construiu e como você trabalha.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-code">PR aprovado. Doc gerado.&#10;Decisão auditada.</div>
+        <h3 class="step-title">Entrega, lembra e evolui</h3>
+        <p class="step-desc">O agente entrega o resultado, persiste o aprendizado e refina o perfil psicométrico a cada interação. Fica melhor com o tempo.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
-    <footer>
-        <div class="container"><p>LavitaCode · Forja · 2026</p></div>
-    </footer>
+<!-- COMPARATIVO -->
+<section id="comparativo">
+  <div class="section-inner">
+    <p class="section-label text-center">Comparativo</p>
+    <h2 class="section-title text-center">Por que não os outros?</h2>
+    <p class="section-subtitle text-center">Cada ferramenta resolve uma fatia. O Forja fecha o ciclo completo.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Ferramenta</th>
+            <th>Memória Episódica</th>
+            <th>Psicometria</th>
+            <th>Veto Hierarchy</th>
+            <th>Zero Infra</th>
+            <th>CLI Local</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="forja-row">
+            <td>✦ Forja</td>
+            <td><span class="check-yes">✓</span></td>
+            <td><span class="check-yes">✓</span></td>
+            <td><span class="check-yes">✓</span></td>
+            <td><span class="check-yes">✓</span></td>
+            <td><span class="check-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>ChatGPT</td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-yes">✓</span></td>
+            <td><span class="check-no">✗</span></td>
+          </tr>
+          <tr>
+            <td>Cursor</td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-yes">✓</span></td>
+            <td><span class="check-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>Replit</td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-yes">✓</span></td>
+          </tr>
+          <tr>
+            <td>LangChain</td>
+            <td><span class="check-partial">~</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-no">✗</span></td>
+            <td><span class="check-partial">~</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="section-inner">
+    <p class="section-label text-center">Pricing</p>
+    <h2 class="section-title text-center">Preço justo para cada estágio</h2>
+    <div style="display:flex;justify-content:center;">
+      <div class="pricing-note">🔒 Billing self-serve disponível em Q3 2026 · acesso manual via contato hoje</div>
+    </div>
+    <div class="pricing-cards">
+      <div class="pricing-card">
+        <div>
+          <div class="plan-tier">Free</div>
+          <div class="plan-price"><span class="amount">R$0</span><span class="period">/mês</span></div>
+          <div class="plan-desc">Para explorar</div>
+        </div>
+        <ul class="plan-features">
+          <li>CLI básica</li>
+          <li>1 agente</li>
+          <li>100 invocações/mês</li>
+          <li>Sem memória persistente</li>
+        </ul>
+        <a href="#" class="btn-plan-outline">Começar Free</a>
+      </div>
+      <div class="pricing-card highlighted">
+        <div>
+          <div class="plan-tier">Pro</div>
+          <div class="plan-price"><span class="amount">R$99</span><span class="period">/mês</span></div>
+          <div class="plan-desc">Para builders</div>
+        </div>
+        <ul class="plan-features">
+          <li>CLI + Web</li>
+          <li>Todos os agentes</li>
+          <li>Invocações ilimitadas</li>
+          <li>Memória episódica</li>
+          <li>Personas psicométricas</li>
+          <li>Suporte prioritário</li>
+        </ul>
+        <a href="#" class="btn-plan-amber">Começar Pro</a>
+      </div>
+      <div class="pricing-card">
+        <div>
+          <div class="plan-tier">Team</div>
+          <div class="plan-price"><span class="amount">R$119</span><span class="period">/assento/mês</span></div>
+          <div class="plan-desc">Para times</div>
+        </div>
+        <ul class="plan-features">
+          <li>Tudo do Pro</li>
+          <li>Workspace multi-user</li>
+          <li>Roles e permissões</li>
+          <li>Audit log</li>
+          <li>Integrações (Q1 2027)</li>
+        </ul>
+        <a href="#" class="btn-plan-outline">Falar com a gente</a>
+      </div>
+    </div>
+    <div class="enterprise-card">
+      <div class="enterprise-info">
+        <h3>Enterprise</h3>
+        <p>Pricing custom · SLA · SSO · compliance · suporte dedicado · contratos anuais</p>
+      </div>
+      <a href="mailto:rafasdiasdev@gmail.com" class="enterprise-btn">Falar com Rafael →</a>
+    </div>
+  </div>
+</section>
+
+<!-- TRAÇÃO -->
+<section id="tracao">
+  <div class="section-inner">
+    <p class="section-label text-center">Tração</p>
+    <h2 class="section-title text-center">Onde estamos hoje</h2>
+    <div class="disclaimer-box">
+      <strong>Early stage — N=3, statistically limited.</strong> Estes números são early signal, não prova de mercado. O produto funciona e retém, mas a amostra não permite extrapolação. Crescimento e distribuição são o próximo capítulo.
+    </div>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-value">3</div>
+        <div class="metric-label">Alpha Users</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">R$297</div>
+        <div class="metric-label">MRR</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">100%</div>
+        <div class="metric-label">Retenção</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-value">60d</div>
+        <div class="metric-label">Período</div>
+      </div>
+    </div>
+    <p class="tracao-note">produto funciona · distribuição é o próximo passo (Q3 2026)</p>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<!-- ROADMAP -->
+<section id="roadmap">
+  <div class="section-inner">
+    <p class="section-label text-center">Roadmap</p>
+    <h2 class="section-title text-center">O que vem a seguir</h2>
+    <p class="section-subtitle text-center">Execução em ondas. Cada fase desbloqueando a próxima.</p>
+    <div class="roadmap-cards">
+      <div class="roadmap-card">
+        <div class="roadmap-badge badge-gate">GATE</div>
+        <div class="roadmap-quarter">Q3 2026</div>
+        <h3 class="roadmap-title">Foundation</h3>
+        <p class="roadmap-desc">Self-serve billing, Stripe, Eng #1 contratado. Onboarding guiado ao vivo. Meta: 20 usuários pagantes.</p>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-badge badge-plg">PLG</div>
+        <div class="roadmap-quarter">Q4 2026</div>
+        <h3 class="roadmap-title">PLG Activation</h3>
+        <p class="roadmap-desc">Product-led growth. Loop de convite, referral, funil self-serve ativo. Meta: 100 signups.</p>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-badge badge-collab">COLLAB</div>
+        <div class="roadmap-quarter">Q1 2027</div>
+        <h3 class="roadmap-title">Team Tier</h3>
+        <p class="roadmap-desc">Workspace multi-user, permissões granulares, integração GitHub/Jira. Meta: 5–10 contas Team.</p>
+      </div>
+      <div class="roadmap-card">
+        <div class="roadmap-badge badge-scale">SCALE</div>
+        <div class="roadmap-quarter">Q2 2027</div>
+        <h3 class="roadmap-title">Scale</h3>
+        <p class="roadmap-desc">30–40 contas ativas, R$30–50k MRR. Expansão para times de engenharia + produto. Seed round.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section id="cta-final">
+  <div class="section-inner">
+    <h2 class="cta-title">Pronto para parar de construir e começar a usar?</h2>
+    <div class="cta-actions">
+      <a href="#" class="btn-amber-lg">Começar agora (Free)</a>
+      <a href="mailto:rafasdiasdev@gmail.com" class="btn-cta-outline">Falar com Rafael →</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <span class="footer-logo">LavitaCode</span> · Forja · Produto Consolidado · 2026
+  </div>
+</footer>
+
 </body>
 </html>
