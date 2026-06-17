@@ -1,1 +1,644 @@
-!PLACEHOLDER_ICP!
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forja — ICP & Personas B4</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #0a0f1a; --surface: #0f172a; --surface2: #1e293b; --border: #1e293b;
+      --text: #e2e8f0; --muted: #94a3b8; --dim: #475569;
+      --ember: #f97316; --ember-d: #ea580c; --spark: #fbbf24;
+      --steel: #22d3ee; --steel-d: #0891b2;
+      --green: #4ade80; --rose: #f43f5e; --violet: #a78bfa;
+    }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif; line-height: 1.65; }
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; }
+
+    /* NAV */
+    nav { position: sticky; top: 0; z-index: 50; background: rgba(10,15,26,.88); backdrop-filter: blur(14px); border-bottom: 1px solid var(--border); }
+    .nav-in { max-width: 1100px; margin: 0 auto; padding: .7rem 1.5rem; display: flex; align-items: center; gap: .75rem; }
+    .nav-brand { font-weight: 800; font-size: 1.1rem; letter-spacing: -.01em; color: var(--ember); }
+    .nav-subtitle { font-size: .75rem; color: var(--muted); margin-left: .5rem; }
+    .nav-tag { margin-left: auto; font-size: .7rem; font-weight: 700; color: var(--spark); background: #1a120660; border: 1px solid #431407; border-radius: 999px; padding: .25rem .75rem; letter-spacing: .03em; }
+
+    /* HERO */
+    .hero { padding: 3.5rem 0 2.5rem; text-align: center; position: relative; overflow: hidden; }
+    .hero-glow { position: absolute; top: -60px; left: 50%; transform: translateX(-50%); width: 800px; height: 400px; background: radial-gradient(circle, #f9731618 0%, transparent 65%); pointer-events: none; }
+    .hero-eyebrow { display: inline-flex; align-items: center; gap: .4rem; font-size: .72rem; font-weight: 700; color: var(--steel); background: #0c1a2080; border: 1px solid #0e7490; border-radius: 999px; padding: .3rem .85rem; margin-bottom: 1.25rem; letter-spacing: .04em; }
+    .hero h1 { font-size: clamp(1.9rem, 4vw, 2.8rem); font-weight: 900; letter-spacing: -.03em; line-height: 1.15; margin-bottom: .75rem; }
+    .hero h1 em { font-style: normal; color: var(--ember); }
+    .hero p { font-size: 1.05rem; color: var(--muted); max-width: 580px; margin: 0 auto 2rem; }
+    .toc { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; }
+    .toc a { font-size: .75rem; font-weight: 600; color: var(--steel); background: #0c1a2066; border: 1px solid #0e7490; border-radius: .4rem; padding: .3rem .75rem; text-decoration: none; transition: background .15s; }
+    .toc a:hover { background: #0c1a20cc; }
+
+    /* SECTIONS */
+    section { padding: 3rem 0; border-top: 1px solid var(--border); }
+    .sec-label { font-size: .65rem; font-weight: 700; letter-spacing: .12em; color: var(--ember); text-transform: uppercase; margin-bottom: .6rem; }
+    .sec-title { font-size: 1.6rem; font-weight: 800; letter-spacing: -.02em; margin-bottom: .5rem; }
+    .sec-sub { color: var(--muted); font-size: .9rem; margin-bottom: 2rem; max-width: 620px; }
+
+    /* MARKET RESEARCH */
+    .market-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; margin-bottom: 2rem; }
+    .market-card { background: var(--surface); border: 1px solid var(--border); border-radius: 1rem; padding: 1.4rem; }
+    .market-card h3 { font-size: .85rem; font-weight: 700; color: var(--steel); margin-bottom: .75rem; display: flex; align-items: center; gap: .5rem; }
+    .market-card ul { list-style: none; padding: 0; }
+    .market-card ul li { font-size: .82rem; color: var(--muted); padding: .3rem 0; border-bottom: 1px solid #1e293b66; display: flex; align-items: flex-start; gap: .45rem; }
+    .market-card ul li:last-child { border-bottom: none; }
+    .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--ember); flex-shrink: 0; margin-top: .45rem; }
+
+    .stat-row { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
+    .stat-box { background: var(--surface2); border: 1px solid var(--border); border-radius: .75rem; padding: 1.25rem; text-align: center; }
+    .stat-num { font-size: 1.8rem; font-weight: 900; color: var(--ember); letter-spacing: -.03em; }
+    .stat-label { font-size: .7rem; color: var(--muted); margin-top: .25rem; }
+
+    /* PERSONAS */
+    .persona-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+    .persona-card { background: var(--surface); border: 1px solid var(--border); border-radius: 1.25rem; overflow: hidden; transition: transform .2s, box-shadow .2s; }
+    .persona-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px #00000055; }
+    .persona-header { padding: 1.5rem; display: flex; align-items: flex-start; gap: 1rem; position: relative; }
+    .persona-avatar { font-size: 3.2rem; line-height: 1; flex-shrink: 0; }
+    .persona-meta h3 { font-size: 1.1rem; font-weight: 800; margin-bottom: .2rem; }
+    .persona-meta .role { font-size: .8rem; color: var(--ember); font-weight: 600; }
+    .persona-meta .company { font-size: .78rem; color: var(--muted); margin-top: .1rem; }
+    .persona-accent { position: absolute; top: 0; right: 0; width: 80px; height: 80px; border-radius: 0 1.25rem 0 100%; opacity: .12; }
+    .persona-body { padding: 0 1.5rem 1.5rem; }
+    .persona-stack { display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1rem; }
+    .tag { font-size: .66rem; font-weight: 700; border-radius: .35rem; padding: .2rem .55rem; }
+    .tag-tech { background: #0c1a2080; color: var(--steel); border: 1px solid #0e749055; }
+    .tag-role { background: #2d1a0e80; color: var(--ember); border: 1px solid #f9731633; }
+    .persona-rows { display: flex; flex-direction: column; gap: .65rem; }
+    .persona-row { background: var(--surface2); border-radius: .6rem; padding: .75rem 1rem; }
+    .persona-row-label { font-size: .62rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--dim); margin-bottom: .25rem; }
+    .persona-row-val { font-size: .82rem; color: var(--text); }
+    .pain { border-left: 3px solid var(--rose); }
+    .gain { border-left: 3px solid var(--green); }
+    .channel { border-left: 3px solid var(--steel); }
+    .objection { border-left: 3px solid var(--spark); }
+
+    /* ICP SCORING */
+    .icp-table-wrap { overflow-x: auto; }
+    .icp-table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+    .icp-table th { background: var(--surface2); padding: .75rem 1rem; text-align: left; font-size: .7rem; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); border-bottom: 2px solid var(--border); white-space: nowrap; }
+    .icp-table td { padding: .75rem 1rem; border-bottom: 1px solid var(--border); vertical-align: top; }
+    .icp-table tr:last-child td { border-bottom: none; }
+    .icp-table tr:hover td { background: var(--surface)88; }
+    .score-pill { display: inline-flex; align-items: center; gap: .3rem; font-size: .7rem; font-weight: 700; border-radius: 999px; padding: .2rem .6rem; }
+    .score-high { background: #052e1680; color: var(--green); border: 1px solid #166534; }
+    .score-mid { background: #1a120680; color: var(--spark); border: 1px solid #a16207; }
+    .score-low { background: #1c0a1280; color: var(--rose); border: 1px solid #9f1239; }
+    .icp-bar-wrap { display: flex; align-items: center; gap: .5rem; }
+    .icp-bar-bg { flex: 1; height: 6px; background: var(--surface2); border-radius: 999px; overflow: hidden; min-width: 80px; }
+    .icp-bar-fill { height: 100%; border-radius: 999px; }
+    .icp-bar-val { font-size: .72rem; color: var(--muted); width: 30px; text-align: right; }
+
+    /* ICP MATRIX */
+    .matrix-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; margin-top: 1.5rem; }
+    .matrix-cell { background: var(--surface); border: 1px solid var(--border); border-radius: .75rem; padding: 1.25rem; }
+    .matrix-cell h4 { font-size: .8rem; font-weight: 700; margin-bottom: .75rem; display: flex; align-items: center; gap: .4rem; }
+    .matrix-cell ul { list-style: none; }
+    .matrix-cell ul li { font-size: .78rem; color: var(--muted); padding: .2rem 0; display: flex; align-items: flex-start; gap: .4rem; }
+    .check { color: var(--green); }
+    .cross { color: var(--rose); }
+
+    /* WAR ROOM */
+    .warroom { background: var(--surface); border: 1px solid var(--border); border-radius: 1.25rem; overflow: hidden; }
+    .warroom-header { background: linear-gradient(135deg, #0f172a, #1a0a05); padding: 1.25rem 1.5rem; display: flex; align-items: center; gap: 1rem; border-bottom: 1px solid var(--border); }
+    .warroom-header h3 { font-size: .95rem; font-weight: 800; }
+    .warroom-header span { font-size: .72rem; color: var(--muted); }
+    .live-badge { font-size: .62rem; font-weight: 700; background: #052e16; color: var(--green); border: 1px solid #166534; border-radius: 999px; padding: .2rem .55rem; letter-spacing: .06em; display: flex; align-items: center; gap: .3rem; }
+    .live-dot { width: 5px; height: 5px; background: var(--green); border-radius: 50%; animation: pulse 1.5s ease-in-out infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+    .warroom-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 1.25rem; }
+    .msg { display: flex; gap: .85rem; align-items: flex-start; }
+    .msg-avatar { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .85rem; font-weight: 800; flex-shrink: 0; margin-top: .1rem; }
+    .msg-gaia .msg-avatar { background: #1a0a05; border: 1px solid var(--ember); color: var(--ember); }
+    .msg-hermes .msg-avatar { background: #0c1a20; border: 1px solid var(--steel); color: var(--steel); }
+    .msg-iris .msg-avatar { background: #1a0d25; border: 1px solid var(--violet); color: var(--violet); }
+    .msg-body { flex: 1; }
+    .msg-meta { font-size: .68rem; font-weight: 700; margin-bottom: .3rem; display: flex; align-items: center; gap: .4rem; }
+    .msg-gaia .msg-meta { color: var(--ember); }
+    .msg-hermes .msg-meta { color: var(--steel); }
+    .msg-iris .msg-meta { color: var(--violet); }
+    .msg-time { color: var(--dim); font-weight: 400; }
+    .msg-text { font-size: .82rem; color: var(--muted); line-height: 1.6; background: var(--surface2); border-radius: .6rem; padding: .75rem 1rem; }
+    .msg-text strong { color: var(--text); }
+    .msg-text em { color: var(--spark); font-style: normal; }
+    .divider { border: none; border-top: 1px solid var(--border); }
+    .consensus { background: linear-gradient(135deg, #052e1620, #0c1a2020); border: 1px solid #16663433; border-radius: .75rem; padding: 1rem 1.25rem; }
+    .consensus-label { font-size: .65rem; font-weight: 700; letter-spacing: .1em; color: var(--green); margin-bottom: .4rem; }
+    .consensus-text { font-size: .82rem; color: var(--text); line-height: 1.6; }
+
+    /* FOOTER */
+    footer { padding: 2rem 0; border-top: 1px solid var(--border); text-align: center; }
+    footer p { font-size: .75rem; color: var(--dim); }
+    footer strong { color: var(--muted); }
+
+    @media (max-width: 640px) {
+      .matrix-grid { grid-template-columns: 1fr; }
+      .persona-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <span class="nav-brand">⚙ Forja</span>
+    <span class="nav-subtitle">ICP & Buyer Personas — Documento B4</span>
+    <span class="nav-tag">WAR ROOM · JUN 2026</span>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="hero-glow"></div>
+  <div class="wrap">
+    <div class="hero-eyebrow">🎯 Ideal Customer Profile · Buyer Personas · Market Research</div>
+    <h1>Quem compra a <em>Forja</em>?</h1>
+    <p>Pesquisa de mercado, 3 personas B4 detalhadas, ICP scoring e debate estratégico do war room Olimpo.</p>
+    <div class="toc">
+      <a href="#market">Pesquisa de Mercado</a>
+      <a href="#personas">3 Personas</a>
+      <a href="#icp">ICP Scoring</a>
+      <a href="#warroom">War Room Notes</a>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ MARKET RESEARCH ═══════════════════════════════ -->
+<section id="market">
+  <div class="wrap">
+    <div class="sec-label">01 — Hermes Research</div>
+    <h2 class="sec-title">Pesquisa de Mercado: Developer Tools SaaS</h2>
+    <p class="sec-sub">Mapeamento de quem são os buyers reais de plataformas de agentes de IA em 2025–2026 — cargo, empresa, stack e comportamento de compra.</p>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-num">$47B</div>
+        <div class="stat-label">Mercado global dev tools SaaS 2026 (est.)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">68%</div>
+        <div class="stat-label">Devs usando alguma IA assistiva diariamente</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">3,2×</div>
+        <div class="stat-label">CAGR de AaaS vs. SaaS tradicional (2024–2027)</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">R$340</div>
+        <div class="stat-label">Gasto médio mensal dev tools por dev sênior BR</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">74%</div>
+        <div class="stat-label">Decisão de compra começa no dev individual</div>
+      </div>
+    </div>
+
+    <div class="market-grid">
+      <div class="market-card">
+        <h3>🧑‍💻 Perfil de Cargo dos Buyers</h3>
+        <ul>
+          <li><span class="dot"></span>Staff/Senior Engineer (decisor bottom-up)</li>
+          <li><span class="dot"></span>Tech Lead / Engenheiro de Plataforma</li>
+          <li><span class="dot"></span>CTO de startup (1–30 pessoas)</li>
+          <li><span class="dot"></span>Head of Engineering (aprovação orçamento)</li>
+          <li><span class="dot"></span>Developer Advocate / DevRel</li>
+          <li><span class="dot"></span>Founder técnico (autocusteio)</li>
+        </ul>
+      </div>
+      <div class="market-card">
+        <h3>🏢 Perfil de Empresa</h3>
+        <ul>
+          <li><span class="dot"></span>Startup SaaS B2B seed–series B (5–80 devs)</li>
+          <li><span class="dot"></span>Scale-up com squads autônomos</li>
+          <li><span class="dot"></span>Consultoria/agência de software (15–100 pessoas)</li>
+          <li><span class="dot"></span>Empresa mid-market com squad interno de produto</li>
+          <li><span class="dot"></span>Freelancer PJ com clientes recorrentes</li>
+        </ul>
+      </div>
+      <div class="market-card">
+        <h3>🛠 Stack Mais Comum</h3>
+        <ul>
+          <li><span class="dot"></span>TypeScript / Node.js (back + front)</li>
+          <li><span class="dot"></span>React / Next.js (SPA/SSR)</li>
+          <li><span class="dot"></span>Python (data, scripts, agentes)</li>
+          <li><span class="dot"></span>PostgreSQL / Supabase / Neon</li>
+          <li><span class="dot"></span>AWS / GCP / Railway / Render</li>
+          <li><span class="dot"></span>GitHub + CI/CD (Actions, Vercel, Fly.io)</li>
+          <li><span class="dot"></span>Docker + Kubernetes (mid-stage)</li>
+        </ul>
+      </div>
+      <div class="market-card">
+        <h3>📡 Canais de Descoberta</h3>
+        <ul>
+          <li><span class="dot"></span>Twitter/X tech (dev influencers, demos virais)</li>
+          <li><span class="dot"></span>Hacker News (Show HN + Ask HN)</li>
+          <li><span class="dot"></span>YouTube (demos de fluxo real)</li>
+          <li><span class="dot"></span>Product Hunt (lançamento)</li>
+          <li><span class="dot"></span>Reddit r/webdev / r/MachineLearning</li>
+          <li><span class="dot"></span>Comunidades Discord/Slack (Indie Hackers, etc.)</li>
+          <li><span class="dot"></span>Indicação peer-to-peer (#1 canal B2B)</li>
+        </ul>
+      </div>
+      <div class="market-card">
+        <h3>⚡ Comportamento de Compra</h3>
+        <ul>
+          <li><span class="dot"></span>Trial-first obrigatório (sem cartão = preferido)</li>
+          <li><span class="dot"></span>Decisão em 7–14 dias após primeiro uso real</li>
+          <li><span class="dot"></span>ROI esperado em &lt; 1 sprint (2 semanas)</li>
+          <li><span class="dot"></span>Resistência a lock-in de dados</li>
+          <li><span class="dot"></span>Expansão por adoção (PLG bottom-up)</li>
+          <li><span class="dot"></span>Compra via cartão pessoal + reembolso</li>
+        </ul>
+      </div>
+      <div class="market-card">
+        <h3>🆚 Concorrentes Diretos</h3>
+        <ul>
+          <li><span class="dot"></span><strong>Cursor/Copilot</strong> — pair programming (não AaaS)</li>
+          <li><span class="dot"></span><strong>Langchain/LangSmith</strong> — infra DIY complexa</li>
+          <li><span class="dot"></span><strong>CrewAI Cloud</strong> — orquestração sem memória nativa</li>
+          <li><span class="dot"></span><strong>AutoGen Studio</strong> — experimental, sem produção</li>
+          <li><span class="dot"></span><strong>Devin/SWE-agent</strong> — foco só em código</li>
+          <li><span class="dot"></span><strong>Diferenciar:</strong> memória cross-sessão + 15 agentes prontos + CLI local</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ PERSONAS ═══════════════════════════════ -->
+<section id="personas">
+  <div class="wrap">
+    <div class="sec-label">02 — Íris Design · Personas</div>
+    <h2 class="sec-title">3 Buyer Personas Detalhadas</h2>
+    <p class="sec-sub">Arquétipos derivados dos padrões reais de adoção de developer tools SaaS no mercado BR/LATAM + global.</p>
+
+    <div class="persona-grid">
+
+      <!-- PERSONA 1: Lucas -->
+      <div class="persona-card">
+        <div class="persona-header" style="background: linear-gradient(135deg, #1a0a0588, transparent);">
+          <div class="persona-avatar">👨‍💻</div>
+          <div class="persona-meta">
+            <h3>Lucas Ferreira</h3>
+            <div class="role">Staff Engineer → Tech Lead</div>
+            <div class="company">Startup SaaS B2B · Series A · 25 devs</div>
+          </div>
+          <div class="persona-accent" style="background: var(--ember);"></div>
+        </div>
+        <div class="persona-body">
+          <div class="persona-stack">
+            <span class="tag tag-tech">TypeScript</span>
+            <span class="tag tag-tech">Next.js</span>
+            <span class="tag tag-tech">PostgreSQL</span>
+            <span class="tag tag-tech">AWS</span>
+            <span class="tag tag-tech">GitHub Actions</span>
+            <span class="tag tag-role">Bottom-up buyer</span>
+          </div>
+          <div class="persona-rows">
+            <div class="persona-row pain">
+              <div class="persona-row-label">🔥 Dor Primária</div>
+              <div class="persona-row-val">Passa 30–40% do tempo em tarefas repetitivas (code review, docs, scripts de deploy). Tentou LangChain mas abandonou na semana 2 — complexidade de infra matou a iniciativa antes de entregar valor.</div>
+            </div>
+            <div class="persona-row gain">
+              <div class="persona-row-label">✅ Ganho Esperado</div>
+              <div class="persona-row-val">Quer delegar revisão de PRs, geração de testes e análise de logs para agentes que <strong>lembram o contexto do projeto</strong> — sem montar uma plataforma do zero.</div>
+            </div>
+            <div class="persona-row channel">
+              <div class="persona-row-label">📡 Canal de Descoberta</div>
+              <div class="persona-row-val">Twitter/X: viu demo de "Ayla resolvendo um bug de produção em 3 minutos". Confirmou no Hacker News (Show HN). Fez trial na mesma semana.</div>
+            </div>
+            <div class="persona-row objection">
+              <div class="persona-row-label">⚠️ Objeção Principal</div>
+              <div class="persona-row-val">"Meu CTO vai perguntar onde os dados do nosso código ficam armazenados." — Precisa de resposta clara sobre isolamento de dados antes de aprovar R$119/assento.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONA 2: Camila -->
+      <div class="persona-card">
+        <div class="persona-header" style="background: linear-gradient(135deg, #0c1a2088, transparent);">
+          <div class="persona-avatar">👩‍🔬</div>
+          <div class="persona-meta">
+            <h3>Camila Souza</h3>
+            <div class="role">CTO / Co-fundadora Técnica</div>
+            <div class="company">Startup de IA clínica · Pre-seed · 8 pessoas</div>
+          </div>
+          <div class="persona-accent" style="background: var(--steel);"></div>
+        </div>
+        <div class="persona-body">
+          <div class="persona-stack">
+            <span class="tag tag-tech">Python</span>
+            <span class="tag tag-tech">FastAPI</span>
+            <span class="tag tag-tech">React</span>
+            <span class="tag tag-tech">GCP</span>
+            <span class="tag tag-tech">Neon</span>
+            <span class="tag tag-role">Decision maker</span>
+          </div>
+          <div class="persona-rows">
+            <div class="persona-row pain">
+              <div class="persona-row-label">🔥 Dor Primária</div>
+              <div class="persona-row-val">Precisa de múltiplos agentes especializados (pesquisa clínica, geração de relatórios, compliance) mas não tem headcount para montar uma plataforma própria de orquestração. Cada hora gasta em infra é hora tirada do produto.</div>
+            </div>
+            <div class="persona-row gain">
+              <div class="persona-row-label">✅ Ganho Esperado</div>
+              <div class="persona-row-val">Uma <strong>Ayla que já sabe o contexto do negócio</strong> e delega para especialistas certos. Quer chegar na segunda e pedir "Atena, revisa a arquitetura do módulo de laudos" — sem configurar nada.</div>
+            </div>
+            <div class="persona-row channel">
+              <div class="persona-row-label">📡 Canal de Descoberta</div>
+              <div class="persona-row-val">Comunidade Slack de CTOs de healthtech BR. Um colega mandou o link do repositório público + o README. Avaliou em 45 minutos e pediu trial Pro imediato.</div>
+            </div>
+            <div class="persona-row objection">
+              <div class="persona-row-label">⚠️ Objeção Principal</div>
+              <div class="persona-row-val">"A Forja vai continuar existindo daqui 18 meses?" — Startup early-stage exige evidência de roadmap sólido e não-abandono antes de integrar no core de produção.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PERSONA 3: André -->
+      <div class="persona-card">
+        <div class="persona-header" style="background: linear-gradient(135deg, #1a0d2588, transparent);">
+          <div class="persona-avatar">🧑‍🏫</div>
+          <div class="persona-meta">
+            <h3>André Matsuda</h3>
+            <div class="role">Engenheiro de Plataforma / DevOps</div>
+            <div class="company">Scale-up de e-commerce · Series B · 120 devs</div>
+          </div>
+          <div class="persona-accent" style="background: var(--violet);"></div>
+        </div>
+        <div class="persona-body">
+          <div class="persona-stack">
+            <span class="tag tag-tech">Kubernetes</span>
+            <span class="tag tag-tech">Terraform</span>
+            <span class="tag tag-tech">Go</span>
+            <span class="tag tag-tech">Python</span>
+            <span class="tag tag-tech">Datadog</span>
+            <span class="tag tag-role">Influenciador interno</span>
+          </div>
+          <div class="persona-rows">
+            <div class="persona-row pain">
+              <div class="persona-row-label">🔥 Dor Primária</div>
+              <div class="persona-row-val">Equipe de plataforma recebe 50+ pedidos/semana de outros squads (ambientes, análise de logs, criação de pipelines). Não tem como atender tudo. Bots internos que criaram "esqueciam" o contexto a cada sessão.</div>
+            </div>
+            <div class="persona-row gain">
+              <div class="persona-row-label">✅ Ganho Esperado</div>
+              <div class="persona-row-val">Quer que a <strong>Forja funcione como 1st line de suporte da plataforma</strong> — agentes que lembram o histórico de cada squad e resolvem pedidos rotineiros sem escalar para o time de platform.</div>
+            </div>
+            <div class="persona-row channel">
+              <div class="persona-row-label">📡 Canal de Descoberta</div>
+              <div class="persona-row-val">YouTube: tutorial de 20 min mostrando CLI local + invoke_agent. Testou no laptop pessoal no fim de semana. Abriu budget request para Team plan na segunda-feira.</div>
+            </div>
+            <div class="persona-row objection">
+              <div class="persona-row-label">⚠️ Objeção Principal</div>
+              <div class="persona-row-val">"O InfoSec vai bloquear porque o código sai do nosso ambiente." — Precisa de opção self-hosted ou garantia contratual de que logs/código não são usados para treino de modelos terceiros.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ ICP SCORING ═══════════════════════════════ -->
+<section id="icp">
+  <div class="wrap">
+    <div class="sec-label">03 — Gaia Strategy · ICP</div>
+    <h2 class="sec-title">ICP Scoring Matrix</h2>
+    <p class="sec-sub">Critérios objetivos para qualificar prospects. Quanto mais alto o score, mais rápido o ciclo de vendas e maior o LTV esperado.</p>
+
+    <div class="icp-table-wrap">
+      <table class="icp-table">
+        <thead>
+          <tr>
+            <th>Dimensão</th>
+            <th>Alto Fit ✅</th>
+            <th>Médio Fit ⚡</th>
+            <th>Baixo Fit ❌</th>
+            <th>Score Forja</th>
+            <th>Peso</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Tamanho do Time de Dev</strong></td>
+            <td>3–50 devs (squads ágeis)</td>
+            <td>51–200 devs (precisa aprovação)</td>
+            <td>&lt;2 ou &gt;500 (freelancer solo / enterprise lento)</td>
+            <td>
+              <div class="icp-bar-wrap">
+                <div class="icp-bar-bg"><div class="icp-bar-fill" style="width:88%; background: var(--green);"></div></div>
+                <span class="icp-bar-val">88</span>
+              </div>
+            </td>
+            <td><span class="score-pill score-high">Alta ×3</span></td>
+          </tr>
+          <tr>
+            <td><strong>Maturidade Cloud</strong></td>
+            <td>CI/CD ativo, IaC, múltiplos ambientes</td>
+            <td>Metade on-premise, DevOps nascendo</td>
+            <td>Tudo on-prem, sem containers</td>
+            <td>
+              <div class="icp-bar-wrap">
+                <div class="icp-bar-bg"><div class="icp-bar-fill" style="width:82%; background: var(--green);"></div></div>
+                <span class="icp-bar-val">82</span>
+              </div>
+            </td>
+            <td><span class="score-pill score-high">Alta ×3</span></td>
+          </tr>
+          <tr>
+            <td><strong>Budget Disponível</strong></td>
+            <td>R$300–2000/mês autoaprovável pelo dev</td>
+            <td>R$2001–10k (precisa CFO)</td>
+            <td>&lt;R$100 (sensível a preço) ou &gt;R$50k (RFP lento)</td>
+            <td>
+              <div class="icp-bar-wrap">
+                <div class="icp-bar-bg"><div class="icp-bar-fill" style="width:75%; background: var(--spark);"></div></div>
+                <span class="icp-bar-val">75</span>
+              </div>
+            </td>
+            <td><span class="score-pill score-mid">Média ×2</span></td>
+          </tr>
+          <tr>
+            <td><strong>Adoção de IA Atual</strong></td>
+            <td>Já usa Copilot / ChatGPT no fluxo</td>
+            <td>Experimentou, não adotou sistematicamente</td>
+            <td>Resistência cultural a IA (compliance/setorial)</td>
+            <td>
+              <div class="icp-bar-wrap">
+                <div class="icp-bar-bg"><div class="icp-bar-fill" style="width:91%; background: var(--green);"></div></div>
+                <span class="icp-bar-val">91</span>
+              </div>
+            </td>
+            <td><span class="score-pill score-high">Alta ×3</span></td>
+          </tr>
+          <tr>
+            <td><strong>Velocidade de Iteração</strong></td>
+            <td>Deploy diário, sprints de 1–2 semanas</td>
+            <td>Deploy semanal, sprints de 3 semanas</td>
+            <td>Releases mensais ou trimestrais</td>
+            <td>
+              <div class="icp-bar-wrap">
+                <div class="icp-bar-bg"><div class="icp-bar-fill" style="width:85%; background: var(--green);"></div></div>
+                <span class="icp-bar-val">85</span>
+              </div>
+            </td>
+            <td><span class="score-pill score-high">Alta ×3</span></td>
+          </tr>
+          <tr>
+            <td><strong>Dor com Contexto Perdido</strong></td>
+            <td>Menciona "esquece o contexto" ou reinicia setups frequentemente</td>
+            <td>Problema existe mas workaround manual resolve</td>
+            <td>Não usa ferramentas de IA atualmente</td>
+            <td>
+              <div class="icp-bar-wrap">
+                <div class="icp-bar-bg"><div class="icp-bar-fill" style="width:94%; background: var(--green);"></div></div>
+                <span class="icp-bar-val">94</span>
+              </div>
+            </td>
+            <td><span class="score-pill score-high">Alta ×3</span></td>
+          </tr>
+          <tr>
+            <td><strong>Localização / Idioma</strong></td>
+            <td>Brasil / LATAM (PT-BR / ES nativo)</td>
+            <td>Portugal / Espanha (fuso compatível)</td>
+            <td>Mercados EN-only com suporte nativo exigido</td>
+            <td>
+              <div class="icp-bar-wrap">
+                <div class="icp-bar-bg"><div class="icp-bar-fill" style="width:70%; background: var(--spark);"></div></div>
+                <span class="icp-bar-val">70</span>
+              </div>
+            </td>
+            <td><span class="score-pill score-mid">Média ×2</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="matrix-grid">
+      <div class="matrix-cell">
+        <h4><span class="check">✓</span> Sinais de Alto Fit (Qualifica)</h4>
+        <ul>
+          <li><span class="check">✓</span> "Tentamos LangChain e desistimos na semana 2"</li>
+          <li><span class="check">✓</span> Usa GitHub Actions + tem >3 ambientes</li>
+          <li><span class="check">✓</span> Paga Cursor/Copilot (prova de budget PLG)</li>
+          <li><span class="check">✓</span> CTO ou tech lead responde ao cold email em &lt;24h</li>
+          <li><span class="check">✓</span> Squad de 5–15 devs com autonomia de compra</li>
+          <li><span class="check">✓</span> Mencionou "contexto" ou "memória" como dor</li>
+          <li><span class="check">✓</span> Deploy pelo menos 3× por semana</li>
+        </ul>
+      </div>
+      <div class="matrix-cell">
+        <h4><span class="cross">✗</span> Sinais de Baixo Fit (Descarta / Adia)</h4>
+        <ul>
+          <li><span class="cross">✗</span> "Precisa passar pelo comitê de TI antes de qualquer SaaS externo"</li>
+          <li><span class="cross">✗</span> Stack 100% Microsoft (Azure AD + Copilot já contratado)</li>
+          <li><span class="cross">✗</span> Setor financeiro com proibição contratual de LLM externo</li>
+          <li><span class="cross">✗</span> Empresa >500 devs sem divisão autônoma</li>
+          <li><span class="cross">✗</span> Founder não-técnico sem CTO/dev no time</li>
+          <li><span class="cross">✗</span> Ciclo de decisão >90 dias (enterprise)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ WAR ROOM ═══════════════════════════════ -->
+<section id="warroom">
+  <div class="wrap">
+    <div class="sec-label">04 — Debate Interno</div>
+    <h2 class="sec-title">War Room Notes</h2>
+    <p class="sec-sub">Debate real entre Gaia (estratégia), Hermes (pesquisa/dados) e Íris (produto/design) na construção deste documento.</p>
+
+    <div class="warroom">
+      <div class="warroom-header">
+        <div>
+          <h3>🏛 War Room — Forja ICP Session</h3>
+          <span>Olimpo · Gaia × Hermes × Íris · Jun 2026</span>
+        </div>
+        <div class="live-badge"><span class="live-dot"></span> DEBATE ATIVO</div>
+      </div>
+      <div class="warroom-body">
+
+        <div class="msg msg-hermes">
+          <div class="msg-avatar">H</div>
+          <div class="msg-body">
+            <div class="msg-meta">Hermes <span class="msg-time">· Research Lead</span></div>
+            <div class="msg-text">Varri o mercado de developer tools SaaS 2025–2026. <strong>Insight crítico:</strong> 74% das decisões de compra de tools começam no dev individual (PLG), não no CTO. O modelo Forja de trial local-first é <em>perfeitamente alinhado</em> com esse comportamento. Mas atenção: o maior obstáculo não é preço — é <strong>tempo para perceber valor</strong>. LangChain perde usuários não por custo, mas porque o dev demora 2+ semanas para ver o primeiro resultado real. A Forja precisa garantir "primeiro valor em &lt;30 minutos" como promessa explícita.</div>
+          </div>
+        </div>
+
+        <div class="msg msg-gaia">
+          <div class="msg-avatar">G</div>
+          <div class="msg-body">
+            <div class="msg-meta">Gaia <span class="msg-time">· Strategy</span></div>
+            <div class="msg-text">Concordo com o TTV (time-to-value), mas quero problematizar o ICP proposto. <strong>Estamos sendo conservadores demais no tamanho de time.</strong> Os dados do Hermes mostram que escale-ups de 120–200 devs também têm squads autônomos de 5–10 com budget próprio. O André Matsuda (Persona 3) representa isso — ele não espera aprovação do CFO. A Forja deveria ter um <em>ICP primário</em> (3–50 devs, decisão em dias) e um <em>ICP secundário</em> (squad autônomo dentro de empresa maior, decisão em semanas). Não são o mesmo motion de vendas.</div>
+          </div>
+        </div>
+
+        <div class="msg msg-iris">
+          <div class="msg-avatar">Í</div>
+          <div class="msg-body">
+            <div class="msg-meta">Íris <span class="msg-time">· Product & Design</span></div>
+            <div class="msg-text">Do ponto de vista de produto, as 3 personas têm <strong>job-to-be-done distintos</strong>. Lucas quer <em>reduzir tarefas repetitivas agora</em>. Camila quer <em>ter capacidade que ela não tem headcount para contratar</em>. André quer <em>desafogar o time de plataforma</em>. Isso muda o onboarding, o primeiro caso de uso mostrado no trial e a mensagem do pricing. Para Lucas mostramos Hefesto (review de PR). Para Camila mostramos Atena (arquitetura). Para André mostramos Hermes (análise de logs/infra). O posicionamento "Stop building agents. Start using the best one." é forte — mas precisamos de <strong>3 trilhas de onboarding diferenciadas</strong> no primeiro acesso.</div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="msg msg-hermes">
+          <div class="msg-avatar">H</div>
+          <div class="msg-body">
+            <div class="msg-meta">Hermes <span class="msg-time">· contra-ponto</span></div>
+            <div class="msg-text">Sobre a objeção da Camila ("Forja vai existir em 18 meses?"): isso é <strong>objeção de founder, não de usuário</strong>. Aparece mais em B2B SaaS pequeno, quase nunca em PLG de dev individual. A solução não é marketing — é ter <strong>GitHub público, roadmap visível e clientes referenciais nomeados</strong>. Um testimonial de CTO real vale mais que qualquer garantia contratual. Recomendo que o site Forja tenha uma seção "Quem usa" com logos reais antes de escalar aquisição.</div>
+          </div>
+        </div>
+
+        <div class="msg msg-gaia">
+          <div class="msg-avatar">G</div>
+          <div class="msg-body">
+            <div class="msg-meta">Gaia <span class="msg-time">· ponto estratégico</span></div>
+            <div class="msg-text">A objeção do André sobre InfoSec é a mais perigosa para o plano de go-to-market. <strong>Segurança de dados bloqueia escala para médias empresas.</strong> Minha recomendação estratégica: criar uma <em>Forja Self-Hosted</em> (Docker Compose, 1 comando) como opção no plano Team. Não precisa ser prioritária no lançamento, mas ter o roadmap comprometido publicamente remove o veto do InfoSec. Isso desbloqueia o ICP secundário (André) sem abrir mão da experiência cloud-first para o ICP primário (Lucas e Camila).</div>
+          </div>
+        </div>
+
+        <div class="msg msg-iris">
+          <div class="msg-avatar">Í</div>
+          <div class="msg-body">
+            <div class="msg-meta">Íris <span class="msg-time">· design implication</span></div>
+            <div class="msg-text">Último ponto de produto: o canal de descoberta mostra que <strong>demos de fluxo real são o trigger principal</strong>. Não é landing page de texto. Lucas entrou pelo Twitter (demo de 2 min). André veio do YouTube (tutorial 20 min). Isso quer dizer que a Forja precisa de um <em>canal de conteúdo técnico ativo</em> — não marketing genérico. <strong>A Ayla gerando conteúdo sobre si mesma é o melhor demo possível.</strong> Sugiro: série "Ayla resolveu" no Twitter/LinkedIn mostrando casos reais de uso semanais. Custo marginal = zero. ROI = enorme.</div>
+          </div>
+        </div>
+
+        <hr class="divider">
+
+        <div class="consensus">
+          <div class="consensus-label">✅ CONSENSO DO WAR ROOM</div>
+          <div class="consensus-text">
+            <strong>ICP primário:</strong> dev sênior/tech lead em startup 5–50 devs, stack TS/Python, já usa Copilot, sente dor de "contexto perdido". Ciclo de decisão de 7–14 dias, budget autoaprovável.
+            <br><br>
+            <strong>ICP secundário:</strong> squad autônomo de plataforma/infra dentro de empresa 50–200 devs — decisão em semanas, objeção de InfoSec requer roadmap self-hosted.
+            <br><br>
+            <strong>Prioridades de ação:</strong> (1) garantir "primeiro valor em &lt;30 min" no onboarding; (2) 3 trilhas diferenciadas por persona no trial; (3) demos de fluxo real como principal canal de aquisição; (4) roadmap self-hosted publicado para desbloquear ICP secundário; (5) testimonials de CTOs reais antes de escalar mídia paga.
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <p><strong>Forja — Managed AI Agent Platform</strong> · Documento B4: ICP & Buyer Personas · Jun 2026</p>
+    <p style="margin-top:.4rem;">War room: Gaia (estratégia) · Hermes (pesquisa) · Íris (produto/design) · Ecossistema Olimpo</p>
+  </div>
+</footer>
+
+</body>
+</html>
