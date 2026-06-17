@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Forja — Go-to-Market Strategy</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a0f1a;
+      --bg2:      #0f1726;
+      --bg3:      #141e30;
+      --border:   #1e2d45;
+      --orange:   #f97316;
+      --orange2:  #fb923c;
+      --cyan:     #22d3ee;
+      --cyan2:    #67e8f9;
+      --green:    #4ade80;
+      --purple:   #a78bfa;
+      --red:      #f87171;
+      --muted:    #64748b;
+      --text:     #e2e8f0;
+      --text2:    #94a3b8;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+      font-size: 15px;
+      line-height: 1.7;
+      padding: 0;
+    }
+
+    /* ─── HEADER ─── */
+    header {
+      background: linear-gradient(135deg, #0a0f1a 0%, #0f1e35 50%, #0a1628 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 60px 40px 48px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute;
+      top: -80px; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(249,115,22,.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .header-badge {
+      display: inline-block;
+      background: rgba(249,115,22,.15);
+      border: 1px solid rgba(249,115,22,.4);
+      color: var(--orange);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 99px;
+      margin-bottom: 20px;
+    }
+    header h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      letter-spacing: -.03em;
+      background: linear-gradient(90deg, var(--orange) 0%, var(--cyan) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 12px;
+    }
+    header .tagline {
+      font-size: 1.1rem;
+      color: var(--text2);
+      font-style: italic;
+      margin-bottom: 24px;
+    }
+    .header-meta {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      flex-wrap: wrap;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .header-meta span { display: flex; align-items: center; gap: 6px; }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+    .dot.cyan { background: var(--cyan); }
+    .dot.green { background: var(--green); }
+
+    /* ─── LAYOUT ─── */
+    main {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    /* ─── SECTION HEADERS ─── */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 28px;
+      margin-top: 56px;
+    }
+    .section-label:first-child { margin-top: 0; }
+    .section-num {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--orange), #ea580c);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+    }
+    .section-num.cyan {
+      background: linear-gradient(135deg, var(--cyan), #0ea5e9);
+    }
+    .section-num.purple {
+      background: linear-gradient(135deg, var(--purple), #7c3aed);
+    }
+    .section-num.green {
+      background: linear-gradient(135deg, var(--green), #16a34a);
+    }
+    .section-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -.02em;
+    }
+    .section-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* ─── CARDS ─── */
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+    }
+    .card-title {
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--orange);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card-title.cyan { color: var(--cyan); }
+    .card-title.green { color: var(--green); }
+    .card-title.purple { color: var(--purple); }
+
+    /* ─── PHASE GRID ─── */
+    .phase-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 16px;
+    }
+    .phase-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .phase-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+    }
+    .phase-card.p0::before { background: linear-gradient(90deg, var(--orange), #ea580c); }
+    .phase-card.p1::before { background: linear-gradient(90deg, var(--cyan), #0ea5e9); }
+    .phase-card.p2::before { background: linear-gradient(90deg, var(--purple), #7c3aed); }
+
+    .phase-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .phase-tag {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 99px;
+    }
+    .phase-tag.p0 { background: rgba(249,115,22,.15); color: var(--orange); }
+    .phase-tag.p1 { background: rgba(34,211,238,.15); color: var(--cyan); }
+    .phase-tag.p2 { background: rgba(167,139,250,.15); color: var(--purple); }
+
+    .phase-range {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.04em;
+    }
+    .phase-range.p0 { color: var(--orange); }
+    .phase-range.p1 { color: var(--cyan); }
+    .phase-range.p2 { color: var(--purple); }
+
+    .phase-kv { margin-bottom: 14px; }
+    .phase-kv-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: .09em;
+      color: var(--muted);
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .phase-kv-val {
+      font-size: 14px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    ul.bullet { list-style: none; padding: 0; }
+    ul.bullet li {
+      padding: 4px 0 4px 18px;
+      position: relative;
+      font-size: 14px;
+      color: var(--text2);
+    }
+    ul.bullet li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--orange);
+      font-weight: 700;
+    }
+    ul.bullet.cyan li::before { color: var(--cyan); }
+    ul.bullet.purple li::before { color: var(--purple); }
+    ul.bullet.green li::before { color: var(--green); }
+
+    /* ─── TIMELINE ─── */
+    .timeline { position: relative; padding-left: 32px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 10px; top: 8px; bottom: 8px;
+      width: 2px;
+      background: linear-gradient(180deg, var(--orange) 0%, var(--cyan) 50%, var(--purple) 100%);
+      opacity: .4;
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .tl-dot {
+      position: absolute;
+      left: -26px; top: 6px;
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      border: 2px solid var(--orange);
+      background: var(--bg);
+    }
+    .tl-dot.cyan { border-color: var(--cyan); }
+    .tl-dot.purple { border-color: var(--purple); }
+
+    .tl-week {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--orange);
+      margin-bottom: 4px;
+    }
+    .tl-week.cyan { color: var(--cyan); }
+    .tl-week.purple { color: var(--purple); }
+
+    .tl-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+    .tl-desc {
+      font-size: 13px;
+      color: var(--text2);
+      line-height: 1.5;
+    }
+    .tl-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 8px;
+    }
+    .chip {
+      font-size: 11px;
+      padding: 2px 9px;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .chip.orange { background: rgba(249,115,22,.15); color: var(--orange2); }
+    .chip.cyan   { background: rgba(34,211,238,.15);  color: var(--cyan2);  }
+    .chip.green  { background: rgba(74,222,128,.15);  color: var(--green);  }
+    .chip.purple { background: rgba(167,139,250,.15); color: var(--purple); }
+    .chip.red    { background: rgba(248,113,113,.15); color: var(--red);    }
+
+    /* ─── CAC TABLE ─── */
+    .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    thead tr {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+    }
+    thead th {
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .09em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    tbody tr {
+      border-bottom: 1px solid var(--border);
+      transition: background .15s;
+    }
+    tbody tr:last-child { border-bottom: none; }
+    tbody tr:hover { background: rgba(255,255,255,.02); }
+    tbody td {
+      padding: 12px 16px;
+      color: var(--text2);
+      vertical-align: top;
+    }
+    .td-channel { color: var(--text); font-weight: 600; }
+    .td-cac { font-weight: 700; }
+    .td-cac.low  { color: var(--green); }
+    .td-cac.mid  { color: var(--orange); }
+    .td-cac.high { color: var(--red); }
+    .priority-badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 99px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .p-high   { background: rgba(74,222,128,.15);  color: var(--green); }
+    .p-mid    { background: rgba(249,115,22,.15);  color: var(--orange); }
+    .p-low    { background: rgba(100,116,139,.15); color: var(--muted); }
+
+    /* ─── METRICS STRIP ─── */
+    .metrics-strip {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .metric-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      text-align: center;
+    }
+    .metric-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+      letter-spacing: -.04em;
+      background: linear-gradient(90deg, var(--orange), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .metric-label {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-top: 4px;
+    }
+
+    /* ─── WAR ROOM ─── */
+    .war-room {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .war-room-header {
+      background: var(--bg3);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .war-room-header h3 {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+    }
+    .war-room-header .live-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .3; }
+    }
+    .wr-body { padding: 8px 0; }
+    .wr-msg {
+      padding: 14px 24px;
+      border-bottom: 1px solid rgba(30,45,69,.5);
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .wr-msg:last-child { border-bottom: none; }
+    .agent-avatar {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .av-gaia    { background: rgba(74,222,128,.2);  color: var(--green);  border: 1px solid rgba(74,222,128,.3); }
+    .av-hermes  { background: rgba(249,115,22,.2);  color: var(--orange); border: 1px solid rgba(249,115,22,.3); }
+    .av-afrodite{ background: rgba(167,139,250,.2); color: var(--purple); border: 1px solid rgba(167,139,250,.3); }
+    .agent-name {
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+    .agent-name.gaia     { color: var(--green); }
+    .agent-name.hermes   { color: var(--orange); }
+    .agent-name.afrodite { color: var(--purple); }
+    .wr-text {
+      font-size: 14px;
+      color: var(--text2);
+      line-height: 1.6;
+    }
+    .wr-text strong { color: var(--text); }
+    .wr-text em { color: var(--cyan); font-style: normal; font-weight: 600; }
+
+    /* ─── FUNNEL ─── */
+    .funnel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      margin: 24px 0;
+    }
+    .funnel-step {
+      border-radius: 8px;
+      padding: 12px 24px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 14px;
+      position: relative;
+    }
+    .funnel-step::after {
+      content: '▼';
+      position: absolute;
+      bottom: -18px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .funnel-step:last-child::after { display: none; }
+    .funnel-arrow { font-size: 11px; color: var(--muted); }
+    .funnel-label { font-size: 12px; color: var(--muted); font-weight: 400; margin-top: 2px; }
+
+    /* ─── DIVIDER ─── */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 48px 0 0;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 40px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    footer strong { color: var(--text2); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-badge">War Room · GTM Strategy</div>
+  <h1>Forja — Go-to-Market</h1>
+  <p class="tagline">"Stop building agents. Start using the best one."</p>
+  <div class="header-meta">
+    <span><span class="dot"></span> Gaia · Estratégia</span>
+    <span><span class="dot cyan"></span> Hermes · Inteligência de Mercado</span>
+    <span><span class="dot green"></span> Afrodite · Validação</span>
+    <span>2026-06-17 · Olimpo v0.5.0</span>
+  </div>
+</header>
+
+<main>
+
+  <!-- ─── CONTEXTO ESTRATÉGICO ─── -->
+  <div class="section-label">
+    <div class="section-num">00</div>
+    <div>
+      <div class="section-title">Contexto & Posicionamento</div>
+      <div class="section-sub">Por que o Forja existe e por que agora</div>
+    </div>
+  </div>
+
+  <div class="metrics-strip">
+    <div class="metric-card">
+      <div class="metric-val">12–18</div>
+      <div class="metric-label">meses de blue ocean</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">R$0</div>
+      <div class="metric-label">CAC ideal Fase 0</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">3</div>
+      <div class="metric-label">tiers de pricing</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">15</div>
+      <div class="metric-label">agentes Olimpo</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">~95%</div>
+      <div class="metric-label">paridade cognitiva</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-val">R$99</div>
+      <div class="metric-label">Pro/mês</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Proposta de valor central</div>
+    <p style="color:var(--text2);font-size:14px;margin-bottom:12px;">
+      O mercado de developer tools converge em torno de agentes de IA — mas exige que o dev <strong style="color:var(--text)">construa, configure e mantenha</strong> o próprio agente. O Forja inverte essa premissa: você entra e já tem a Ayla, com memória persistente, 15 agentes Olimpo e CLI local-first. <em style="color:var(--cyan);font-style:normal;">Zero scaffolding. Zero prompt engineering. Zero ops.</em>
+    </p>
+    <ul class="bullet">
+      <li>Benchmark de referência: Cursor $20/mês (só code), Devin $500/mês (só tarefas autônomas), GitHub Copilot $19/mês (assistente passivo)</li>
+      <li>Forja Pro R$99 = orquestrador ativo, multi-agente, memória cross-sessão, mobile-first — sem paralelo direto no mercado BR</li>
+      <li>Diferencial defensável: corpus Laura + arquitetura Olimpo não são replicáveis em semanas — moat de 6–12 meses antes de commodity</li>
+    </ul>
+  </div>
+
+
+  <!-- ─── FASES ─── -->
+  <div class="section-label">
+    <div class="section-num">01</div>
+    <div>
+      <div class="section-title">Fases de Crescimento</div>
+      <div class="section-sub">0 → 10 → 100 → 1000 clientes pagos</div>
+    </div>
+  </div>
+
+  <div class="phase-grid">
+
+    <!-- FASE 0 -->
+    <div class="phase-card p0">
+      <div class="phase-header">
+        <div>
+          <div class="phase-tag p0">Fase 0</div>
+          <div class="phase-range p0">0 → 10</div>
+        </div>
+        <div style="text-align:right;font-size:12px;color:var(--muted)">Semanas 1–3</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Objetivo</div>
+        <div class="phase-kv-val">Encontrar os primeiros <strong>devs de verdade</strong> que já sentem a dor — não evangelizar.</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Canal principal</div>
+        <div class="phase-kv-val">Rede pessoal do Rafael + comunidades brasileiras de dev (Discord, Telegram, X/Twitter)</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Mensagem</div>
+        <div class="phase-kv-val">"Você passa mais tempo configurando agentes do que usando? Testa o Forja — 5 minutos e a Ayla já está trabalhando por você."</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Táticas</div>
+        <ul class="bullet">
+          <li>DM direto para devs que reclamam de setup de AI no X/Twitter</li>
+          <li>Post "build in public" no X: "Day 1 do Forja — veja a Ayla em ação ao vivo"</li>
+          <li>Convite waitlist para primeiros 50 (exclusividade real, não marketing)</li>
+          <li>1:1 onboarding call com cada early adopter — feedback raw</li>
+          <li>Grupo privado WhatsApp/Discord: "Forja Insiders" — Rafael como membro ativo</li>
+        </ul>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Métrica de sucesso</div>
+        <div class="phase-kv-val">10 usuários usando por ≥3 dias consecutivos + NPS ≥ 50</div>
+      </div>
+    </div>
+
+    <!-- FASE 1 -->
+    <div class="phase-card p1">
+      <div class="phase-header">
+        <div>
+          <div class="phase-tag p1">Fase 1</div>
+          <div class="phase-range p1">10 → 100</div>
+        </div>
+        <div style="text-align:right;font-size:12px;color:var(--muted)">Semanas 4–8</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Objetivo</div>
+        <div class="phase-kv-val">Ativar o <strong>growth loop orgânico</strong> antes de qualquer gasto em paid.</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Growth loop central</div>
+        <div class="phase-kv-val">Dev usa → Ayla entrega resultado visível → Dev posta screenshot/GIF → curiosos pedem acesso → loop</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Referral</div>
+        <ul class="bullet cyan">
+          <li>Tier Free: "Indique 2 devs → ganhe 30 dias Pro grátis"</li>
+          <li>Link de referral com tracking nativo no CLI (forja invite)</li>
+          <li>Leaderboard público: top inviters do mês ganham swag</li>
+        </ul>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Community</div>
+        <ul class="bullet cyan">
+          <li>Discord público "Forja Dev Community" — Rafael e Mari como staff visíveis</li>
+          <li>Weekly AMA ao vivo: "O que a Ayla aprendeu essa semana"</li>
+          <li>Showcase semanal: melhor uso da semana vira post patrocinado</li>
+          <li>Open changelog: cada update tem vídeo de 60s de demonstração</li>
+        </ul>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Canais de aquisição</div>
+        <ul class="bullet cyan">
+          <li>Product Hunt launch (planejado para semana 5)</li>
+          <li>Dev.to / Tableless / imasters — artigos técnicos assinados</li>
+          <li>Hacker News "Show HN" (versão EN com CLI demo)</li>
+        </ul>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Métrica de sucesso</div>
+        <div class="phase-kv-val">100 usuários ativos, ≥30 pagando Pro/Team + churn &lt; 8% mês</div>
+      </div>
+    </div>
+
+    <!-- FASE 2 -->
+    <div class="phase-card p2">
+      <div class="phase-header">
+        <div>
+          <div class="phase-tag p2">Fase 2</div>
+          <div class="phase-range p2">100 → 1000</div>
+        </div>
+        <div style="text-align:right;font-size:12px;color:var(--muted)">Meses 3–9</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Objetivo</div>
+        <div class="phase-kv-val">Escalar com <strong>paid channels validados</strong> + parcerias que trazem volume.</div>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Paid channels</div>
+        <ul class="bullet purple">
+          <li>X/Twitter Ads: developer persona BR — CPC estimado R$2–5, conversão landing ~4%</li>
+          <li>LinkedIn Ads (Team tier): CTOs e tech leads — CPC R$8–15, ticket maior justifica</li>
+          <li>YouTube Pre-roll em canais dev BR (Filipe Deschamps, Código Fonte TV)</li>
+          <li>Reddit Ads (r/programming, r/devbrasil) — teste $500/mês</li>
+        </ul>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Parcerias estratégicas</div>
+        <ul class="bullet purple">
+          <li>Bootcamps (Rocketseat, Alura, DIO): bundle Free por 90 dias para alunos</li>
+          <li>Aceleradoras (Y Combinator BR, Cubo, InovaBra): Forja como stack padrão</li>
+          <li>Agencies de dev: white-label Team tier para oferecer aos clientes</li>
+          <li>Eventos (BrazilJS, TDC, Campus Party): presença física + demo ao vivo</li>
+        </ul>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Expansão de produto</div>
+        <ul class="bullet purple">
+          <li>API pública: devs integram Ayla nos próprios produtos (novo revenue stream)</li>
+          <li>Marketplace de agentes: comunidade publica agentes customizados</li>
+          <li>Enterprise tier: SSO, audit logs, SLA 99.9% (teto CAC aumenta para R$800+)</li>
+        </ul>
+      </div>
+
+      <div class="phase-kv">
+        <div class="phase-kv-label">Métrica de sucesso</div>
+        <div class="phase-kv-val">1000 usuários pagos, MRR ≥ R$120k, LTV/CAC ≥ 3x</div>
+      </div>
+    </div>
+
+  </div>
+
+
+  <!-- ─── SEQUÊNCIA SEMANAL ─── -->
+  <div class="section-label">
+    <div class="section-num cyan">02</div>
+    <div>
+      <div class="section-title">Sequência de Lançamento — 8 Semanas</div>
+      <div class="section-sub">Execução tática semana a semana</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Semana 1</div>
+        <div class="tl-title">Pré-lançamento: Construir audiência e esperar</div>
+        <div class="tl-desc">
+          Landing page live com waitlist. Rafael começa série "build in public" no X: 1 post/dia mostrando a Ayla em cenas reais de desenvolvimento. DM manual para 50 devs selecionados que já reclamam de setup de AI.
+          Abrir Discord privado para primeiros 50 inscritos da waitlist.
+        </div>
+        <div class="tl-chips">
+          <span class="chip orange">Landing page</span>
+          <span class="chip orange">Waitlist</span>
+          <span class="chip cyan">X/Twitter build-in-public</span>
+          <span class="chip green">Discord privado</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Semana 2</div>
+        <div class="tl-title">Alpha fechado: 10 usuários, onboarding 1:1</div>
+        <div class="tl-desc">
+          Invitar os 10 primeiros da waitlist. Onboarding call de 20 minutos com cada um. Coletar feedback em formulário estruturado. Identificar o "wow moment": o momento em que o dev vê pela primeira vez a Ayla resolvendo algo que levaria 1 hora.
+          Ajustar onboarding flow com base nos erros mais comuns observados.
+        </div>
+        <div class="tl-chips">
+          <span class="chip orange">10 usuários alpha</span>
+          <span class="chip cyan">Onboarding 1:1</span>
+          <span class="chip purple">Feedback loop</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-week">Semana 3</div>
+        <div class="tl-title">Ativar referral + abrir beta para 50</div>
+        <div class="tl-desc">
+          Habilitar sistema de referral no CLI (<code>forja invite</code>). Expandir para 50 usuários via indicações dos 10 alpha. Publicar primeiro artigo técnico assinado no dev.to: "Como a Ayla orquestra 15 agentes em paralelo — arquitetura real". Primeiro post de showcase: melhor use case da semana viralizado no X.
+        </div>
+        <div class="tl-chips">
+          <span class="chip green">Referral ativo</span>
+          <span class="chip orange">Beta 50 usuários</span>
+          <span class="chip cyan">Artigo técnico</span>
+          <span class="chip purple">Showcase</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot cyan"></div>
+        <div class="tl-week cyan">Semana 4</div>
+        <div class="tl-title">Product Hunt Launch 🚀</div>
+        <div class="tl-desc">
+          Lançamento no Product Hunt — post agendado para terça às 00h01 PST (maior janela de votos). Mobilizar todos os alpha users para upvotar e comentar com casos reais. Preparar demo GIF de 30s para o post. Hunter de alto hunter score como parceiro (buscar dev BR com 500+ seguidores no PH).
+          Simultaneamente: Show HN no Hacker News em inglês — demo CLI ao vivo no post.
+        </div>
+        <div class="tl-chips">
+          <span class="chip cyan">Product Hunt</span>
+          <span class="chip cyan">Show HN</span>
+          <span class="chip orange">Demo GIF</span>
+          <span class="chip green">Community mobilization</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot cyan"></div>
+        <div class="tl-week cyan">Semana 5</div>
+        <div class="tl-title">Converter audiência em pagantes</div>
+        <div class="tl-desc">
+          Ativar planos pagos. Oferecer "Early Bird Pro" a R$69/mês por 12 meses para quem assinar até o fim da semana (urgência real, não falsa). Email sequence de 3 mensagens para waitlist: dor → solução → prova social (quote dos 10 alpha).
+          Abrir Discord público. Primeiro AMA ao vivo no Discord/YouTube: Rafael + demos ao vivo da Ayla.
+        </div>
+        <div class="tl-chips">
+          <span class="chip orange">Early Bird Pro</span>
+          <span class="chip cyan">Email sequence</span>
+          <span class="chip green">Discord público</span>
+          <span class="chip purple">AMA ao vivo</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot cyan"></div>
+        <div class="tl-week cyan">Semana 6</div>
+        <div class="tl-title">Parcerias táticas + conteúdo SEO</div>
+        <div class="tl-desc">
+          Contato com Rocketseat e Alura para proposta de bundle Free 90 dias para alunos. Publicar segundo artigo técnico: "Por que construir seu próprio agente custa caro — e o que fazer diferente". Iniciar série de YouTube Shorts (30s cada): 1 tarefa resolvida pela Ayla por dia.
+          Analisar métricas da semana 4–5: quais canais trouxeram os usuários mais engajados.
+        </div>
+        <div class="tl-chips">
+          <span class="chip green">Parcerias bootcamps</span>
+          <span class="chip cyan">SEO artigos</span>
+          <span class="chip orange">YouTube Shorts</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot purple"></div>
+        <div class="tl-week purple">Semana 7</div>
+        <div class="tl-title">Paid channels: teste controlado</div>
+        <div class="tl-desc">
+          Ativar X/Twitter Ads com R$1.000 de budget — 3 criativos diferentes (pain, demo, social proof). Medir CPC, CTR e conversão para Free. LinkedIn Ads com R$800 para Team tier — persona: CTO de startup 5–20 devs. Regra: só escalar canal se CPA &lt; R$150 para Pro ou &lt; R$500 para Team.
+        </div>
+        <div class="tl-chips">
+          <span class="chip purple">X Ads R$1k</span>
+          <span class="chip purple">LinkedIn Ads R$800</span>
+          <span class="chip red">CPA gate &lt; R$150</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot purple"></div>
+        <div class="tl-week purple">Semana 8</div>
+        <div class="tl-title">Retrospectiva + ajuste de rota</div>
+        <div class="tl-desc">
+          War room semanal: Gaia revisa métricas de crescimento, Hermes analisa canais (qual CAC real vs estimado), Afrodite valida NPS e churn. Decisão: qual canal dobrar, qual pausar. Planejar Fase 2 com base nos dados reais das 8 semanas. Publicar "Forja Month 2 — O que funcionou e o que não funcionou" (transparência como diferencial).
+        </div>
+        <div class="tl-chips">
+          <span class="chip green">Retrospectiva</span>
+          <span class="chip orange">Ajuste de rota</span>
+          <span class="chip cyan">Post transparência</span>
+          <span class="chip purple">Planejamento Fase 2</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ─── CAC TABLE ─── -->
+  <div class="section-label">
+    <div class="section-num purple">03</div>
+    <div>
+      <div class="section-title">Canais Priorizados & CAC Estimado</div>
+      <div class="section-sub">Custo de aquisição por cliente pagante — ordem de prioridade</div>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Canal</th>
+          <th>CAC Estimado</th>
+          <th>Fase</th>
+          <th>Prioridade</th>
+          <th>Notas</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="td-channel">Rede pessoal / DM direto</td>
+          <td class="td-cac low">R$ 0</td>
+          <td>0</td>
+          <td><span class="priority-badge p-high">Alta</span></td>
+          <td>Custo zero, feedback de altíssima qualidade. Não escala, mas valida.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">Referral (forja invite)</td>
+          <td class="td-cac low">R$ 15–30</td>
+          <td>0–1</td>
+          <td><span class="priority-badge p-high">Alta</span></td>
+          <td>Custo = valor do incentivo. Usuário indicado tem retenção 2x maior.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">X/Twitter orgânico (build-in-public)</td>
+          <td class="td-cac low">R$ 0–20</td>
+          <td>0–1</td>
+          <td><span class="priority-badge p-high">Alta</span></td>
+          <td>Custo = tempo do Rafael. Audiência dev BR muito ativa. Viral com GIF certo.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">Product Hunt launch</td>
+          <td class="td-cac low">R$ 5–25</td>
+          <td>1</td>
+          <td><span class="priority-badge p-high">Alta</span></td>
+          <td>One-time. Se entrar no top 5 do dia, gera 500–2.000 signups em 24h.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">Artigos técnicos (dev.to, Tableless)</td>
+          <td class="td-cac low">R$ 20–50</td>
+          <td>1</td>
+          <td><span class="priority-badge p-high">Alta</span></td>
+          <td>SEO de longo prazo. Um artigo bem ranqueado gera leads por meses.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">Hacker News (Show HN)</td>
+          <td class="td-cac low">R$ 0–15</td>
+          <td>1</td>
+          <td><span class="priority-badge p-high">Alta</span></td>
+          <td>Audiência global. Top 10 = 1.000–5.000 visitantes. Requer demo técnico sólido.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">Discord community</td>
+          <td class="td-cac mid">R$ 30–60</td>
+          <td>1</td>
+          <td><span class="priority-badge p-mid">Média</span></td>
+          <td>Converte melhor para Team tier. Rafael como membro ativo é o diferencial.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">X/Twitter Ads</td>
+          <td class="td-cac mid">R$ 80–150</td>
+          <td>2</td>
+          <td><span class="priority-badge p-mid">Média</span></td>
+          <td>Escala com criativo certo. Testar pain vs demo vs social proof. Gate CPA &lt; R$150.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">YouTube (Shorts + canal)</td>
+          <td class="td-cac mid">R$ 40–100</td>
+          <td>1–2</td>
+          <td><span class="priority-badge p-mid">Média</span></td>
+          <td>Shorts virais têm CPM zero. Canal longo prazo constrói autoridade técnica.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">Parcerias (Rocketseat, Alura, DIO)</td>
+          <td class="td-cac mid">R$ 50–120</td>
+          <td>2</td>
+          <td><span class="priority-badge p-mid">Média</span></td>
+          <td>Volume alto, qualidade média. Conversão Free→Pro depende de onboarding forte.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">LinkedIn Ads (Team tier)</td>
+          <td class="td-cac high">R$ 300–600</td>
+          <td>2</td>
+          <td><span class="priority-badge p-low">Baixa inicial</span></td>
+          <td>CAC alto, mas Team a R$119/assento × 5–10 usuários = LTV justifica acima de R$500.</td>
+        </tr>
+        <tr>
+          <td class="td-channel">Eventos presenciais (BrazilJS, TDC)</td>
+          <td class="td-cac high">R$ 200–400</td>
+          <td>2</td>
+          <td><span class="priority-badge p-low">Baixa inicial</span></td>
+          <td>Custo alto, mas constrói comunidade e leads de qualidade. Melhor para Team/Enterprise.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- ─── GROWTH LOOP ─── -->
+  <div class="section-label">
+    <div class="section-num green">04</div>
+    <div>
+      <div class="section-title">Growth Loop Central</div>
+      <div class="section-sub">O flywheel que sustenta o crescimento orgânico</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="funnel">
+      <div class="funnel-step" style="background:rgba(249,115,22,.15);color:var(--orange);border:1px solid rgba(249,115,22,.3);width:80%;">
+        Dev descobre via referral / PH / artigo / X
+      </div>
+      <div style="height:20px;"></div>
+      <div class="funnel-step" style="background:rgba(34,211,238,.1);color:var(--cyan);border:1px solid rgba(34,211,238,.3);width:72%;">
+        Instala CLI em &lt; 5 min → primeiro resultado visível em &lt; 10 min
+      </div>
+      <div style="height:20px;"></div>
+      <div class="funnel-step" style="background:rgba(167,139,250,.1);color:var(--purple);border:1px solid rgba(167,139,250,.3);width:64%;">
+        Wow moment: Ayla resolve algo que levaria 1h → dev posta screenshot
+      </div>
+      <div style="height:20px;"></div>
+      <div class="funnel-step" style="background:rgba(74,222,128,.1);color:var(--green);border:1px solid rgba(74,222,128,.3);width:56%;">
+        Post vira prova social → novos devs pedem acesso → referral
+      </div>
+      <div style="height:20px;"></div>
+      <div class="funnel-step" style="background:rgba(249,115,22,.2);color:var(--orange2);border:1px solid rgba(249,115,22,.4);width:48%;font-size:15px;">
+        ↩ Loop reinicia com novo usuário
+      </div>
+    </div>
+
+    <div style="margin-top: 16px;">
+      <div class="card-title green">Alavancas do loop</div>
+      <ul class="bullet green" style="columns: 2; gap: 32px;">
+        <li>Time-to-value &lt; 10 minutos (onboarding sem fricção)</li>
+        <li>Resultado visível e compartilhável (output da Ayla tem logo Forja)</li>
+        <li>Referral com incentivo real (30 dias Pro, não só créditos)</li>
+        <li>Showcase semanal amplifica os melhores casos</li>
+        <li>Discord vivo com Rafael → senso de comunidade exclusiva</li>
+        <li>Changelog público semanal → produto que evolui em público</li>
+      </ul>
+    </div>
+  </div>
+
+
+  <!-- ─── WAR ROOM NOTES ─── -->
+  <div class="divider"></div>
+
+  <div class="section-label" style="margin-top:48px;">
+    <div class="section-num" style="background:linear-gradient(135deg,#1e2d45,#2d3e55);">⚔️</div>
+    <div>
+      <div class="section-title">War Room Notes</div>
+      <div class="section-sub">Debate Gaia × Hermes × Afrodite — divergências, riscos e decisões</div>
+    </div>
+  </div>
+
+  <div class="war-room">
+    <div class="war-room-header">
+      <div class="live-dot"></div>
+      <h3>Debate estratégico — GTM Forja v1.0</h3>
+      <span style="margin-left:auto;font-size:12px;color:var(--muted)">2026-06-17 · Olimpo war room</span>
+    </div>
+    <div class="wr-body">
+
+      <div class="wr-msg">
+        <div class="agent-avatar av-gaia">G</div>
+        <div>
+          <div class="agent-name gaia">Gaia · Estratégia</div>
+          <div class="wr-text">
+            Minha posição central: <strong>a Fase 0 não pode ser escalada prematuramente.</strong> O erro mais comum de produtos developer-first é pular para paid antes de ter o "wow moment" documentado e replicável. O Rafael precisa fazer onboarding 1:1 com os 10 primeiros usuários não por humildade — mas porque esses 10 serão o manual de vendas das próximas 990. Cada call é pesquisa de produto disfarçada de onboarding.
+          </div>
+        </div>
+      </div>
+
+      <div class="wr-msg">
+        <div class="agent-avatar av-hermes">H</div>
+        <div>
+          <div class="agent-name hermes">Hermes · Inteligência de Mercado</div>
+          <div class="wr-text">
+            Concordo com a Gaia na sequência, mas tenho dados que informam onde o Forja deve <em>não</em> competir inicialmente. Cursor e GitHub Copilot dominam "code autocomplete" — entrar em comparação direta é perder. A janela de oportunidade está em <strong>orquestração multi-agente com memória persistente</strong>, que nenhum dos players principais oferece como produto pronto. O benchmark que devemos citar não é "somos melhor que o Cursor" — é "somos a primeira plataforma onde você não precisa construir o agente". Diferente categoria, diferentes compradores.
+          </div>
+        </div>
+      </div>
+
+      <div class="wr-msg">
+        <div class="agent-avatar av-afrodite">A</div>
+        <div>
+          <div class="agent-name afrodite">Afrodite · Validação</div>
+          <div class="wr-text">
+            Preciso levantar dois riscos que a estratégia atual subestima. <strong>Risco 1: churn invisível.</strong> Ferramentas dev têm um padrão clássico — spike de uso na semana 1, queda no mês 2 quando o "brinquedo novo" esfria. O GTM precisa de um <em>engagement hook no mês 2</em>: algo que faça o dev voltar mesmo sem tarefa imediata. Sugiro a Ayla enviar um "relatório semanal de aprendizados" por email/push — mostra que ela cresceu junto com o dev. <strong>Risco 2: o pricing R$99 Pro não tem âncora clara.</strong> Comparar com Devin ($500) é válido, mas o comprador BR vai perguntar "por que não usar o ChatGPT Plus por R$100?". Precisamos de uma resposta de 10 palavras para essa pergunta antes da semana 5.
+          </div>
+        </div>
+      </div>
+
+      <div class="wr-msg">
+        <div class="agent-avatar av-gaia">G</div>
+        <div>
+          <div class="agent-name gaia">Gaia · Estratégia</div>
+          <div class="wr-text">
+            Afrodite está certa no Risco 2. Minha resposta de 10 palavras: <em>"ChatGPT responde. Ayla age — e lembra do que você construiu."</em> Memória persistente cross-sessão + ação real (commits, PRs, deploys) é o diferenciador. Precisamos que essa linha apareça acima do fold na landing page. Sobre o Risco 1: o "relatório de aprendizados" é boa ideia, mas só funciona se a Ayla de fato aprendeu algo mensurável. Precisa de dado real, não copy genérico.
+          </div>
+        </div>
+      </div>
+
+      <div class="wr-msg">
+        <div class="agent-avatar av-hermes">H</div>
+        <div>
+          <div class="agent-name hermes">Hermes · Inteligência de Mercado</div>
+          <div class="wr-text">
+            Sobre o Product Hunt na semana 4: <strong>risco de timing.</strong> Se o PH cair num dia ruim (outro produto grande lançando), o CAC explode sem resultado. Recomendo ter um "plano B de launch": se na manhã do lançamento já tivermos 50+ upvotes até meio-dia, mantemos. Se não, reprogramamos para a semana seguinte. Não é fraqueza — é não queimar a bala de silver bullet do PH no dia errado. Também recomendo começar a construir relacionamento com 2–3 hunters de alto score pelo menos 2 semanas antes.
+          </div>
+        </div>
+      </div>
+
+      <div class="wr-msg">
+        <div class="agent-avatar av-afrodite">A</div>
+        <div>
+          <div class="agent-name afrodite">Afrodite · Validação</div>
+          <div class="wr-text">
+            Validação final do plano: <strong>as Fases 0 e 1 estão bem calibradas</strong> — sequência orgânica antes de paid é a escolha certa para developer tools. <strong>Ponto de atenção na Fase 2:</strong> parcerias com bootcamps trazem volume mas qualidade média — o usuário que chega via "Free 90 dias Rocketseat" tem perfil diferente do early adopter orgânico. Precisamos de um onboarding flow diferenciado por fonte de aquisição, ou o churn do cohort "parceria" vai contaminar as métricas agregadas. Sugiro segmentar MRR por cohort de aquisição desde o dia 1 no analytics.
+          </div>
+        </div>
+      </div>
+
+      <div class="wr-msg">
+        <div class="agent-avatar av-gaia">G</div>
+        <div>
+          <div class="agent-name gaia">Gaia · Estratégia</div>
+          <div class="wr-text">
+            <strong>Decisão de guerra room:</strong> plan aprovado com três ajustes. (1) Adicionar "engagement hook mês 2" ao roadmap de produto — Afrodite tem razão que o churn invisível mata o NRR. (2) Contactar hunters do PH 2 semanas antes do lançamento, não 1 dia antes. (3) Implementar segmentação de cohort por canal de aquisição no analytics desde o onboarding. A tagline de âncora para pricing fica: <em>"ChatGPT responde. Ayla age — e lembra."</em> — acima do fold, sem desculpa.
+          </div>
+        </div>
+      </div>
+
+      <div class="wr-msg">
+        <div class="agent-avatar av-hermes">H</div>
+        <div>
+          <div class="agent-name hermes">Hermes · Inteligência de Mercado</div>
+          <div class="wr-text">
+            Uma observação final de mercado que não pode ficar de fora: <strong>a janela de 12–18 meses é real mas assimétrica.</strong> O risco não é um player brasileiro copiar o Forja — é o Anthropic ou OpenAI lançarem um produto managed-agent próprio e tornar a categoria commodity globalmente. A defesa é velocidade + corpus Laura + memória persistente real (que nenhum player global terá em PT-BR no curto prazo). O GTM precisa ser executado como se a janela fosse 6 meses, não 18. Urgência é vantagem competitiva.
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!-- ─── MÉTRICAS NORTE ─── -->
+  <div class="section-label">
+    <div class="section-num green">05</div>
+    <div>
+      <div class="section-title">North Star Metrics por Fase</div>
+      <div class="section-sub">O que medir para saber se o GTM está funcionando</div>
+    </div>
+  </div>
+
+  <div class="phase-grid">
+    <div class="card" style="border-color:rgba(249,115,22,.3);">
+      <div class="card-title">Fase 0 — Fit</div>
+      <ul class="bullet">
+        <li><strong>NPS ≥ 50</strong> após 7 dias de uso</li>
+        <li><strong>D7 retention ≥ 60%</strong> dos primeiros 10</li>
+        <li><strong>Time-to-value ≤ 10 min</strong> (medido no onboarding)</li>
+        <li><strong>"Wow moment" identificado</strong> e documentado</li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(34,211,238,.3);">
+      <div class="card-title cyan">Fase 1 — Growth</div>
+      <ul class="bullet cyan">
+        <li><strong>Referral rate ≥ 30%</strong> (3 de cada 10 indicam)</li>
+        <li><strong>Free → Pro conversion ≥ 15%</strong></li>
+        <li><strong>Churn mensal ≤ 8%</strong></li>
+        <li><strong>MRR crescendo ≥ 20%/mês</strong></li>
+      </ul>
+    </div>
+    <div class="card" style="border-color:rgba(167,139,250,.3);">
+      <div class="card-title purple">Fase 2 — Scale</div>
+      <ul class="bullet purple">
+        <li><strong>LTV/CAC ≥ 3x</strong> por canal</li>
+        <li><strong>NRR ≥ 110%</strong> (expansão supera churn)</li>
+        <li><strong>CAC payback ≤ 4 meses</strong></li>
+        <li><strong>1.000 usuários pagos</strong> com MRR ≥ R$120k</li>
+      </ul>
+    </div>
+  </div>
+
+
+</main>
+
+<footer>
+  <strong>Forja GTM Strategy v1.0</strong> · Produzido por Gaia (Estratégia) + Hermes (Inteligência de Mercado) + Afrodite (Validação) · War Room Olimpo · 2026-06-17
+  <br /><br />
+  <span style="color:var(--orange)">Stop building agents.</span> <span style="color:var(--cyan)">Start using the best one.</span>
+</footer>
+
+</body>
+</html>
