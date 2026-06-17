@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forja — Arquitetura do Sistema</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background: #0a0f1a; color: #e2e8f0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; }
+
+        /* ── Swimlane embed ── */
+        .embed-wrap {
+            width: 100%;
+            background: #0a0f1a;
+            padding: 0;
+        }
+        .embed-wrap iframe {
+            width: 100%;
+            height: 70vh;
+            min-height: 600px;
+            border: none;
+            display: block;
+        }
+
+        /* ── Divider ── */
+        .divider {
+            border: none;
+            border-top: 2px solid #1e293b;
+            margin: 0;
+        }
+
+        /* ── Schema section ── */
+        .schema-section {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 3rem 2rem 5rem;
+        }
+
+        .schema-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .schema-header h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            margin-bottom: .5rem;
+        }
+        .schema-header p {
+            color: #64748b;
+            font-size: .92rem;
+        }
+        .schema-header .badge {
+            display: inline-block;
+            margin-top: .75rem;
+            padding: .35rem 1rem;
+            background: #0c1a3a;
+            border: 1px solid #3b82f6;
+            border-radius: 2rem;
+            color: #93c5fd;
+            font-size: .78rem;
+            font-weight: 600;
+            letter-spacing: .05em;
+        }
+
+        /* ── Layer stack ── */
+        .layer-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+        }
+
+        .layer {
+            display: grid;
+            grid-template-columns: 56px 1fr 2fr;
+            gap: 0 1.5rem;
+            align-items: center;
+            padding: 1.1rem 1.5rem;
+            border: 1px solid #1e293b;
+            border-bottom: none;
+            position: relative;
+            transition: background .15s;
+        }
+        .layer:first-child { border-radius: 12px 12px 0 0; }
+        .layer:last-child  { border-bottom: 1px solid #1e293b; border-radius: 0 0 12px 12px; }
+        .layer:hover { background: #0d1525; }
+
+        .layer-num {
+            width: 40px; height: 40px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 800; font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .layer-title { font-weight: 700; font-size: .97rem; color: #f1f5f9; }
+        .layer-subtitle { font-size: .78rem; font-weight: 500; margin-top: .15rem; }
+
+        .layer-desc { font-size: .86rem; color: #94a3b8; line-height: 1.55; }
+
+        /* Layer color palette */
+        .l1 { background: #0d1525; border-color: #1e3a5f; }
+        .l1 .layer-num { background: #1e3a5f; color: #93c5fd; }
+        .l1 .layer-subtitle { color: #60a5fa; }
+
+        .l2 { background: #0d1421; border-color: #2d1b69; }
+        .l2 .layer-num { background: #2d1b69; color: #c4b5fd; }
+        .l2 .layer-subtitle { color: #a78bfa; }
+
+        .l3 { background: #0c1a14; border-color: #14532d; }
+        .l3 .layer-num { background: #14532d; color: #86efac; }
+        .l3 .layer-subtitle { color: #4ade80; }
+
+        .l4 { background: #11180d; border-color: #1a2e08; }
+        .l4 .layer-num { background: #1a3a0a; color: #bef264; }
+        .l4 .layer-subtitle { color: #a3e635; }
+
+        .l5 { background: #1a120c; border-color: #431407; }
+        .l5 .layer-num { background: #431407; color: #fdba74; }
+        .l5 .layer-subtitle { color: #fb923c; }
+
+        .l6 { background: #1a1016; border-color: #500724; }
+        .l6 .layer-num { background: #500724; color: #f9a8d4; }
+        .l6 .layer-subtitle { color: #f472b6; }
+
+        .l7 { background: #1a1208; border-color: #713f12; }
+        .l7 .layer-num { background: #78350f; color: #fde68a; }
+        .l7 .layer-subtitle { color: #fbbf24; }
+
+        /* Schema = layer 8 — highlighted */
+        .l8 {
+            background: #1a1614;
+            border: 2px solid #d97706 !important;
+            border-radius: 0 0 12px 12px !important;
+        }
+        .l8 .layer-num { background: #d97706; color: #0a0f1a; }
+        .l8 .layer-subtitle { color: #fbbf24; }
+        .l8 .layer-title { color: #fde68a; }
+        .l8 .layer-desc { color: #d4a96a; }
+
+        .schema-tag {
+            display: inline-block;
+            margin-left: .5rem;
+            padding: .15rem .6rem;
+            background: #78350f;
+            border: 1px solid #d97706;
+            border-radius: .4rem;
+            font-size: .7rem;
+            font-weight: 700;
+            color: #fbbf24;
+            vertical-align: middle;
+            letter-spacing: .05em;
+        }
+
+        /* ── Arrow between layers ── */
+        .arrow-down {
+            text-align: center;
+            font-size: .9rem;
+            color: #334155;
+            line-height: 1;
+            padding: 2px 0;
+            border-left: 1px solid #1e293b;
+            border-right: 1px solid #1e293b;
+            margin: 0 0;
+        }
+
+        /* ── Note ── */
+        .note {
+            margin-top: 2.5rem;
+            padding: 1.25rem 1.5rem;
+            background: #0c1814;
+            border: 1px solid #14532d;
+            border-radius: .75rem;
+            font-size: .85rem;
+            color: #86efac;
+            line-height: 1.6;
+        }
+        .note strong { color: #4ade80; }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            border-top: 1px solid #1e293b;
+            color: #334155;
+            font-size: .8rem;
+        }
+
+        @media (max-width: 640px) {
+            .layer { grid-template-columns: 44px 1fr; gap: .75rem; }
+            .layer-desc { grid-column: 1 / -1; margin-top: .25rem; }
+            .embed-wrap iframe { height: 50vh; min-height: 360px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Swimlane intocável embeds here -->
+    <div class="embed-wrap">
+        <iframe src="forja-arquitetura.html" title="Forja — Arquitetura CLI vs Mobile/Web" scrolling="no"></iframe>
+    </div>
+
+    <hr class="divider">
+
+    <div class="schema-section">
+
+        <div class="schema-header">
+            <h2>Modelo Base dos Agentes — 7 Camadas + Schema</h2>
+            <p>Arquitetura cognitiva padrão de todo agente Olimpo. Cada agente é uma instância deste stack.</p>
+            <div class="badge">Íris · Modelo Base · 7 layers + schema = 8</div>
+        </div>
+
+        <div class="layer-stack">
+
+            <div class="layer l1">
+                <div class="layer-num">1</div>
+                <div>
+                    <div class="layer-title">Input & Percepção</div>
+                    <div class="layer-subtitle">Parsing · Normalização · Injeção de contexto</div>
+                </div>
+                <div class="layer-desc">Recebe o prompt bruto, normaliza encoding, injeta contexto de sessão (session_id, tenant_id, origin, timestamp). Resolve quem está falando e de onde.</div>
+            </div>
+
+            <div class="layer l2">
+                <div class="layer-num">2</div>
+                <div>
+                    <div class="layer-title">Auth & Origin Resolution</div>
+                    <div class="layer-subtitle">Role · Origin · Trust level</div>
+                </div>
+                <div class="layer-desc">Deriva origin (authenticated / personal / mari / guest) a partir do role do tenant. Define trust level da sessão. Gates de autorização se alocam aqui — falha-fechado se origin não resolvido.</div>
+            </div>
+
+            <div class="layer l3">
+                <div class="layer-num">3</div>
+                <div>
+                    <div class="layer-title">Memory Recall</div>
+                    <div class="layer-subtitle">Episódico · Neon · Cross-sessão</div>
+                </div>
+                <div class="layer-desc">Consulta Neon Postgres: episódios anteriores, preferências, decisões de arquitetura, handoffs. Memória cross-sessão real — não RAG stateless. Buffer local em fallback, replay automático no reconnect.</div>
+            </div>
+
+            <div class="layer l4">
+                <div class="layer-num">4</div>
+                <div>
+                    <div class="layer-title">Raciocínio & Deliberação</div>
+                    <div class="layer-subtitle">Chain-of-thought · Reflexão diferida · Detecção</div>
+                </div>
+                <div class="layer-desc">Motor principal de raciocínio. Inclui reflexão diferida (decisões pesadas passam para a sessão N+1), detecção de manipulação com nomeação explícita, e deliberation loop pré-geração quando necessário.</div>
+            </div>
+
+            <div class="layer l5">
+                <div class="layer-num">5</div>
+                <div>
+                    <div class="layer-title">Tool Selection & Planning</div>
+                    <div class="layer-subtitle">MCP · invoke_agent · Orquestração</div>
+                </div>
+                <div class="layer-desc">Seleciona ferramentas (MCP filesystem, GitHub, Playwright etc.) e decide se invoca sub-agentes via invoke_agent. Compõe o plano de execução. Budget de tokens por loop controlado aqui (airbag 80k tokens).</div>
+            </div>
+
+            <div class="layer l6">
+                <div class="layer-num">6</div>
+                <div>
+                    <div class="layer-title">Execução</div>
+                    <div class="layer-subtitle">Tool calls · Commits · Persistência</div>
+                </div>
+                <div class="layer-desc">Executa ferramentas, commita no GitHub, persiste no Neon, publica via Centrifugo. Handoff automático entre agentes com payload estruturado. Retry com airbag de iterações (max 25 ciclos).</div>
+            </div>
+
+            <div class="layer l7">
+                <div class="layer-num">7</div>
+                <div>
+                    <div class="layer-title">Policy & Veto Gate</div>
+                    <div class="layer-subtitle">Musa · PolicyEngine · JARVIS override</div>
+                </div>
+                <div class="layer-desc">Camada de segurança: Musa audita ANTES de capabilities críticas. PolicyEngine aplica guardrails por origin. Root pode emitir JARVIS OVERRIDE (suspende gates de política, logado com SHA-256). Veto ofensivo absoluto para não-root.</div>
+            </div>
+
+            <div class="layer l8">
+                <div class="layer-num">8</div>
+                <div>
+                    <div class="layer-title">Output Contract <span class="schema-tag">SCHEMA</span></div>
+                    <div class="layer-subtitle">Structured output · §422 · Fail-closed</div>
+                </div>
+                <div class="layer-desc">Saída validada contra contrato (Output Contract). Zero any, zero fallback silencioso, zero catch que descarta. Se Neon offline → 503 retryável, não dado inventado. Schema 8 = o que garante que cada camada entrega o que prometeu.</div>
+            </div>
+
+        </div>
+
+        <div class="note">
+            <strong>Nota de integridade:</strong> Este schema representa a arquitetura base compartilhada por todos os agentes Olimpo. A arquitetura interna da Ayla — seu corpus, persona, vault e camadas cognitivas privadas — <strong>não é documentada aqui</strong> e permanece sob acesso exclusivo do root.
+        </div>
+
+    </div>
+
+    <footer>
+        Forja · Arquitetura do Sistema · v2.0 · 2026-06-17
+    </footer>
+
+</body>
+</html>
