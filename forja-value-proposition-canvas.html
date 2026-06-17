@@ -1,1 +1,636 @@
-PCFET0NUWVBFIGh0bWw+CjxodG1sIGxhbmc9InB0LUJSIj4KPGhlYWQ+CiAgICA8bWV0YSBjaGFyc2V0PSJVVEYtOCI+CiAgICA8bWV0YSBuYW1lPSJ2aWV3cG9ydCIgY29udGVudD0id2lkdGg9ZGV2aWNlLXdpZHRoLCBpbml0aWFsLXNjYWxlPTEuMCI+CiAgICA8dGl0bGU+Rm9yamEg4oCUIFZhbHVlIFByb3Bvc2l0aW9uIENhbnZhczwvdGl0bGU+CiAgICA8c3R5bGU+CiAgICAgICAgKiB7IG1hcmdpbjogMDsgcGFkZGluZzogMDsgYm94LXNpemluZzogYm9yZGVyLWJveDsgfQogICAgICAgIGJvZHkgeyBmb250LWZhbWlseTogJ0ludGVyJywgLWFwcGxlLXN5c3RlbSwgQmxpbmtNYWNTeXN0ZW1Gb250LCAnU2Vnb2UgVUknLCBzYW5zLXNlcmlmOyBiYWNrZ3JvdW5kOiAjMGEwZjFhOyBjb2xvcjogI2UyZThmMDsgbGluZS1oZWlnaHQ6IDEuNjsgcGFkZGluZzogMnJlbTsgfQogICAgICAgIC5jb250YWluZXIgeyBtYXgtd2lkdGg6IDE2MDBweDsgbWFyZ2luOiAwIGF1dG87IH0KICAgICAgICBoZWFkZXIgeyB0ZXh0LWFsaWduOiBjZW50ZXI7IG1hcmdpbi1ib3R0b206IDNyZW07IHBhZGRpbmctYm90dG9tOiAycmVtOyBib3JkZXItYm90dG9tOiAycHggc29saWQgIzFlMjkzYjsgfQogICAgICAgIGgxIHsgZm9udC1zaXplOiAyLjVyZW07IGZvbnQtd2VpZ2h0OiA3MDA7IGNvbG9yOiAjZjk3MzE2OyBtYXJnaW4tYm90dG9tOiAwLjVyZW07IH0KICAgICAgICAuc3VidGl0bGUgeyBmb250LXNpemU6IDFyZW07IGNvbG9yOiAjOTRhM2I4OyB9CiAgICAgICAgLmNhbnZhcy13cmFwcGVyIHsgZGlzcGxheTogZ3JpZDsgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiAxZnIgMWZyOyBnYXA6IDNyZW07IG1hcmdpbi1ib3R0b206IDNyZW07IH0KICAgICAgICAuY2FudmFzLXNlY3Rpb24geyBiYWNrZ3JvdW5kOiAjMTMxYzJlOyBib3JkZXItcmFkaXVzOiAxNnB4OyBwYWRkaW5nOiAyLjVyZW07IHBvc2l0aW9uOiByZWxhdGl2ZTsgfQogICAgICAgIC5jYW52YXMtc2VjdGlvbjo6YmVmb3JlIHsgY29udGVudDogJyc7IHBvc2l0aW9uOiBhYnNvbHV0ZTsgdG9wOiAwOyBsZWZ0OiAwOyByaWdodDogMDsgaGVpZ2h0OiA0cHg7IGJvcmRlci1yYWRpdXM6IDE2cHggMTZweCAwIDA7IH0KICAgICAgICAuY3VzdG9tZXItcHJvZmlsZTo6YmVmb3JlIHsgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDkwZGVnLCAjMjJkM2VlLCAjMGVhNWU5KTsgfQogICAgICAgIC52YWx1ZS1tYXA6OmJlZm9yZSB7IGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCg5MGRlZywgI2Y5NzMxNiwgI2ZiYmYyNCk7IH0KICAgICAgICAuc2VjdGlvbi10aXRsZSB7IGZvbnQtc2l6ZTogMS43NXJlbTsgZm9udC13ZWlnaHQ6IDcwMDsgbWFyZ2luLWJvdHRvbTogMC41cmVtOyB9CiAgICAgICAgLmN1c3RvbWVyLXByb2ZpbGUgLnNlY3Rpb24tdGl0bGUgeyBjb2xvcjogIzIyZDNlZTsgfQogICAgICAgIC52YWx1ZS1tYXAgLnNlY3Rpb24tdGl0bGUgeyBjb2xvcjogI2Y5NzMxNjsgfQogICAgICAgIC5zZWN0aW9uLXN1YnRpdGxlIHsgZm9udC1zaXplOiAwLjk1cmVtOyBjb2xvcjogIzk0YTNiODsgbWFyZ2luLWJvdHRvbTogMnJlbTsgZm9udC1zdHlsZTogaXRhbGljOyB9CiAgICAgICAgLmNhdGVnb3J5IHsgbWFyZ2luLWJvdHRvbTogMnJlbTsgfQogICAgICAgIC5jYXRlZ29yeS10aXRsZSB7IGZvbnQtc2l6ZTogMS4yNXJlbTsgZm9udC13ZWlnaHQ6IDYwMDsgbWFyZ2luLWJvdHRvbTogMXJlbTsgcGFkZGluZy1ib3R0b206IDAuNXJlbTsgYm9yZGVyLWJvdHRvbTogMXB4IHNvbGlkICMxZTI5M2I7IH0KICAgICAgICAuY3VzdG9tZXItcHJvZmlsZSAuY2F0ZWdvcnktdGl0bGUgeyBjb2xvcjogIzdkZDNmYzsgfQogICAgICAgIC52YWx1ZS1tYXAgLmNhdGVnb3J5LXRpdGxlIHsgY29sb3I6ICNmYmJmMjQ7IH0KICAgICAgICAuaXRlbSB7IGRpc3BsYXk6IGZsZXg7IGFsaWduLWl0ZW1zOiBmbGV4LXN0YXJ0OyBnYXA6IDAuNzVyZW07IHBhZGRpbmc6IDAuODc1cmVtOyBtYXJnaW4tYm90dG9tOiAwLjc1cmVtOyBiYWNrZ3JvdW5kOiAjMGYxNzJhOyBib3JkZXItcmFkaXVzOiA4cHg7IGJvcmRlci1sZWZ0OiAzcHggc29saWQgdHJhbnNwYXJlbnQ7IH0KICAgICAgICAuY3VzdG9tZXItcHJvZmlsZSAuaXRlbSB7IGJvcmRlci1sZWZ0LWNvbG9yOiAjMjJkM2VlOyB9CiAgICAgICAgLnZhbHVlLW1hcCAuaXRlbSB7IGJvcmRlci1sZWZ0LWNvbG9yOiAjZjk3MzE2OyB9CiAgICAgICAgLnByaW9yaXR5IHsgZmxleC1zaHJpbms6IDA7IGZvbnQtc2l6ZTogMS4yNXJlbTsgfQogICAgICAgIC5pdGVtLXRleHQgeyBmbGV4OiAxOyBmb250LXNpemU6IDAuOTVyZW07IGNvbG9yOiAjY2JkNWUxOyB9CiAgICAgICAgLmZpdC1zZWN0aW9uIHsgYmFja2dyb3VuZDogbGluZWFyLWdyYWRpZW50KDEzNWRlZywgIzEzMWMyZSwgIzFlMjkzYik7IGJvcmRlci1yYWRpdXM6IDE2cHg7IHBhZGRpbmc6IDIuNXJlbTsgYm9yZGVyOiAycHggc29saWQgIzIyZDNlZTsgbWFyZ2luLWJvdHRvbTogM3JlbTsgfQogICAgICAgIC5maXQtc2VjdGlvbiAuc2VjdGlvbi10aXRsZSB7IGNvbG9yOiAjZmJiZjI0OyB0ZXh0LWFsaWduOiBjZW50ZXI7IG1hcmdpbi1ib3R0b206IDAuNXJlbTsgfQogICAgICAgIC5maXQtc2VjdGlvbiAuc2VjdGlvbi1zdWJ0aXRsZSB7IHRleHQtYWxpZ246IGNlbnRlcjsgbWFyZ2luLWJvdHRvbTogMnJlbTsgfQogICAgICAgIC5maXQtZ3JpZCB7IGRpc3BsYXk6IGdyaWQ7IGdyaWQtdGVtcGxhdGUtY29sdW1uczogcmVwZWF0KGF1dG8tZml0LCBtaW5tYXgoMzAwcHgsIDFmcikpOyBnYXA6IDEuNXJlbTsgfQogICAgICAgIC5maXQtaXRlbSB7IGJhY2tncm91bmQ6ICMwZjE3MmE7IHBhZGRpbmc6IDEuNXJlbTsgYm9yZGVyLXJhZGl1czogMTJweDsgYm9yZGVyOiAxcHggc29saWQgIzFlMjkzYjsgfQogICAgICAgIC5maXQtaXRlbS10aXRsZSB7IGZvbnQtd2VpZ2h0OiA2MDA7IGNvbG9yOiAjMjJkM2VlOyBtYXJnaW4tYm90dG9tOiAwLjVyZW07IGZvbnQtc2l6ZTogMS4wNXJlbTsgfQogICAgICAgIC5maXQtYXJyb3cgeyBjb2xvcjogI2Y5NzMxNjsgbWFyZ2luOiAwLjVyZW0gMDsgZm9udC13ZWlnaHQ6IDcwMDsgfQogICAgICAgIC5maXQtc29sdXRpb24geyBjb2xvcjogIzk0YTNiODsgZm9udC1zaXplOiAwLjlyZW07IH0KICAgICAgICBmb290ZXIgeyB0ZXh0LWFsaWduOiBjZW50ZXI7IG1hcmdpbi10b3A6IDNyZW07IHBhZGRpbmctdG9wOiAycmVtOyBib3JkZXItdG9wOiAycHggc29saWQgIzFlMjkzYjsgfQogICAgICAgIC50YWdsaW5lIHsgZm9udC1zaXplOiAxLjVyZW07IGZvbnQtd2VpZ2h0OiA2MDA7IGJhY2tncm91bmQ6IGxpbmVhci1ncmFkaWVudCg5MGRlZywgI2Y5NzMxNiAwJSwgI2ZiYmYyNCA1MCUsICMyMmQzZWUgMTAwJSk7IC13ZWJraXQtYmFja2dyb3VuZC1jbGlwOiB0ZXh0OyAtd2Via2l0LXRleHQtZmlsbC1jb2xvcjogdHJhbnNwYXJlbnQ7IGJhY2tncm91bmQtY2xpcDogdGV4dDsgfQogICAgICAgIC5tZXRhIHsgbWFyZ2luLXRvcDogMXJlbTsgZm9udC1zaXplOiAwLjg1cmVtOyBjb2xvcjogIzY0NzQ4YjsgfQogICAgICAgIEBtZWRpYSAobWF4LXdpZHRoOiAxMjAwcHgpIHsgLmNhbnZhcy13cmFwcGVyIHsgZ3JpZC10ZW1wbGF0ZS1jb2x1bW5zOiAxZnI7IH0gfQogICAgPC9zdHlsZT4KPC9oZWFkPgo8Ym9keT4KPGRpdiBjbGFzcz0iY29udGFpbmVyIj4KICAgIDxoZWFkZXI+CiAgICAgICAgPGgxPkZvcmphIOKAlCBWYWx1ZSBQcm9wb3NpdGlvbiBDYW52YXM8L2gxPgogICAgICAgIDxwIGNsYXNzPSJzdWJ0aXRsZSI+TWFuYWdlZCBBSSBBZ2VudCBQbGF0Zm9ybSAoQWFhUykgwrcgMjAyNi0wNi0xNzwvcD4KICAgIDwvaGVhZGVyPgogICAgPGRpdiBjbGFzcz0iY2FudmFzLXdyYXBwZXIiPgogICAgICAgIDxkaXYgY2xhc3M9ImNhbnZhcy1zZWN0aW9uIGN1c3RvbWVyLXByb2ZpbGUiPgogICAgICAgICAgICA8aDIgY2xhc3M9InNlY3Rpb24tdGl0bGUiPkN1c3RvbWVyIFByb2ZpbGU8L2gyPgogICAgICAgICAgICA8cCBjbGFzcz0ic2VjdGlvbi1zdWJ0aXRsZSI+RGV2IC8gQWRtaW4gZGUgb3JnYW5pemHDp8O1ZXMgZGUgc29mdHdhcmU8L3A+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhdGVnb3J5Ij4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY2F0ZWdvcnktdGl0bGUiPkN1c3RvbWVyIEpvYnM8L2gzPgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5S0PC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPkVudHJlZ2FyIGZlYXR1cmVzIGNvbSB2ZWxvY2lkYWRlIGNvbnNpc3RlbnRlPC9zcGFuPjwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5S0PC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPk1hbnRlciBwYWRyw7VlcyBkZSBjw7NkaWdvIGVtIHRvZG8gbyB0aW1lPC9zcGFuPjwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5+gPC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPlRyYWJhbGhhciBlbSBxdWFscXVlciBjb250ZXh0byAobG9jYWwsIG1vYmlsZSkgc2VtIHBlcmRlciBwcm9kdXRpdmlkYWRlPC9zcGFuPjwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5+hPC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPlJldmlzYXIgY8OzZGlnbyBlIGdhcmFudGlyIFVYL2FjZXNzaWJpbGlkYWRlPC9zcGFuPjwvZGl2PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2F0ZWdvcnkiPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjYXRlZ29yeS10aXRsZSI+UGFpbnM8L2gzPgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5S0PC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPkNvbnN0cnVpciBvcnF1ZXN0cmFkb3JlcyBkZSBhZ2VudGVzIMOpIGNvbXBsZXhvIGUgY2Fybzwvc3Bhbj48L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9Iml0ZW0iPjxzcGFuIGNsYXNzPSJwcmlvcml0eSI+8J+UtDwvc3Bhbj48c3BhbiBjbGFzcz0iaXRlbS10ZXh0Ij5GZXJyYW1lbnRhcyBzZW0gbWVtw7NyaWEgcGVyc2lzdGVudGUg4oCUIGNhZGEgc2Vzc8OjbyByZWNvbWXDp2EgZG8gemVybzwvc3Bhbj48L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9Iml0ZW0iPjxzcGFuIGNsYXNzPSJwcmlvcml0eSI+8J+foDwvc3Bhbj48c3BhbiBjbGFzcz0iaXRlbS10ZXh0Ij5JREVzIGNsb3VkLW9ubHkgdHJhdmFtIHdvcmtmbG93IGxvY2FsOyBDTElzIG7Do28gZnVuY2lvbmFtIG5vIG1vYmlsZTwvc3Bhbj48L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9Iml0ZW0iPjxzcGFuIGNsYXNzPSJwcmlvcml0eSI+8J+foDwvc3Bhbj48c3BhbiBjbGFzcz0iaXRlbS10ZXh0Ij5Db3BpbG90L0N1cnNvciBzw6NvIHJlYXRpdm9zIOKAlCBuw6NvIGxpZGVyYW0gYXJxdWl0ZXR1cmE8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCfn6E8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+TmVuaHVtYSBmZXJyYW1lbnRhIGNvYnJlIFVYL2FjZXNzaWJpbGlkYWRlIHByb2F0aXZhbWVudGU8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgIDwvZGl2PgogICAgICAgICAgICA8ZGl2IGNsYXNzPSJjYXRlZ29yeSI+CiAgICAgICAgICAgICAgICA8aDMgY2xhc3M9ImNhdGVnb3J5LXRpdGxlIj5HYWluczwvaDM+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCflLQ8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+QWdlbnRlIHF1ZSBsZW1icmEgbyBjb250ZXh0byBkYSBvcmcgZSBldm9sdWkgY29tIG8gcHJvamV0bzwvc3Bhbj48L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9Iml0ZW0iPjxzcGFuIGNsYXNzPSJwcmlvcml0eSI+8J+UtDwvc3Bhbj48c3BhbiBjbGFzcz0iaXRlbS10ZXh0Ij5UcmFiYWxoYXIgcHJvZHV0aXZhbWVudGUgZW0gcXVhbHF1ZXIgZGV2aWNlPC9zcGFuPjwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5+gPC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPlRpbWUgZGUgZXNwZWNpYWxpc3RhcyAoYXJxLCBRQSwgVVgpIGRpc3BvbsOtdmVsIDI0Lzc8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCfn6E8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+UmVkdcOnw6NvIGRlIDQw4oCTNjAlIG5vIHRlbXBvIGRlIGNvZGUgcmV2aWV3PC9zcGFuPjwvZGl2PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICA8L2Rpdj4KICAgICAgICA8ZGl2IGNsYXNzPSJjYW52YXMtc2VjdGlvbiB2YWx1ZS1tYXAiPgogICAgICAgICAgICA8aDIgY2xhc3M9InNlY3Rpb24tdGl0bGUiPlZhbHVlIE1hcDwvaDI+CiAgICAgICAgICAgIDxwIGNsYXNzPSJzZWN0aW9uLXN1YnRpdGxlIj5PIG8gRm9yamEgZW50cmVnYTwvcD4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2F0ZWdvcnkiPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjYXRlZ29yeS10aXRsZSI+UHJvZHVjdHMgJmFtcDsgU2VydmljZXM8L2gzPgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5S0PC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPjxzdHJvbmc+QXlsYTo8L3N0cm9uZz4gb3JxdWVzdHJhZG9yIGNvbSBtZW3Ds3JpYSBwZXJzaXN0ZW50ZSBjcm9zcy1zZXNzw6NvPC9zcGFuPjwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5S0PC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPjxzdHJvbmc+T2xpbXBvOjwvc3Ryb25nPiAxNSBhZ2VudGVzIGVzcGVjaWFsaXN0YXMgKEF0ZW5hLCBIZXJtZXMsIEFwb2xvLCDDjXJpcywgUXVpcm9u4oCmKTwvc3Bhbj48L2Rpdj4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9Iml0ZW0iPjxzcGFuIGNsYXNzPSJwcmlvcml0eSI+8J+UtDwvc3Bhbj48c3BhbiBjbGFzcz0iaXRlbS10ZXh0Ij48c3Ryb25nPkNMSSBsb2NhbC1maXJzdDo8L3N0cm9uZz4gYWdlbnRlcyBubyBwcm9qZXRvIGxvY2FsLCBmYWxsYmFjayBFQzI8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCflLQ8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+PHN0cm9uZz5Nb2JpbGUvcmVtb3RlLWZpcnN0Ojwvc3Ryb25nPiB0cmFiYWxoYSBkaXJldG8gbm8gR2l0SHViIHZpYSBFQzI8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCfn6E8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+PHN0cm9uZz5GYWJyaWNhIGNvbXBhcnRpbGhhZGE6PC9zdHJvbmc+IGF0dWFsaXphw6fDtWVzIGJlbmVmaWNpYW0gdG9kb3Mgb3MgdGVuYW50czwvc3Bhbj48L2Rpdj4KICAgICAgICAgICAgPC9kaXY+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImNhdGVnb3J5Ij4KICAgICAgICAgICAgICAgIDxoMyBjbGFzcz0iY2F0ZWdvcnktdGl0bGUiPlBhaW4gUmVsaWV2ZXJzPC9oMz4KICAgICAgICAgICAgICAgIDxkaXYgY2xhc3M9Iml0ZW0iPjxzcGFuIGNsYXNzPSJwcmlvcml0eSI+8J+UtDwvc3Bhbj48c3BhbiBjbGFzcz0iaXRlbS10ZXh0Ij5aZXJvIGNvbnN0cnXDp8OjbyBkZSBvcnF1ZXN0cmFkb3Ig4oCUIGFzc2luYSBlamEgdGVtIEF5bGEgKyBPbGltcG88L3NwYW4+PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCflLQ8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+TWVtw7NyaWEgcGVyc2lzdGVudGUg4oCUIGFnZW50ZSBsZW1icmEgY29udGV4dG8gZW50cmUgc2Vzc8O1ZXM8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCfn6A8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+Q0xJICsgTW9iaWxlIGjDrWJyaWRvOiBwcm9kdXRpdm8gbm8gbGFwdG9wLCBpUGFkLCBpUGhvbmU8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCfn6E8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+UXVpcm9uICsgw41yaXMgY29icmVtIFVYL2ExMXkg4oCUIGFwYXJ0aXIgZG8gcHJpbWVpcm8gY29tbWl0PC9zcGFuPjwvZGl2PgogICAgICAgICAgICA8L2Rpdj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iY2F0ZWdvcnkiPgogICAgICAgICAgICAgICAgPGgzIGNsYXNzPSJjYXRlZ29yeS10aXRsZSI+R2FpbiBDcmVhdG9yczwvaDM+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCflLQ8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+TWVtw7NyaWEgZXZvbHVpIGNvbSBvIHByb2pldG8g4oCUIGFnZW50ZSBjYWRhIHZleiBtYWlzIHByZWNpc288L3NwYW4+PC9kaXY+CiAgICAgICAgICAgICAgICA8ZGl2IGNsYXNzPSJpdGVtIj48c3BhbiBjbGFzcz0icHJpb3JpdHkiPvCflLQ8L3NwYW4+PHNwYW4gY2xhc3M9Iml0ZW0tdGV4dCI+TXVsdGktZGV2aWNlIHJlYWw6IENMSSB0b2NhbCDihpIgcHVzaCDihpIgR2l0SHViIOKGkCBtb2JpbGUgY29tbWl0IOKGkiBwdWxsPC9zcGFuPjwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5+gPC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPjE1IGVzcGVjaWFsaXN0YXMgMjQvNyBzZW0gaGlyaW5nPC9zcGFuPjwvZGl2PgogICAgICAgICAgICAgICAgPGRpdiBjbGFzcz0iaXRlbSI+PHNwYW4gY2xhc3M9InByaW9yaXR5Ij7wn5+hPC9zcGFuPjxzcGFuIGNsYXNzPSJpdGVtLXRleHQiPjQw4oCTNjAlIG1lbm9zIHRlbXBvIGVtIGNvZGUgcmV2aWV3IGUgcmVmYWN0b3I8L3NwYW4+PC9kaXY+CiAgICAgICAgICAgIDwvZGl2PgogICAgICAgIDwvZGl2PgogICAgPC9kaXY+CiAgICA8ZGl2IGNsYXNzPSJmaXQtc2VjdGlvbiI+CiAgICAgICAgPGgyIGNsYXNzPSJzZWN0aW9uLXRpdGxlIj5Qcm9kdWN0LU1hcmtldCBGaXQ8L2gyPgogICAgICAgIDxwIGNsYXNzPSJzZWN0aW9uLXN1YnRpdGxlIj5PbmRlIGRvciBjcsOtdGljYSBlbmNvbnRyYSBzb2x1w6fDo28gw7puaWNhPC9wPgogICAgICAgIDxkaXYgY2xhc3M9ImZpdC1ncmlkIj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iZml0LWl0ZW0iPjxkaXYgY2xhc3M9ImZpdC1pdGVtLXRpdGxlIj7wn5S0IE1lbcOzcmlhIFBlcnNpc3RlbnRlPC9kaXY+PGRpdiBjbGFzcz0iZml0LWFycm93Ij7ihpM8L2Rpdj48ZGl2IGNsYXNzPSJmaXQtc29sdXRpb24iPjxzdHJvbmc+UGFpbjo8L3N0cm9uZz4gc2Vzc8OjbyByZWNvbWXDp2EgZG8gemVybzxicj48c3Ryb25nPlJlbGlldmVyOjwvc3Ryb25nPiBBeWxhIGxlbWJyYSBjb250ZXh0byBjcm9zcy1zZXNzw6NvPGJyPjxzdHJvbmc+R2FpbTo8L3N0cm9uZz4gYWdlbnRlIGV2b2x1aSBjb20gbyBwcm9qZXRvPC9kaXY+PC9kaXY+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImZpdC1pdGVtIj48ZGl2IGNsYXNzPSJmaXQtaXRlbS10aXRsZSI+8J+UtCBNdWx0aS1EZXZpY2UgUmVhbDwvZGl2PjxkaXYgY2xhc3M9ImZpdC1hcnJvdyI+4oaTPC9kaXY+PGRpdiBjbGFzcz0iZml0LXNvbHV0aW9uIj48c3Ryb25nPlBhaW46PC9zdHJvbmc+IElERXMgY2xvdWQtb25seSB2cyBDTElzIHNlbSBtb2JpbGU8YnI+PHN0cm9uZz5SZWxpZXZlcjo8L3N0cm9uZz4gQ0xJIGxvY2FsLWZpcnN0ICsgTW9iaWxlIHJlbW90ZS1maXJzdDxicj48c3Ryb25nPkdhaW46PC9zdHJvbmc+IHByb2R1dGl2byBlbSBxdWFscXVlciBkZXZpY2U8L2Rpdj48L2Rpdj4KICAgICAgICAgICAgPGRpdiBjbGFzcz0iZml0LWl0ZW0iPjxkaXYgY2xhc3M9ImZpdC1pdGVtLXRpdGxlIj7wn5S0IFplcm8gT3JxdWVzdHJhZG9yPC9kaXY+PGRpdiBjbGFzcz0iZml0LWFycm93Ij7ihpM8L2Rpdj48ZGl2IGNsYXNzPSJmaXQtc29sdXRpb24iPjxzdHJvbmc+UGFpbjo8L3N0cm9uZz4gY29uc3RydWlyIGFnZW50ZSA9IHNlbWFuYXMgZGUgZW5nPGJyPjxzdHJvbmc+UmVsaWV2ZXI6PC9zdHJvbmc+IGFzc2luYSwgQXlsYSArIDE1IGFnZW50ZXMgcHJvbnRvczxicj48c3Ryb25nPkdhaW46PC9zdHJvbmc+IHByb2R1dGl2byBlbSBtaW51dG9zPC9kaXY+PC9kaXY+CiAgICAgICAgICAgIDxkaXYgY2xhc3M9ImZpdC1pdGVtIj48ZGl2IGNsYXNzPSJmaXQtaXRlbS10aXRsZSI+8J+foCBBZ2VudGVzIFByb2F0aXZvczwvZGl2PjxkaXYgY2xhc3M9ImZpdC1hcnJvdyI+4oaTPC9kaXY+PGRpdiBjbGFzcz0iZml0LXNvbHV0aW9uIj48c3Ryb25nPlBhaW46PC9zdHJvbmc+IEN1cnNvci9Db3BpbG90IHPDsyBjb21wbGV0YW0gY8OzZGlnbzxicj48c3Ryb25nPlJlbGlldmVyOjwvc3Ryb25nPiBBdGVuYSAoYXJxKSwgQXBvbG8gKFFBKSwgR2FpYSAoZXN0cmF0w6lnaWEpPGJyPjxzdHJvbmc+R2Fpbjo8L3N0cm9uZz4gcGFkcsO1ZXMgY29uc2lzdGVudGVzPC9kaXY+PC9kaXY+CiAgICAgICAgPC9kaXY+CiAgICA8L2Rpdj4KICAgIDxmb290ZXI+CiAgICAgICAgPHAgY2xhc3M9InRhZ2xpbmUiPiJTdG9wIGJ1aWxkaW5nIGFnZW50cy4gU3RhcnQgdXNpbmcgdGhlIGJlc3Qgb25lLiI8L3A+CiAgICAgICAgPHAgY2xhc3M9Im1ldGEiPkZvcmphIMK3IE1hbmFnZWQgQUkgQWdlbnQgUGxhdGZvcm0gKEFhYVMpPGJyPkJsdWUgb2NlYW46IENMSSB0b2NhbC1maXJzdCArIE1vYmlsZSByZW1vdGUtZmlyc3QgKyBNZW3Ds3JpYSBjcm9zcy1zZXNzw6NvPGJyPkphbmVsYTogMTLigJMxOCBtZXNlcyDCtyAyMDI2LTA2LTE3PC9wPgogICAgPC9mb290ZXI+CjwvZGl2Pgo8L2JvZHk+CjwvaHRtbD4=
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>B2 — Value Proposition Canvas · Forja</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #020617;
+      --card:      #0f172a;
+      --border:    #1e293b;
+      --muted:     #334155;
+      --subtle:    #475569;
+      --text:      #e2e8f0;
+      --text-dim:  #94a3b8;
+      --amber:     #f59e0b;
+      --amber-dim: #78350f;
+      --blue:      #3b82f6;
+      --blue-dim:  #1e3a8a;
+      --green:     #22c55e;
+      --green-dim: #14532d;
+      --red:       #ef4444;
+      --red-dim:   #7f1d1d;
+      --purple:    #a855f7;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* HEADER */
+    .page-header {
+      border-bottom: 1px solid var(--border);
+      padding: 32px 40px 28px;
+      background: linear-gradient(135deg, #020617 0%, #0a1628 100%);
+    }
+    .page-header .label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 8px;
+    }
+    .page-header h1 {
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.2;
+    }
+    .page-header .subtitle {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+    .page-header .tagline {
+      margin-top: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tagline-text {
+      font-size: 15px;
+      font-weight: 600;
+      color: #fff;
+      font-style: italic;
+    }
+    .badge {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 4px;
+      background: var(--amber-dim);
+      color: var(--amber);
+      border: 1px solid var(--amber);
+    }
+
+    /* MAIN */
+    .main { padding: 40px; max-width: 1400px; margin: 0 auto; }
+
+    .section-label {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      color: var(--subtle);
+      margin-bottom: 20px;
+    }
+
+    /* VPC CANVAS */
+    .vpc-wrap {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 40px;
+    }
+
+    .vpc-col {
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      background: var(--card);
+    }
+    .vpc-col-header {
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .vpc-col-header .col-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .vpc-col-header .col-title { font-size: 15px; font-weight: 700; color: #fff; }
+    .vpc-col-header .col-sub   { font-size: 11px; color: var(--text-dim); margin-top: 1px; }
+
+    .vpc-left  .vpc-col-header { background: linear-gradient(135deg, #0f172a, #0c1a3a); }
+    .vpc-right .vpc-col-header { background: linear-gradient(135deg, #0f172a, #1c1205); }
+    .vpc-left  .col-icon { background: var(--blue-dim); }
+    .vpc-right .col-icon { background: var(--amber-dim); }
+
+    .vpc-segments { padding: 16px 20px; display: flex; flex-direction: column; gap: 16px; }
+
+    .segment {
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+    .seg-header {
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      border-bottom: 1px solid var(--border);
+    }
+    .seg-dot {
+      width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+    }
+    .seg-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+
+    .item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .item-num {
+      flex-shrink: 0;
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      margin-top: 1px;
+    }
+    .item-text strong { color: var(--text); font-weight: 600; }
+
+    /* Colour roles */
+    .role-jobs   { --role-color: var(--blue);   --role-bg: var(--blue-dim); }
+    .role-pains  { --role-color: var(--red);    --role-bg: var(--red-dim); }
+    .role-gains  { --role-color: var(--green);  --role-bg: var(--green-dim); }
+    .role-prods  { --role-color: var(--purple); --role-bg: #3b0764; }
+    .role-reliev { --role-color: var(--blue);   --role-bg: var(--blue-dim); }
+    .role-creat  { --role-color: var(--amber);  --role-bg: var(--amber-dim); }
+
+    .role-jobs   .seg-header { color: var(--blue);   background: color-mix(in srgb, var(--blue-dim) 40%, #0f172a); }
+    .role-pains  .seg-header { color: var(--red);    background: color-mix(in srgb, var(--red-dim) 40%, #0f172a); }
+    .role-gains  .seg-header { color: var(--green);  background: color-mix(in srgb, var(--green-dim) 40%, #0f172a); }
+    .role-prods  .seg-header { color: var(--purple); background: color-mix(in srgb, #3b0764 40%, #0f172a); }
+    .role-reliev .seg-header { color: var(--blue);   background: color-mix(in srgb, var(--blue-dim) 40%, #0f172a); }
+    .role-creat  .seg-header { color: var(--amber);  background: color-mix(in srgb, var(--amber-dim) 40%, #0f172a); }
+
+    .role-jobs   .seg-dot { background: var(--blue); }
+    .role-pains  .seg-dot { background: var(--red); }
+    .role-gains  .seg-dot { background: var(--green); }
+    .role-prods  .seg-dot { background: var(--purple); }
+    .role-reliev .seg-dot { background: var(--blue); }
+    .role-creat  .seg-dot { background: var(--amber); }
+
+    .role-jobs   .item-num { background: color-mix(in srgb, var(--blue-dim) 80%, transparent); color: var(--blue); }
+    .role-pains  .item-num { background: color-mix(in srgb, var(--red-dim) 80%, transparent);  color: var(--red); }
+    .role-gains  .item-num { background: color-mix(in srgb, var(--green-dim) 80%, transparent); color: var(--green); }
+    .role-prods  .item-num { background: color-mix(in srgb, #3b0764 80%, transparent); color: var(--purple); }
+    .role-reliev .item-num { background: color-mix(in srgb, var(--blue-dim) 80%, transparent); color: var(--blue); }
+    .role-creat  .item-num { background: color-mix(in srgb, var(--amber-dim) 80%, transparent); color: var(--amber); }
+
+    /* Products chips */
+    .prod-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 12px 14px; }
+    .chip {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 6px;
+      border: 1px solid;
+    }
+    .chip-purple { background: #3b076440; color: var(--purple); border-color: #7c3aed60; }
+    .chip-blue   { background: var(--blue-dim); color: var(--blue); border-color: #2563eb60; }
+    .chip-amber  { background: var(--amber-dim); color: var(--amber); border-color: #d9770660; }
+    .chip-green  { background: var(--green-dim); color: var(--green); border-color: #16a34a60; }
+
+    /* FIT SECTION */
+    .fit-section { margin-bottom: 40px; }
+    .fit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .fit-col { border: 1px solid var(--border); border-radius: 14px; overflow: hidden; background: var(--card); }
+    .fit-col-header { padding: 14px 18px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; }
+    .fit-col-header .status-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+    .fit-col-header .fit-title { font-size: 13px; font-weight: 700; }
+    .fit-col-header .fit-hint  { font-size: 11px; color: var(--text-dim); }
+    .fit-items { padding: 14px 18px; display: flex; flex-direction: column; gap: 10px; }
+
+    .fit-item {
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 10px;
+    }
+    .fit-left  { font-size: 12px; color: var(--text); text-align: right; line-height: 1.4; }
+    .fit-right { font-size: 12px; color: var(--text-dim); text-align: left; line-height: 1.4; }
+    .fit-arrow { font-size: 16px; flex-shrink: 0; }
+    .fit-green-arrow { color: var(--green); }
+    .fit-amber-arrow { color: var(--amber); }
+
+    /* ICP SECTION */
+    .icp-section { margin-bottom: 40px; }
+    .icp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+    .icp-card {
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: var(--card);
+    }
+    .icp-card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+    }
+    .icp-card-title { font-size: 14px; font-weight: 700; color: #fff; }
+    .icp-card-sub   { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+    .icp-status {
+      font-size: 10px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    .status-green  { background: var(--green-dim); color: var(--green); border: 1px solid #16a34a60; }
+    .status-amber  { background: var(--amber-dim); color: var(--amber); border: 1px solid #d9770660; }
+    .icp-rows { padding: 14px 18px; display: flex; flex-direction: column; gap: 8px; }
+    .icp-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; }
+    .icp-row-key { color: var(--subtle); }
+    .icp-row-val { color: var(--text); font-weight: 500; text-align: right; }
+
+    /* FOOTER */
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    footer .footer-text { font-size: 11px; color: var(--subtle); }
+    footer .footer-brand { font-size: 12px; font-weight: 700; color: var(--text-dim); letter-spacing: .06em; }
+
+    /* RESPONSIVE */
+    @media (max-width: 768px) {
+      .page-header { padding: 24px 20px 20px; }
+      .main { padding: 24px 16px; }
+      .vpc-wrap, .fit-grid, .icp-grid { grid-template-columns: 1fr; }
+      .fit-item { grid-template-columns: 1fr; gap: 4px; }
+      .fit-left, .fit-right { text-align: left; }
+      .fit-arrow { display: none; }
+      footer { padding: 16px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="page-header">
+  <div class="label">Forja · AaaS Platform · 2026</div>
+  <h1>B2 — Value Proposition Canvas</h1>
+  <div class="subtitle">Moat real: memória episódica · psicometria · veto hierarchy</div>
+  <div class="tagline">
+    <span class="tagline-text">"Stop building agents. Start using the best one."</span>
+    <span class="badge">AaaS</span>
+  </div>
+</header>
+
+<main class="main">
+
+  <!-- 01 VPC CANVAS -->
+  <div class="section-label">01 · Customer Profile ↔ Value Map</div>
+  <div class="vpc-wrap">
+
+    <!-- LEFT: Customer Profile -->
+    <div class="vpc-col vpc-left">
+      <div class="vpc-col-header">
+        <div class="col-icon">👤</div>
+        <div>
+          <div class="col-title">Customer Profile</div>
+          <div class="col-sub">ICP hoje: Founder Técnico solo/dupla · pré-seed a seed</div>
+        </div>
+      </div>
+
+      <div class="vpc-segments">
+
+        <!-- Jobs -->
+        <div class="segment role-jobs">
+          <div class="seg-header">
+            <div class="seg-dot"></div>
+            Customer Jobs — o que tenta fazer
+          </div>
+          <div class="seg-body">
+            <div class="item">
+              <div class="item-num">1</div>
+              <div class="item-text"><strong>Construir produto funcional</strong> com time mínimo</div>
+            </div>
+            <div class="item">
+              <div class="item-num">2</div>
+              <div class="item-text"><strong>Automatizar tarefas repetitivas</strong> de dev/ops/atendimento</div>
+            </div>
+            <div class="item">
+              <div class="item-num">3</div>
+              <div class="item-text"><strong>Tomar decisões rápidas</strong> com contexto persistente</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pains -->
+        <div class="segment role-pains">
+          <div class="seg-header">
+            <div class="seg-dot"></div>
+            Pains — o que frustra
+          </div>
+          <div class="seg-body">
+            <div class="item">
+              <div class="item-num">1</div>
+              <div class="item-text"><strong>Tempo perdido re-explicando contexto</strong> a cada sessão de IA</div>
+            </div>
+            <div class="item">
+              <div class="item-num">2</div>
+              <div class="item-text"><strong>Orquestrar múltiplos agentes</strong> é complexo demais para time pequeno</div>
+            </div>
+            <div class="item">
+              <div class="item-num">3</div>
+              <div class="item-text"><strong>Ferramentas genéricas</strong> não entendem o comportamento específico do seu negócio</div>
+            </div>
+            <div class="item">
+              <div class="item-num">4</div>
+              <div class="item-text"><strong>Custo e complexidade</strong> de construir infra própria de agentes</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gains -->
+        <div class="segment role-gains">
+          <div class="seg-header">
+            <div class="seg-dot"></div>
+            Gains — o que deseja conquistar
+          </div>
+          <div class="seg-body">
+            <div class="item">
+              <div class="item-num">1</div>
+              <div class="item-text"><strong>Agente que lembra</strong> o que já foi decidido e evolui</div>
+            </div>
+            <div class="item">
+              <div class="item-num">2</div>
+              <div class="item-text"><strong>Orquestração automática</strong> sem código extra</div>
+            </div>
+            <div class="item">
+              <div class="item-num">3</div>
+              <div class="item-text"><strong>Personalidade calibrada</strong> para o contexto do negócio</div>
+            </div>
+            <div class="item">
+              <div class="item-num">4</div>
+              <div class="item-text"><strong>Time pequeno</strong> com capacidade de time de 10×</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- RIGHT: Value Map -->
+    <div class="vpc-col vpc-right">
+      <div class="vpc-col-header">
+        <div class="col-icon">💎</div>
+        <div>
+          <div class="col-title">Value Map</div>
+          <div class="col-sub">O que o Forja entrega</div>
+        </div>
+      </div>
+
+      <div class="vpc-segments">
+
+        <!-- Products / Services -->
+        <div class="segment role-prods">
+          <div class="seg-header">
+            <div class="seg-dot"></div>
+            Products &amp; Services
+          </div>
+          <div class="prod-chips">
+            <span class="chip chip-purple">Ayla Orquestradora</span>
+            <span class="chip chip-blue">15 Agentes Olimpo</span>
+            <span class="chip chip-amber">Memória Episódica Neon</span>
+            <span class="chip chip-purple">DISC / Eneagrama</span>
+            <span class="chip chip-blue">CLI + Mobile + Web</span>
+            <span class="chip chip-green">Veto Hierarchy</span>
+          </div>
+        </div>
+
+        <!-- Pain Relievers -->
+        <div class="segment role-reliev">
+          <div class="seg-header">
+            <div class="seg-dot"></div>
+            Pain Relievers — alivia as dores
+          </div>
+          <div class="seg-body">
+            <div class="item">
+              <div class="item-num">1</div>
+              <div class="item-text"><strong>Memória episódica:</strong> zero re-explicação, contexto persiste entre sessões</div>
+            </div>
+            <div class="item">
+              <div class="item-num">2</div>
+              <div class="item-text"><strong>invoke_agent / orchestrate:</strong> orquestração sem código</div>
+            </div>
+            <div class="item">
+              <div class="item-num">3</div>
+              <div class="item-text"><strong>Personas calibradas:</strong> agente adapta comportamento ao perfil do usuário</div>
+            </div>
+            <div class="item">
+              <div class="item-num">4</div>
+              <div class="item-text"><strong>AaaS gerenciado:</strong> infraestrutura zero, só usar</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Gain Creators -->
+        <div class="segment role-creat">
+          <div class="seg-header">
+            <div class="seg-dot"></div>
+            Gain Creators — amplifica ganhos
+          </div>
+          <div class="seg-body">
+            <div class="item">
+              <div class="item-num">1</div>
+              <div class="item-text"><strong>Recall instantâneo</strong> de decisões e aprendizados anteriores</div>
+            </div>
+            <div class="item">
+              <div class="item-num">2</div>
+              <div class="item-text"><strong>15 especialistas</strong> disponíveis em paralelo sob demanda</div>
+            </div>
+            <div class="item">
+              <div class="item-num">3</div>
+              <div class="item-text"><strong>Calibração comportamental contínua</strong> (DISC/Eneagrama)</div>
+            </div>
+            <div class="item">
+              <div class="item-num">4</div>
+              <div class="item-text"><strong>Veto hierarchy:</strong> controle fino sem complexidade de IAM</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 02 PRODUCT-MARKET FIT -->
+  <div class="section-label">02 · Product-Market Fit</div>
+  <div class="fit-section">
+    <div class="fit-grid">
+
+      <div class="fit-col">
+        <div class="fit-col-header">
+          <div class="status-dot" style="background:var(--green)"></div>
+          <div>
+            <div class="fit-title" style="color:var(--green)">FIT confirmado</div>
+            <div class="fit-hint">Value ↔ Pain match já entregue</div>
+          </div>
+        </div>
+        <div class="fit-items">
+          <div class="fit-item">
+            <div class="fit-left">Memória episódica</div>
+            <div class="fit-arrow fit-green-arrow">↔</div>
+            <div class="fit-right">"tempo perdido re-explicando contexto"</div>
+          </div>
+          <div class="fit-item">
+            <div class="fit-left">Orquestração nativa</div>
+            <div class="fit-arrow fit-green-arrow">↔</div>
+            <div class="fit-right">"complexidade para time pequeno"</div>
+          </div>
+          <div class="fit-item">
+            <div class="fit-left">Personas DISC/Eneagrama</div>
+            <div class="fit-arrow fit-green-arrow">↔</div>
+            <div class="fit-right">"ferramentas genéricas não entendem meu negócio"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="fit-col">
+        <div class="fit-col-header">
+          <div class="status-dot" style="background:var(--amber)"></div>
+          <div>
+            <div class="fit-title" style="color:var(--amber)">Q3 Foundation</div>
+            <div class="fit-hint">Ainda não entregue — bloqueia escala</div>
+          </div>
+        </div>
+        <div class="fit-items">
+          <div class="fit-item">
+            <div class="fit-left">PLG / self-serve</div>
+            <div class="fit-arrow fit-amber-arrow">→</div>
+            <div class="fit-right">usuário ativa sem contato humano</div>
+          </div>
+          <div class="fit-item">
+            <div class="fit-left">Stripe / billing automático</div>
+            <div class="fit-arrow fit-amber-arrow">→</div>
+            <div class="fit-right">receita recorrente sem fricção manual</div>
+          </div>
+          <div class="fit-item">
+            <div class="fit-left">Onboarding automatizado</div>
+            <div class="fit-arrow fit-amber-arrow">→</div>
+            <div class="fit-right">time-to-value &lt; 5 min para novo usuário</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- 03 ICP SPLIT -->
+  <div class="section-label">03 · ICP Split</div>
+  <div class="icp-section">
+    <div class="icp-grid">
+
+      <div class="icp-card">
+        <div class="icp-card-header">
+          <div>
+            <div class="icp-card-title">ICP Hoje</div>
+            <div class="icp-card-sub">Founder Técnico solo/dupla</div>
+          </div>
+          <span class="icp-status status-green">Validado (N=1 ext)</span>
+        </div>
+        <div class="icp-rows">
+          <div class="icp-row">
+            <span class="icp-row-key">Perfil</span>
+            <span class="icp-row-val">Founder Técnico solo/dupla</span>
+          </div>
+          <div class="icp-row">
+            <span class="icp-row-key">Estágio</span>
+            <span class="icp-row-val">Pré-seed a Seed</span>
+          </div>
+          <div class="icp-row">
+            <span class="icp-row-key">Contexto</span>
+            <span class="icp-row-val">Build ativo</span>
+          </div>
+          <div class="icp-row">
+            <span class="icp-row-key">Ticket estimado</span>
+            <span class="icp-row-val" style="color:var(--green)">R$ 99 – 300/mês</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="icp-card">
+        <div class="icp-card-header">
+          <div>
+            <div class="icp-card-title">ICP Target</div>
+            <div class="icp-card-sub">CTO / VP Eng · Series A-B</div>
+          </div>
+          <span class="icp-status status-amber">Hypothesis — Q3+</span>
+        </div>
+        <div class="icp-rows">
+          <div class="icp-row">
+            <span class="icp-row-key">Perfil</span>
+            <span class="icp-row-val">CTO / VP Engineering</span>
+          </div>
+          <div class="icp-row">
+            <span class="icp-row-key">Estágio</span>
+            <span class="icp-row-val">Series A – B</span>
+          </div>
+          <div class="icp-row">
+            <span class="icp-row-key">Team size</span>
+            <span class="icp-row-val">5 – 15 devs</span>
+          </div>
+          <div class="icp-row">
+            <span class="icp-row-key">Ticket estimado</span>
+            <span class="icp-row-val" style="color:var(--amber)">R$ 500 – 2.000/mês</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <span class="footer-text">LavitaCode · Forja · Value Proposition Canvas · 2026</span>
+  <span class="footer-brand">FORJA</span>
+</footer>
+
+</body>
+</html>
