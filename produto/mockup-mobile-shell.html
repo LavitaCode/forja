@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forja — Mobile Shell (aprovado)</title>
+  <link rel="icon" type="image/svg+xml" href="../identidade/forja-logo.svg">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:      #020617;
+      --surface: #0f172a;
+      --border:  #1e293b;
+      --border2: #334155;
+      --text:    #e2e8f0;
+      --muted:   #64748b;
+      --muted2:  #475569;
+      --orange:  #f97316;
+      --orange2: #ea580c;
+    }
+
+    body {
+      background: #111827;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 32px 16px 48px;
+      gap: 40px;
+      min-height: 100vh;
+    }
+
+    /* ═══════════════════════════════════════════
+       DEMO LABEL
+    ═══════════════════════════════════════════ */
+    .demo-label {
+      color: #475569; font-size: 11px; font-weight: 700;
+      letter-spacing: .1em; text-transform: uppercase;
+      text-align: center;
+    }
+
+    /* ═══════════════════════════════════════════
+       PHONE FRAME
+    ═══════════════════════════════════════════ */
+    .phones-row {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .phone-wrap { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+    .phone-title { font-size: 11px; font-weight: 700; color: #475569; letter-spacing: .08em; text-transform: uppercase; }
+
+    .phone {
+      width: 375px;
+      background: var(--bg);
+      border-radius: 44px;
+      border: 6px solid #1e293b;
+      box-shadow: 0 0 0 1px #334155, 0 24px 60px #00000088;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    /* status bar */
+    .status-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 14px 24px 6px;
+      font-size: 12px; font-weight: 700; color: #f1f5f9;
+      flex-shrink: 0;
+    }
+    .status-time { font-size: 15px; font-weight: 800; }
+    .status-icons { display: flex; gap: 5px; align-items: center; font-size: 11px; }
+
+    /* topbar */
+    .topbar {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 20px 10px;
+      flex-shrink: 0;
+    }
+    .topbar-logo {
+      width: 28px; height: 28px; border-radius: 7px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 13px; color: #fff; flex-shrink: 0;
+    }
+    .topbar-name { font-weight: 800; font-size: 16px; color: #f1f5f9; }
+    .topbar-chip {
+      font-size: 9px; font-weight: 800; padding: 2px 7px;
+      border-radius: 10px; background: #1e3a5f; color: #7dd3fc;
+    }
+    .topbar-chip.run { background: #052e16; color: #4ade80; }
+    .topbar-right { margin-left: auto; display: flex; gap: 8px; align-items: center; }
+    .topbar-ec2 { font-size: 10px; color: var(--muted); display: flex; align-items: center; gap: 4px; }
+    .topbar-logout { font-size: 16px; color: var(--muted2); }
+
+    /* scroll content */
+    .scroll-area { flex: 1; overflow-y: auto; padding: 0 0 80px; }
+    .scroll-area::-webkit-scrollbar { display: none; }
+
+    /* ── BOTTOM TAB BAR ── */
+    .tab-bar {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      background: #080f1e;
+      border-top: 1px solid var(--border);
+      display: flex;
+      padding: 8px 0 20px;
+      z-index: 50;
+    }
+    .tab {
+      flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px;
+      cursor: pointer;
+    }
+    .tab-icon { font-size: 20px; line-height: 1; }
+    .tab-label { font-size: 9.5px; font-weight: 600; color: var(--muted2); }
+    .tab.active .tab-label { color: var(--orange); }
+    .tab.active .tab-icon { filter: drop-shadow(0 0 4px #f9731688); }
+
+    /* FAB */
+    .fab {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; color: #fff;
+      box-shadow: 0 0 20px #f9731660;
+      margin-top: -14px;
+      flex-shrink: 0;
+    }
+
+    /* ════════════════════════════════
+       COMPONENTS
+    ════════════════════════════════ */
+    .section-pad { padding: 14px 16px 0; }
+
+    /* uso bar */
+    .uso-card {
+      margin: 10px 16px 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 12px 14px;
+    }
+    .uso-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .uso-title { font-size: 11px; font-weight: 700; color: #f1f5f9; }
+    .uso-reset { font-size: 9.5px; color: var(--muted); }
+    .uso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+    .uso-label { font-size: 10px; color: var(--muted); min-width: 52px; }
+    .uso-track { flex: 1; height: 5px; background: #1e293b; border-radius: 3px; overflow: hidden; }
+    .uso-fill { height: 100%; border-radius: 3px; }
+    .uso-fill.ok   { background: linear-gradient(90deg, #34d399, #22d3ee); }
+    .uso-fill.warn { background: linear-gradient(90deg, #fbbf24, #f97316); }
+    .uso-fill.red  { background: #dc2626; }
+
+    /* stats */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;
+      margin: 10px 16px 0;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 12px 10px; text-align: center;
+    }
+    .stat-val { font-size: 22px; font-weight: 800; color: #f1f5f9; line-height: 1; }
+    .stat-label { font-size: 8.5px; color: var(--muted); letter-spacing: .05em; text-transform: uppercase; margin-top: 4px; }
+
+    /* ayla card */
+    .ayla-card {
+      margin: 10px 16px 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .ayla-avatar {
+      width: 42px; height: 42px; border-radius: 50%; flex-shrink: 0;
+      background: linear-gradient(135deg, #06b6d4, #0891b2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; font-weight: 800; color: #fff;
+      box-shadow: 0 0 12px #22d3ee44;
+    }
+    .ayla-name { font-weight: 700; font-size: 14px; color: #f1f5f9; }
+    .ayla-role { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .ayla-badge { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 2px; }
+    .ayla-count { font-size: 22px; font-weight: 800; color: #f1f5f9; line-height: 1; }
+    .ayla-sub { font-size: 9px; color: var(--muted); }
+
+    /* section title */
+    .sec-title {
+      font-size: 13px; font-weight: 700; color: #f1f5f9;
+      display: flex; align-items: center; gap: 6px;
+      padding: 14px 16px 6px;
+    }
+    .badge-count {
+      background: var(--orange); color: #fff;
+      font-size: 9px; font-weight: 800;
+      padding: 1px 6px; border-radius: 10px;
+    }
+    .badge-live { background: #7f1d1d; color: #fca5a5; font-size: 8px; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+
+    /* exec list */
+    .exec-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; border-bottom: 1px solid #1e293b33;
+    }
+    .exec-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .exec-dot.ok   { background: #4ade80; }
+    .exec-dot.run  { background: #7dd3fc; box-shadow: 0 0 5px #7dd3fc88; }
+    .exec-dot.wait { background: #fbbf24; }
+    .exec-text { flex: 1; min-width: 0; }
+    .exec-branch { font-family: monospace; font-size: 11px; color: #e2e8f0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .exec-meta { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .chip-xs {
+      font-size: 9px; font-weight: 700; padding: 2px 7px; border-radius: 4px; flex-shrink: 0;
+    }
+    .chip-ok   { background: #052e16; color: #4ade80; }
+    .chip-run  { background: #1e3a5f; color: #7dd3fc; }
+    .chip-wait { background: #2d1b00; color: #fbbf24; }
+    .chip-fail { background: #450a0a; color: #f87171; }
+
+    /* ════════════════════════════════
+       CODE PANEL — sub-tabs scroll
+    ════════════════════════════════ */
+    .cp-tabs-scroll {
+      display: flex; gap: 0; overflow-x: auto; padding: 0 16px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .cp-tabs-scroll::-webkit-scrollbar { display: none; }
+    .cpt {
+      padding: 10px 14px; font-size: 11px; font-weight: 600;
+      color: var(--muted2); white-space: nowrap; cursor: pointer;
+      border-bottom: 2px solid transparent; flex-shrink: 0;
+    }
+    .cpt.active { color: #f1f5f9; border-bottom-color: var(--orange); font-weight: 700; }
+
+    /* drift alert mobile */
+    .drift-alert-m {
+      margin: 10px 16px 0;
+      border-radius: 10px; padding: 12px 14px;
+      display: flex; gap: 10px;
+    }
+    .drift-alert-m.red  { background: #1a0a0a; border: 1px solid #7f1d1d; }
+    .drift-alert-m.warn { background: #1a1200; border: 1px solid #78350f; }
+    .drift-alert-m.info { background: #0a1628; border: 1px solid #1e3a5f; }
+    .da-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .da-title { font-size: 12px; font-weight: 700; margin-bottom: 2px; }
+    .drift-alert-m.red  .da-title { color: #f87171; }
+    .drift-alert-m.warn .da-title { color: #fbbf24; }
+    .drift-alert-m.info .da-title { color: #7dd3fc; }
+    .da-desc { font-size: 10.5px; line-height: 1.5; }
+    .drift-alert-m.red  .da-desc { color: #fca5a5; }
+    .drift-alert-m.warn .da-desc { color: #fde68a; }
+    .drift-alert-m.info .da-desc { color: #bae6fd; }
+
+    /* pipeline stepper mobile */
+    .pipeline-stepper {
+      margin: 10px 16px 0;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 14px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .ps-step { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .ps-circle {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; font-size: 14px;
+    }
+    .ps-circle.ok   { background: #052e16; border: 2px solid #4ade80; }
+    .ps-circle.act  { background: #1a1206; border: 2px solid #f97316; }
+    .ps-circle.wait { background: #0f172a; border: 2px solid #334155; }
+    .ps-label { font-size: 9px; font-weight: 700; }
+    .ps-label.ok   { color: #4ade80; }
+    .ps-label.act  { color: #f97316; }
+    .ps-label.wait { color: var(--muted2); }
+    .ps-line { flex: 1; height: 2px; background: var(--border); margin: 0 4px; margin-bottom: 16px; }
+    .ps-line.done { background: linear-gradient(90deg, #4ade80, #22d3ee); }
+
+    /* pr card mobile */
+    .pr-card {
+      margin: 10px 16px 0;
+      background: var(--surface); border: 1px solid #1e3a5f;
+      border-radius: 12px; overflow: hidden;
+    }
+    .pr-card-head { padding: 12px 14px; border-bottom: 1px solid var(--border); }
+    .pr-card-title { font-size: 12px; font-weight: 700; color: #f1f5f9; margin-bottom: 3px; }
+    .pr-card-meta { font-size: 10px; color: var(--muted); }
+    .pr-card-body { padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+    .auditor-row { display: flex; align-items: center; gap: 8px; }
+    .aud-av {
+      width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 8px; font-weight: 800; color: #fff;
+    }
+    .aud-name { font-size: 11px; color: #cbd5e1; flex: 1; }
+    .pr-actions { display: flex; gap: 8px; padding: 0 14px 14px; }
+    .pr-btn {
+      flex: 1; padding: 9px 0; border-radius: 8px; border: none;
+      font-size: 11px; font-weight: 700; cursor: pointer; text-align: center;
+    }
+    .pr-btn.ok     { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; }
+    .pr-btn.reject { background: #7f1d1d; color: #fca5a5; }
+    .pr-btn.copy   { background: #1e293b; color: #94a3b8; border: 1px solid var(--border2); }
+
+    /* chat mobile */
+    .agent-list { padding: 0 8px; }
+    .agent-row {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 8px; border-radius: 8px; cursor: pointer;
+    }
+    .agent-row:active { background: #1e293b55; }
+    .agent-row.active { background: #1e293b; }
+    .ag-avatar {
+      width: 36px; height: 36px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 800; color: #fff;
+    }
+    .ag-name { font-size: 13px; color: var(--text); font-weight: 600; flex: 1; }
+    .ag-dot { width: 7px; height: 7px; border-radius: 50%; }
+
+    /* limit screen */
+    .limit-body {
+      flex: 1; display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 32px 20px; gap: 16px; text-align: center;
+    }
+    .limit-icon { font-size: 44px; }
+    .limit-title { font-size: 18px; font-weight: 800; color: #f87171; }
+    .limit-desc { font-size: 12px; color: #fca5a5; line-height: 1.6; }
+    .limit-bar-wrap { width: 100%; }
+    .limit-bar-track { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; }
+    .limit-bar-fill { height: 100%; background: #dc2626; width: 100%; border-radius: 4px; }
+    .limit-bar-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 5px; }
+    .limit-reset { font-size: 11px; color: var(--muted); }
+    .limit-reset strong { color: #f1f5f9; }
+    .limit-cta-pro {
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #f97316, #ea580c); color: #fff;
+      border-radius: 12px; border: none; font-size: 14px; font-weight: 800;
+      cursor: pointer; box-shadow: 0 0 20px #f9731640;
+    }
+    .limit-cta-wait {
+      width: 100%; padding: 12px;
+      background: #1e293b; color: #94a3b8;
+      border-radius: 12px; border: 1px solid var(--border2);
+      font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+
+    /* move item */
+    .move-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 16px; border-bottom: 1px solid #1e293b33;
+    }
+    .move-type { flex-shrink: 0; }
+    .move-desc { flex: 1; font-size: 12px; color: #cbd5e1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .move-time { font-size: 10px; color: var(--muted); flex-shrink: 0; }
+
+    /* diff */
+    pre.diff-m {
+      font-size: 10.5px; line-height: 1.65; font-family: 'SF Mono','Fira Code',monospace;
+      padding: 14px 16px; overflow-x: auto; white-space: pre;
+    }
+    .diff-add { color: #4ade80; }
+    .diff-rem { color: #f87171; }
+    .diff-ctx { color: var(--muted2); }
+
+    /* bottom action bar */
+    .action-bar {
+      position: absolute; bottom: 72px; left: 0; right: 0;
+      padding: 8px 16px;
+      display: flex; gap: 8px;
+    }
+    .action-bar button {
+      flex: 1; padding: 10px; border-radius: 9px; border: none;
+      font-size: 11px; font-weight: 700; cursor: pointer;
+    }
+    .action-bar .ab-ok     { background: linear-gradient(135deg,#f97316,#ea580c); color:#fff; }
+    .action-bar .ab-reject { background: #7f1d1d; color:#fca5a5; }
+    .action-bar .ab-ghost  { background: #1e293b; color:#94a3b8; border: 1px solid var(--border2); }
+
+    /* chat input fixed */
+    .chat-input-bar {
+      position: absolute; bottom: 72px; left: 0; right: 0;
+      padding: 8px 12px;
+      display: flex; gap: 8px; align-items: center;
+      background: var(--bg); border-top: 1px solid var(--border);
+    }
+    .chat-input-m {
+      flex: 1; background: #1e293b; border: 1px solid var(--border2);
+      border-radius: 20px; padding: 9px 14px; color: var(--text);
+      font-size: 13px; outline: none;
+    }
+    .chat-input-m::placeholder { color: var(--muted2); }
+    .chat-send-m {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: linear-gradient(135deg,#f97316,#ea580c);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; color: #fff; flex-shrink: 0;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="demo-label">Forja — Mobile Shell · Aprovado · 375px</div>
+
+  <div class="phones-row">
+
+    <!-- ══════════════════════════════════
+         PHONE 1 — HOME / COCKPIT
+    ══════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-title">🏠 Home / Cockpit</div>
+      <div class="phone" style="height:780px;">
+        <div class="status-bar">
+          <span class="status-time">09:41</span>
+          <span class="status-icons">▲ ◆ 100%</span>
+        </div>
+
+        <div class="topbar">
+          <div class="topbar-logo">F</div>
+          <span class="topbar-name">Forja</span>
+          <span class="topbar-chip run">0 em execução</span>
+          <div class="topbar-right">
+            <span class="topbar-ec2">☁ EC2</span>
+            <span class="topbar-logout">↪</span>
+          </div>
+        </div>
+
+        <div class="scroll-area">
+          <!-- barra de uso -->
+          <div class="uso-card">
+            <div class="uso-head">
+              <span class="uso-title">⚡ Uso de hoje</span>
+              <span class="uso-reset">Reseta à meia-noite</span>
+            </div>
+            <div class="uso-row">
+              <span class="uso-label">Geral</span>
+              <div class="uso-track"><div class="uso-fill ok" style="width:42%"></div></div>
+            </div>
+            <div class="uso-row">
+              <span class="uso-label">Sonnet</span>
+              <div class="uso-track"><div class="uso-fill warn" style="width:78%"></div></div>
+            </div>
+          </div>
+
+          <!-- stats -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-val" style="color:#fbbf24;">0</div>
+              <div class="stat-label">Rodando</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" style="color:#fb923c;">0</div>
+              <div class="stat-label">Reviews</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-val" style="color:#4ade80;">0</div>
+              <div class="stat-label">Merged</div>
+            </div>
+          </div>
+
+          <!-- ayla card -->
+          <div class="ayla-card">
+            <div class="ayla-avatar">A</div>
+            <div>
+              <div class="ayla-name">Ayla</div>
+              <div class="ayla-role">Produtora Operacional</div>
+            </div>
+            <div class="ayla-badge">
+              <div class="ayla-count">0</div>
+              <div class="ayla-sub">em execução</div>
+            </div>
+          </div>
+
+          <!-- execuções -->
+          <div class="sec-title">
+            ⚡ Execuções Ativas
+            <span class="badge-count">34</span>
+            <span class="badge-live" style="margin-left:2px;">ao vivo</span>
+          </div>
+
+          <div class="exec-item">
+            <div class="exec-dot run"></div>
+            <div class="exec-text">
+              <div class="exec-branch">feat/auth-refresh</div>
+              <div class="exec-meta">Apolo · sistema · há 4 min</div>
+            </div>
+            <span class="chip-xs chip-run">rodando</span>
+          </div>
+          <div class="exec-item">
+            <div class="exec-dot wait"></div>
+            <div class="exec-text">
+              <div class="exec-branch">fix/session-ttl</div>
+              <div class="exec-meta">Hermes · sistema · há 12 min</div>
+            </div>
+            <span class="chip-xs chip-wait">aguard.</span>
+          </div>
+          <div class="exec-item">
+            <div class="exec-dot ok"></div>
+            <div class="exec-text">
+              <div class="exec-branch">chore/cleanup-branches</div>
+              <div class="exec-meta">sistema · há 18 min</div>
+            </div>
+            <span class="chip-xs chip-ok">concluído</span>
+          </div>
+          <div class="exec-item">
+            <div class="exec-dot ok"></div>
+            <div class="exec-text">
+              <div class="exec-branch">ping recebido. Artemis de pé...</div>
+              <div class="exec-meta">sistema · há 23 min</div>
+            </div>
+            <span class="chip-xs chip-ok">concluído</span>
+          </div>
+          <div class="exec-item">
+            <div class="exec-dot ok"></div>
+            <div class="exec-text">
+              <div class="exec-branch">pong. Handoff recebido da Ayla</div>
+              <div class="exec-meta">sistema · há 24 min</div>
+            </div>
+            <span class="chip-xs chip-ok">concluído</span>
+          </div>
+        </div>
+
+        <!-- tab bar -->
+        <div class="tab-bar">
+          <div class="tab active">
+            <span class="tab-icon">🏠</span>
+            <span class="tab-label" style="color:var(--orange);">Home</span>
+          </div>
+          <div class="tab">
+            <span class="tab-icon">🖥️</span>
+            <span class="tab-label">Code Panel</span>
+          </div>
+          <div class="tab" style="flex:0 0 64px;">
+            <div class="fab">⚡</div>
+            <span class="tab-label" style="margin-top:2px;">Disparar</span>
+          </div>
+          <div class="tab">
+            <span class="tab-icon">⚔️</span>
+            <span class="tab-label">War Room</span>
+          </div>
+          <div class="tab">
+            <span class="tab-icon">···</span>
+            <span class="tab-label">Mais</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PHONE 2 — CODE PANEL · DRIFT
+    ══════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-title">🖥️ Code Panel — Drift</div>
+      <div class="phone" style="height:780px;">
+        <div class="status-bar">
+          <span class="status-time">09:41</span>
+          <span class="status-icons">▲ ◆ 100%</span>
+        </div>
+
+        <div class="topbar">
+          <div class="topbar-logo">F</div>
+          <span class="topbar-name">Code Panel</span>
+          <div class="topbar-right">
+            <span style="font-size:11px;color:#f87171;font-weight:700;">3 drifts ⚠️</span>
+          </div>
+        </div>
+
+        <!-- sub-tabs scroll horizontal -->
+        <div class="cp-tabs-scroll">
+          <div class="cpt active">⚠️ Drift</div>
+          <div class="cpt">🚀 Pipeline</div>
+          <div class="cpt">📦 Movim.</div>
+          <div class="cpt">🔍 Reviews</div>
+          <div class="cpt">📄 Diff</div>
+        </div>
+
+        <div class="scroll-area">
+          <div class="drift-alert-m red">
+            <div class="da-icon">🔴</div>
+            <div>
+              <div class="da-title">Drift lockfile — deploy bloqueado</div>
+              <div class="da-desc"><code>package-lock.json</code> v0.4.28 → v0.5.0. Hermes detectou.</div>
+            </div>
+          </div>
+          <div class="drift-alert-m warn">
+            <div class="da-icon">🟡</div>
+            <div>
+              <div class="da-title">Schema — coluna agent_tier ausente</div>
+              <div class="da-desc">Migration 0071 no Neon, não refletida no prisma.schema.</div>
+            </div>
+          </div>
+          <div class="drift-alert-m info">
+            <div class="da-icon">🔵</div>
+            <div>
+              <div class="da-title">2 envs ausentes no EC2</div>
+              <div class="da-desc">VAULT_KEY e ORCHESTRATE_ENABLED em .env.local mas não no servidor.</div>
+            </div>
+          </div>
+
+          <div style="height:80px;"></div>
+        </div>
+
+        <div class="action-bar">
+          <button class="ab-ok">▶ npm install</button>
+          <button class="ab-ghost">📋 Relatório</button>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab"><span class="tab-icon">🏠</span><span class="tab-label">Home</span></div>
+          <div class="tab active"><span class="tab-icon">🖥️</span><span class="tab-label" style="color:var(--orange);">Code Panel</span></div>
+          <div class="tab" style="flex:0 0 64px;"><div class="fab">⚡</div><span class="tab-label" style="margin-top:2px;">Disparar</span></div>
+          <div class="tab"><span class="tab-icon">⚔️</span><span class="tab-label">War Room</span></div>
+          <div class="tab"><span class="tab-icon">···</span><span class="tab-label">Mais</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PHONE 3 — CODE PANEL · PIPELINE
+    ══════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-title">🚀 Code Panel — Pipeline</div>
+      <div class="phone" style="height:780px;">
+        <div class="status-bar">
+          <span class="status-time">09:41</span>
+          <span class="status-icons">▲ ◆ 100%</span>
+        </div>
+        <div class="topbar">
+          <div class="topbar-logo">F</div>
+          <span class="topbar-name">Code Panel</span>
+        </div>
+
+        <div class="cp-tabs-scroll">
+          <div class="cpt">⚠️ Drift</div>
+          <div class="cpt active">🚀 Pipeline</div>
+          <div class="cpt">📦 Movim.</div>
+          <div class="cpt">🔍 Reviews</div>
+          <div class="cpt">📄 Diff</div>
+        </div>
+
+        <div class="scroll-area">
+          <!-- stepper -->
+          <div class="pipeline-stepper">
+            <div class="ps-step">
+              <div class="ps-circle ok">✅</div>
+              <span class="ps-label ok">Commit</span>
+            </div>
+            <div class="ps-line done"></div>
+            <div class="ps-step">
+              <div class="ps-circle ok">✅</div>
+              <span class="ps-label ok">Push</span>
+            </div>
+            <div class="ps-line" style="background:linear-gradient(90deg,#22d3ee,#f97316);"></div>
+            <div class="ps-step">
+              <div class="ps-circle act">🔄</div>
+              <span class="ps-label act">PR</span>
+            </div>
+            <div class="ps-line"></div>
+            <div class="ps-step">
+              <div class="ps-circle wait">⏳</div>
+              <span class="ps-label wait">Merge</span>
+            </div>
+          </div>
+
+          <!-- PR card -->
+          <div class="pr-card">
+            <div class="pr-card-head">
+              <div class="pr-card-title">#871 — feat(billing): token counter Free</div>
+              <div class="pr-card-meta">olimpo/feat/billing-token → main · Artemis · 14 min</div>
+            </div>
+            <div class="pr-card-body">
+              <div style="font-size:10px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;">Auditoria</div>
+              <div class="auditor-row">
+                <div class="aud-av" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">A</div>
+                <span class="aud-name">Atena — impacto arquitetural</span>
+                <span class="chip-xs chip-run">analisando</span>
+              </div>
+              <div class="auditor-row">
+                <div class="aud-av" style="background:linear-gradient(135deg,#34d399,#059669);">A</div>
+                <span class="aud-name">Apolo — testes e regressão</span>
+                <span class="chip-xs chip-ok">PASS</span>
+              </div>
+            </div>
+          </div>
+          <div class="pr-actions" style="padding:8px 16px;">
+            <button class="pr-btn ok">✓ Aprovar e Merge</button>
+            <button class="pr-btn reject">✗</button>
+            <button class="pr-btn copy" style="flex:0 0 36px;">📋</button>
+          </div>
+
+          <!-- histórico -->
+          <div class="sec-title" style="padding-top:8px;">Histórico</div>
+          <div class="move-item">
+            <span class="move-type"><span class="chip-xs chip-ok">merge</span></span>
+            <span class="move-desc">fix/auth-refresh → main</span>
+            <span class="move-time">1h</span>
+          </div>
+          <div class="move-item">
+            <span class="move-type"><span class="chip-xs chip-ok">push</span></span>
+            <span class="move-desc">olimpo/feat/billing-token</span>
+            <span class="move-time">14m</span>
+          </div>
+          <div class="move-item">
+            <span class="move-type"><span class="chip-xs chip-ok">commit</span></span>
+            <span class="move-desc">feat: token counter dual profile</span>
+            <span class="move-time">16m</span>
+          </div>
+          <div style="height:80px;"></div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab"><span class="tab-icon">🏠</span><span class="tab-label">Home</span></div>
+          <div class="tab active"><span class="tab-icon">🖥️</span><span class="tab-label" style="color:var(--orange);">Code Panel</span></div>
+          <div class="tab" style="flex:0 0 64px;"><div class="fab">⚡</div><span class="tab-label" style="margin-top:2px;">Disparar</span></div>
+          <div class="tab"><span class="tab-icon">⚔️</span><span class="tab-label">War Room</span></div>
+          <div class="tab"><span class="tab-icon">···</span><span class="tab-label">Mais</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PHONE 4 — CHAT
+    ══════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-title">💬 Chat — Agentes</div>
+      <div class="phone" style="height:780px;">
+        <div class="status-bar">
+          <span class="status-time">09:41</span>
+          <span class="status-icons">▲ ◆ 100%</span>
+        </div>
+        <div class="topbar">
+          <div class="topbar-logo">F</div>
+          <span class="topbar-name">Chat</span>
+          <div class="topbar-right">
+            <span style="color:var(--muted);font-size:16px;">🔍</span>
+            <span style="color:var(--muted);font-size:16px;">✏️</span>
+          </div>
+        </div>
+
+        <div class="scroll-area" style="padding-bottom:120px;">
+          <div style="padding:10px 16px 4px;font-size:9.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;">Canais</div>
+          <div class="agent-row">
+            <div style="width:36px;height:36px;border-radius:8px;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:14px;">🔒</div>
+            <span style="font-size:13px;color:var(--text);font-weight:600;">engenharia</span>
+          </div>
+          <div class="agent-row">
+            <div style="width:36px;height:36px;border-radius:8px;background:#1e293b;display:flex;align-items:center;justify-content:center;font-size:14px;">#</div>
+            <span style="font-size:13px;color:var(--text);font-weight:600;">social</span>
+          </div>
+
+          <div style="padding:10px 16px 4px;font-size:9.5px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.08em;">Direto — Agentes</div>
+          <div class="agent-list">
+            <div class="agent-row active">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#06b6d4,#0891b2);">A</div>
+              <span class="ag-name">@Ayla</span>
+              <div class="ag-dot" style="background:#22d3ee;box-shadow:0 0 5px #22d3ee88;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#f472b6,#ec4899);">A</div>
+              <span class="ag-name">@Artemis</span>
+              <div class="ag-dot" style="background:#f472b6;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">A</div>
+              <span class="ag-name">@Atena</span>
+              <div class="ag-dot" style="background:#a78bfa;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#34d399,#059669);">A</div>
+              <span class="ag-name">@Apolo</span>
+              <div class="ag-dot" style="background:#34d399;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#f9a8d4,#db2777);">A</div>
+              <span class="ag-name">@Afrodite</span>
+              <div class="ag-dot" style="background:#f9a8d4;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#fbbf24,#d97706);">H</div>
+              <span class="ag-name">@Hermes</span>
+              <div class="ag-dot" style="background:#f97316;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#c084fc,#9333ea);">H</div>
+              <span class="ag-name">@Hera</span>
+              <div class="ag-dot" style="background:#c084fc;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#67e8f9,#0891b2);">Í</div>
+              <span class="ag-name">@Íris</span>
+              <div class="ag-dot" style="background:#fb923c;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#67e8f9,#0284c7);">Q</div>
+              <span class="ag-name">@Quíron</span>
+              <div class="ag-dot" style="background:#67e8f9;"></div>
+            </div>
+            <div class="agent-row">
+              <div class="ag-avatar" style="background:linear-gradient(135deg,#86efac,#16a34a);">G</div>
+              <span class="ag-name">@Gaia</span>
+              <div class="ag-dot" style="background:#86efac;"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="chat-input-bar">
+          <input class="chat-input-m" type="text" placeholder="Mensagem para Ayla…">
+          <div class="chat-send-m">➤</div>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab"><span class="tab-icon">🏠</span><span class="tab-label">Home</span></div>
+          <div class="tab"><span class="tab-icon">🖥️</span><span class="tab-label">Code Panel</span></div>
+          <div class="tab" style="flex:0 0 64px;"><div class="fab">⚡</div><span class="tab-label" style="margin-top:2px;">Disparar</span></div>
+          <div class="tab active"><span class="tab-icon">💬</span><span class="tab-label" style="color:var(--orange);">Chat</span></div>
+          <div class="tab"><span class="tab-icon">···</span><span class="tab-label">Mais</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══════════════════════════════════
+         PHONE 5 — LIMITE ATINGIDO
+    ══════════════════════════════════ -->
+    <div class="phone-wrap">
+      <div class="phone-title">🔴 Limite Atingido</div>
+      <div class="phone" style="height:780px;">
+        <div class="status-bar">
+          <span class="status-time">09:41</span>
+          <span class="status-icons">▲ ◆ 100%</span>
+        </div>
+        <div class="topbar">
+          <div class="topbar-logo">F</div>
+          <span class="topbar-name">Home</span>
+        </div>
+
+        <div class="limit-body">
+          <div class="limit-icon">⚡</div>
+          <div class="limit-title">Limite diário atingido</div>
+          <div class="limit-desc">Você usou toda a sua cota de hoje. Reseta à meia-noite — ou sobe pro Pro agora.</div>
+          <div class="limit-bar-wrap">
+            <div class="limit-bar-label"><span>Uso de hoje</span><span>100%</span></div>
+            <div class="limit-bar-track"><div class="limit-bar-fill"></div></div>
+          </div>
+          <div class="limit-reset">Próximo reset: <strong>00:00 UTC-3</strong></div>
+          <button class="limit-cta-pro">⚡ Assinar o Pro — R$99/mês</button>
+          <button class="limit-cta-wait">Esperar o reset (grátis)</button>
+        </div>
+
+        <div class="tab-bar">
+          <div class="tab active"><span class="tab-icon">🏠</span><span class="tab-label" style="color:var(--orange);">Home</span></div>
+          <div class="tab"><span class="tab-icon">🖥️</span><span class="tab-label">Code Panel</span></div>
+          <div class="tab" style="flex:0 0 64px;"><div class="fab" style="opacity:.4;">⚡</div><span class="tab-label" style="margin-top:2px;">Disparar</span></div>
+          <div class="tab"><span class="tab-icon">⚔️</span><span class="tab-label">War Room</span></div>
+          <div class="tab"><span class="tab-icon">···</span><span class="tab-label">Mais</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /phones-row -->
+
+</body>
+</html>
