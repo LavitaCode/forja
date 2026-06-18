@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Lavita Code — Proposta de Sociedade · Dev</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg:      #020617;
+      --card:    #0f172a;
+      --border:  #1e293b;
+      --subtle:  #334155;
+      --amber:   #f59e0b;
+      --amber-bg: rgba(245,158,11,0.08);
+      --amber-b:  rgba(245,158,11,0.28);
+      --orange:  #f97316;
+      --orange-bg: rgba(249,115,22,0.08);
+      --orange-b:  rgba(249,115,22,0.28);
+      --blue:    #3b82f6;
+      --blue-bg: rgba(59,130,246,0.08);
+      --blue-b:  rgba(59,130,246,0.28);
+      --verde:   #22c55e;
+      --verde-bg: rgba(34,197,94,0.08);
+      --verde-b:  rgba(34,197,94,0.28);
+      --roxo:    #8b5cf6;
+      --roxo-bg: rgba(139,92,246,0.08);
+      --roxo-b:  rgba(139,92,246,0.28);
+      --red:     #ef4444;
+      --text:    #e2e8f0;
+      --muted:   #64748b;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      line-height: 1.6;
+      padding: 2rem 1rem 6rem;
+    }
+    .deck { max-width: 900px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
+
+    /* SLIDE */
+    .slide {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 2.5rem 2.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+    .slide::before {
+      content: ''; position: absolute; inset: 0 0 auto 0; height: 3px;
+      background: linear-gradient(90deg, var(--amber) 0%, transparent 70%);
+    }
+    .slide.orange::before { background: linear-gradient(90deg, var(--orange) 0%, transparent 70%); }
+    .slide.blue::before   { background: linear-gradient(90deg, var(--blue)   0%, transparent 70%); }
+    .slide.verde::before  { background: linear-gradient(90deg, var(--verde)  0%, transparent 70%); }
+    .slide.roxo::before   { background: linear-gradient(90deg, var(--roxo)   0%, transparent 70%); }
+
+    /* SLIDE HEADER */
+    .sh { display: flex; align-items: center; gap: 0.65rem; margin-bottom: 1.75rem; }
+    .chip {
+      font-size: 0.6rem; font-weight: 700; letter-spacing: 0.12em;
+      padding: 0.25rem 0.65rem; border-radius: 4px; border: 1px solid;
+    }
+    .chip.amber  { color: var(--amber);  background: var(--amber-bg);  border-color: var(--amber-b); }
+    .chip.orange { color: var(--orange); background: var(--orange-bg); border-color: var(--orange-b); }
+    .chip.blue   { color: var(--blue);   background: var(--blue-bg);   border-color: var(--blue-b); }
+    .chip.verde  { color: var(--verde);  background: var(--verde-bg);  border-color: var(--verde-b); }
+    .chip.roxo   { color: var(--roxo);   background: var(--roxo-bg);   border-color: var(--roxo-b); }
+    .sh-label { font-size: 0.7rem; font-weight: 600; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; }
+
+    /* TYPE */
+    h1 { font-size: 2.5rem; font-weight: 900; line-height: 1.1; }
+    h2 { font-size: 1.65rem; font-weight: 800; line-height: 1.2; margin-bottom: 0.5rem; }
+    h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.3rem; }
+    p  { color: #94a3b8; font-size: 0.95rem; }
+    .muted { color: var(--muted); font-size: 0.82rem; }
+
+    /* HERO */
+    .badge {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      background: var(--orange-bg); border: 1px solid var(--orange-b);
+      color: var(--orange); font-size: 0.75rem; font-weight: 700;
+      padding: 0.35rem 1rem; border-radius: 99px; margin-bottom: 1.25rem; letter-spacing: 0.06em;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--orange); }
+    .hero-sub { font-size: 1.1rem; color: #94a3b8; margin-top: 0.75rem; max-width: 600px; line-height: 1.7; }
+    .hero-stats { display: flex; gap: 2.5rem; flex-wrap: wrap; margin-top: 2rem; }
+    .hs-val { font-size: 1.9rem; font-weight: 900; }
+    .hs-lbl { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+
+    /* GRID */
+    .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+    .g3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+    .g4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 0.85rem; }
+    @media(max-width:640px) { .g2,.g3,.g4 { grid-template-columns: 1fr; } }
+
+    /* CARD */
+    .c {
+      background: #080f1f; border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.2rem 1.4rem;
+    }
+    .c-icon { font-size: 1.5rem; margin-bottom: 0.5rem; }
+    .c h3 { font-size: 0.95rem; }
+    .c p { font-size: 0.83rem; color: #64748b; }
+    .c .val { font-size: 1.35rem; font-weight: 800; margin-top: 0.5rem; }
+
+    /* URGENCY */
+    .urgency {
+      background: rgba(239,68,68,0.07); border: 1px solid rgba(239,68,68,0.25);
+      border-radius: 10px; padding: 1rem 1.25rem;
+      display: flex; align-items: center; gap: 1rem; margin-bottom: 1.75rem;
+    }
+    .urgency-txt { font-size: 0.95rem; color: #fca5a5; font-weight: 600; }
+    .urgency-txt strong { color: var(--red); }
+
+    /* MOAT TABLE */
+    .moat-row {
+      display: grid; grid-template-columns: 1fr 1fr 1fr;
+      gap: 0; border-bottom: 1px solid var(--border); padding: 0.65rem 0;
+    }
+    .moat-row:last-child { border-bottom: none; }
+    .moat-head { font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; padding-bottom: 0.5rem; }
+    .moat-cell { font-size: 0.85rem; color: #94a3b8; padding-right: 1rem; }
+    .moat-cell.x { color: #ef4444; }
+    .moat-cell.ok { color: var(--verde); font-weight: 600; }
+
+    /* SCREEN PREVIEW */
+    .screens-wrap {
+      margin-top: 1.5rem;
+      background: #060d1a;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+    .screens-label {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.12em;
+      color: var(--muted); text-transform: uppercase;
+      padding: 0.6rem 1rem; border-bottom: 1px solid var(--border);
+      background: #08111f;
+    }
+    .screens-body { padding: 1.5rem; display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: flex-start; justify-content: center; }
+
+    /* DESKTOP MOCKUP */
+    .desktop-frame {
+      background: #000; border-radius: 10px 10px 6px 6px;
+      border: 1px solid #2a3a52; width: 100%; max-width: 520px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+    }
+    .desktop-bar {
+      background: #0a0a0a; padding: 8px 12px; border-radius: 10px 10px 0 0;
+      display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #1a2744;
+    }
+    .wb { width: 9px; height: 9px; border-radius: 50%; }
+    .wb.r { background: #ff5f57; }
+    .wb.y { background: #febc2e; }
+    .wb.g { background: #28c840; }
+    .desktop-screen {
+      background: var(--bg); display: flex; height: 340px; overflow: hidden;
+    }
+    /* desktop sidebar */
+    .ds-nav {
+      width: 52px; background: #050d1a; border-right: 1px solid #0f1e38;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 12px 0; gap: 6px; flex-shrink: 0;
+    }
+    .ds-logo {
+      width: 30px; height: 30px; background: var(--orange);
+      border-radius: 8px; margin-bottom: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 12px; color: #fff;
+    }
+    .ds-ni {
+      width: 34px; height: 34px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; color: var(--muted); cursor: pointer;
+    }
+    .ds-ni.active { background: rgba(249,115,22,0.15); color: var(--orange); }
+    /* agent list */
+    .ds-agents {
+      width: 200px; background: #060e1f; border-right: 1px solid #0f1e38;
+      display: flex; flex-direction: column; flex-shrink: 0; overflow: hidden;
+    }
+    .ds-agents-h {
+      font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--muted);
+      text-transform: uppercase; padding: 10px 12px 6px;
+    }
+    .ds-agent {
+      padding: 7px 12px; display: flex; align-items: center; gap: 8px;
+      cursor: pointer; border-bottom: 1px solid #0a1628;
+    }
+    .ds-agent.active { background: rgba(249,115,22,0.08); }
+    .ds-a-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+    .ds-a-name { font-size: 11px; color: #94a3b8; flex: 1; }
+    .ds-a-name.active { color: var(--text); font-weight: 600; }
+    .ds-a-role { font-size: 9px; color: var(--muted); }
+    /* chat area */
+    .ds-chat { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .ds-chat-h {
+      padding: 10px 14px; border-bottom: 1px solid #0f1e38;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ds-chat-h .title { font-size: 12px; font-weight: 700; }
+    .ds-chat-h .sub { font-size: 10px; color: var(--muted); }
+    .ds-msgs { flex: 1; padding: 12px 14px; display: flex; flex-direction: column; gap: 10px; overflow: hidden; }
+    .msg { display: flex; gap: 8px; align-items: flex-start; }
+    .msg-av {
+      width: 24px; height: 24px; border-radius: 6px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700;
+    }
+    .msg-body { flex: 1; }
+    .msg-name { font-size: 10px; font-weight: 700; margin-bottom: 2px; }
+    .msg-txt { font-size: 11px; color: #94a3b8; line-height: 1.5; }
+    .msg-txt .hl { color: var(--orange); font-weight: 600; }
+    .msg-txt .code {
+      background: #0a1628; border: 1px solid #1e293b; border-radius: 4px;
+      padding: 6px 8px; font-family: 'SF Mono', monospace; font-size: 10px;
+      color: #7dd3fc; display: block; margin-top: 4px;
+    }
+    .ds-input {
+      padding: 8px 12px; border-top: 1px solid #0f1e38;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .ds-input-box {
+      flex: 1; background: #0a1628; border: 1px solid #1e293b;
+      border-radius: 8px; padding: 6px 10px; font-size: 11px; color: #64748b;
+    }
+    .ds-send {
+      width: 28px; height: 28px; background: var(--orange); border-radius: 7px;
+      display: flex; align-items: center; justify-content: center; font-size: 12px;
+    }
+
+    /* MOBILE MOCKUP */
+    .mobile-frame {
+      width: 220px; flex-shrink: 0;
+      background: var(--bg); border-radius: 32px;
+      border: 6px solid #1a2744;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+      overflow: hidden; position: relative;
+    }
+    .mobile-notch {
+      width: 80px; height: 22px; background: #000;
+      border-radius: 0 0 14px 14px;
+      margin: 0 auto 0; position: relative; z-index: 2;
+    }
+    .mobile-screen { padding: 0; }
+    .m-header {
+      background: #050d1a; border-bottom: 1px solid #0f1e38;
+      padding: 10px 14px 8px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .m-logo { display: flex; align-items: center; gap: 6px; }
+    .m-logo-box {
+      width: 22px; height: 22px; background: var(--orange);
+      border-radius: 6px; display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 900; color: #fff;
+    }
+    .m-logo-txt { font-size: 12px; font-weight: 800; color: var(--text); }
+    .m-avatar { width: 24px; height: 24px; border-radius: 50%; background: var(--orange); font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; color: #fff; }
+    .m-agents-scroll {
+      padding: 8px 10px; display: flex; gap: 7px; overflow-x: auto;
+      border-bottom: 1px solid #0f1e38;
+    }
+    .m-agents-scroll::-webkit-scrollbar { display: none; }
+    .m-agent-chip {
+      flex-shrink: 0; padding: 4px 8px; border-radius: 99px;
+      font-size: 9px; font-weight: 600; border: 1px solid;
+      display: flex; align-items: center; gap: 4px; cursor: pointer;
+    }
+    .m-agent-chip.active { background: rgba(249,115,22,0.15); color: var(--orange); border-color: var(--orange-b); }
+    .m-agent-chip.idle { color: var(--muted); border-color: #1e293b; background: transparent; }
+    .m-agent-dot { width: 5px; height: 5px; border-radius: 50%; }
+    .m-chat { padding: 10px; display: flex; flex-direction: column; gap: 8px; min-height: 240px; }
+    .m-msg { display: flex; gap: 6px; align-items: flex-start; }
+    .m-av { width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 8px; font-weight: 700; }
+    .m-body { flex: 1; }
+    .m-name { font-size: 8.5px; font-weight: 700; margin-bottom: 2px; }
+    .m-txt { font-size: 9.5px; color: #94a3b8; line-height: 1.5; }
+    .m-txt .hl { color: var(--orange); font-weight: 600; }
+    .m-bubble {
+      background: rgba(249,115,22,0.08); border: 1px solid var(--orange-b);
+      border-radius: 10px 10px 10px 3px; padding: 6px 8px; font-size: 10px;
+      color: #fdba74; line-height: 1.5; align-self: flex-start; max-width: 85%;
+    }
+    .m-user-bubble {
+      background: rgba(59,130,246,0.12); border: 1px solid rgba(59,130,246,0.3);
+      border-radius: 10px 10px 3px 10px; padding: 6px 8px; font-size: 9.5px;
+      color: #93c5fd; align-self: flex-end; max-width: 80%; margin-left: auto;
+    }
+    .m-input-row {
+      padding: 8px 10px; border-top: 1px solid #0f1e38;
+      display: flex; gap: 6px; align-items: center;
+    }
+    .m-input-box {
+      flex: 1; background: #0a1628; border: 1px solid #1e293b;
+      border-radius: 20px; padding: 5px 10px; font-size: 9.5px; color: #64748b;
+    }
+    .m-send-btn {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--orange); display: flex; align-items: center; justify-content: center; font-size: 10px;
+    }
+    .m-navbar {
+      background: #050d1a; border-top: 1px solid #0f1e38;
+      padding: 8px 0 12px; display: flex; justify-content: space-around;
+    }
+    .m-nb-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 8px; color: var(--muted); }
+    .m-nb-item.active { color: var(--orange); }
+    .m-nb-icon { font-size: 14px; }
+
+    /* PRODUTO LIST */
+    .prod-row {
+      background: #080f1f; border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.1rem 1.4rem;
+      display: grid; grid-template-columns: 2rem 1fr auto; gap: 1rem; align-items: center;
+    }
+    .prod-row + .prod-row { margin-top: 0.65rem; }
+    .prod-icon { font-size: 1.4rem; }
+    .prod-name { font-size: 0.95rem; font-weight: 700; }
+    .prod-desc { font-size: 0.8rem; color: #64748b; }
+    .prod-val { font-size: 0.9rem; font-weight: 800; color: var(--verde); white-space: nowrap; text-align: right; }
+    .prod-stake { font-size: 0.7rem; color: var(--muted); }
+
+    /* VALUATION */
+    .val-box {
+      background: #080f1f; border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.1rem 1.4rem; margin-top: 0.75rem;
+    }
+    .val-box h3 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.1em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.75rem; }
+    .val-row { display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid #0f1e38; }
+    .val-row:last-child { border-bottom: none; }
+    .val-row .lbl { font-size: 0.88rem; color: #94a3b8; }
+    .val-row .v   { font-size: 0.88rem; font-weight: 700; }
+
+    /* CAP TABLE */
+    .cap-row { display: flex; align-items: center; gap: 1rem; padding: 0.7rem 0; border-bottom: 1px solid #0f1e38; }
+    .cap-row:last-child { border-bottom: none; }
+    .cap-av { width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0; }
+    .cap-info { flex: 1; }
+    .cap-name { font-size: 0.9rem; font-weight: 600; }
+    .cap-role { font-size: 0.72rem; color: var(--muted); }
+    .cap-bar-wrap { flex: 2; display: flex; align-items: center; gap: 0.65rem; }
+    .cap-bar-bg { flex: 1; background: var(--subtle); border-radius: 99px; height: 5px; }
+    .cap-bar { height: 5px; border-radius: 99px; }
+    .cap-pct { font-size: 0.9rem; font-weight: 800; width: 38px; text-align: right; }
+
+    /* DEAL */
+    .deal-g { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; margin-top: 0.5rem; }
+    .deal-c {
+      background: #080f1f; border: 1px solid var(--border);
+      border-radius: 12px; padding: 1.25rem; text-align: center; position: relative; overflow: hidden;
+    }
+    .deal-c.rec { border-color: var(--verde-b); }
+    .deal-c.rec::after {
+      content: 'SUGERIDO'; position: absolute; top: 0.55rem; right: -1.9rem;
+      background: var(--verde); color: #020617; font-size: 0.5rem; font-weight: 800;
+      padding: 0.15rem 2.2rem; transform: rotate(35deg); letter-spacing: 0.08em;
+    }
+    .deal-pct { font-size: 2rem; font-weight: 900; color: var(--amber); }
+    .deal-eq  { font-size: 0.9rem; font-weight: 700; color: var(--verde); margin: 0.3rem 0; }
+    .deal-sub { font-size: 0.75rem; color: var(--muted); }
+
+    /* TIMELINE */
+    .tl-item { display: grid; grid-template-columns: 80px 1fr; gap: 1rem; }
+    .tl-item + .tl-item { margin-top: 0; }
+    .tl-l { text-align: right; padding-top: 0.1rem; }
+    .tl-week { font-size: 0.68rem; font-weight: 700; color: var(--orange); letter-spacing: 0.08em; }
+    .tl-date { font-size: 0.68rem; color: var(--muted); }
+    .tl-r { border-left: 2px solid var(--border); padding: 0 0 1.5rem 1.25rem; position: relative; }
+    .tl-r::before { content: ''; position: absolute; left: -5px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--orange); border: 2px solid var(--bg); }
+    .tl-r.v::before { background: var(--verde); }
+    .tl-r.b::before { background: var(--blue); }
+    .tl-r.r::before { background: var(--roxo); }
+    .tl-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 0.3rem; }
+    .tl-li { font-size: 0.82rem; color: #64748b; padding: 0.15rem 0 0.15rem 0.75rem; position: relative; }
+    .tl-li::before { content: '·'; position: absolute; left: 0; color: var(--muted); }
+
+    /* ROLE */
+    .role-box { background: #080f1f; border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; }
+    .role-box h3 { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; color: var(--muted); text-transform: uppercase; margin-bottom: 0.75rem; }
+    .ri { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.3rem 0; border-bottom: 1px solid #0f1e38; }
+    .ri:last-child { border-bottom: none; }
+    .ri-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--verde); margin-top: 0.45rem; flex-shrink: 0; }
+    .ri-dot.o { background: var(--orange); }
+    .ri span { font-size: 0.85rem; color: #94a3b8; }
+
+    /* NOTE */
+    .note {
+      background: var(--amber-bg); border-left: 3px solid var(--amber);
+      padding: 0.75rem 1rem; border-radius: 0 8px 8px 0;
+      font-size: 0.83rem; color: #94a3b8; margin-top: 1rem;
+    }
+    .note.orange { background: var(--orange-bg); border-color: var(--orange); }
+
+    /* DIVIDER */
+    hr { border: none; border-top: 1px solid var(--border); margin: 1.5rem 0; }
+
+    /* TAG */
+    .tag {
+      display: inline-block; font-size: 0.62rem; font-weight: 600;
+      padding: 0.18rem 0.55rem; border-radius: 99px; border: 1px solid;
+    }
+    .tag.o { color: var(--orange); border-color: var(--orange-b); background: var(--orange-bg); }
+    .tag.g { color: var(--verde);  border-color: var(--verde-b);  background: var(--verde-bg); }
+    .tag.b { color: var(--blue);   border-color: var(--blue-b);   background: var(--blue-bg); }
+    .tag.m { color: var(--muted);  border-color: var(--subtle);   background: transparent; }
+
+    /* CTA */
+    .cta {
+      background: linear-gradient(135deg, rgba(249,115,22,0.07) 0%, rgba(245,158,11,0.05) 100%);
+      border: 1px solid var(--orange-b); border-radius: 14px; padding: 2rem; text-align: center;
+    }
+    .cta h2 { font-size: 1.6rem; }
+    .cta p { margin-top: 0.5rem; }
+  </style>
+</head>
+<body>
+<div class="deck">
+
+  <!-- ══ 01 CAPA ══ -->
+  <div class="slide orange">
+    <div class="badge"><div class="badge-dot"></div>PROPOSTA CONFIDENCIAL · JUN 2026 · LAVITA CODE</div>
+    <h1>Entra no chão de fábrica.<br><span style="color:var(--orange)">Cresce junto.</span></h1>
+    <p class="hero-sub">Uma oportunidade de entrar como sócia antes do go-to-market — sem salário fixo, com participação real numa holding de IA que vai ao ar em 14 dias.</p>
+    <div class="hero-stats">
+      <div><div class="hs-val" style="color:var(--orange)">14 dias</div><div class="hs-lbl">até o Forja ir ao ar</div></div>
+      <div><div class="hs-val" style="color:var(--amber)">R$12–14M</div><div class="hs-lbl">valuation pre-money estimado</div></div>
+      <div><div class="hs-val" style="color:var(--verde)">5 produtos</div><div class="hs-lbl">em portfólio ativo</div></div>
+      <div><div class="hs-val" style="color:var(--roxo)">1–5%</div><div class="hs-lbl">equity a negociar</div></div>
+    </div>
+  </div>
+
+  <!-- ══ 02 URGÊNCIA + CONTEXTO ══ -->
+  <div class="slide blue">
+    <div class="sh"><span class="chip blue">02</span><span class="sh-label">Por que agora</span></div>
+    <h2>2 semanas para o Forja ir ao ar</h2>
+
+    <div class="urgency">
+      <span style="font-size:1.4rem">⚡</span>
+      <div class="urgency-txt">Deadline: <strong>Forja em produção em 14 dias.</strong> O produto está pronto. Falta o sprint final — precisamos de mais uma mão no código agora.</div>
+    </div>
+
+    <div class="g2">
+      <div class="c">
+        <div class="c-icon">🔨</div>
+        <h3>Forja v0.5.0 — funciona hoje</h3>
+        <p>Agentes orquestram, memória persiste, CLI publicado. Falta o sprint final de polish + self-serve + billing para go-to-market público.</p>
+        <div class="val" style="color:var(--orange)">Go-live: Jul 2026</div>
+      </div>
+      <div class="c">
+        <div class="c-icon">🧠</div>
+        <h3>Motor: Olimpo Platform</h3>
+        <p>15 agentes especializados rodando em produção. NestJS + Angular/Ionic + Neon + AWS Bedrock. Arquitetura validada e congelada.</p>
+        <div class="val" style="color:var(--blue)">Em produção</div>
+      </div>
+      <div class="c">
+        <div class="c-icon">👥</div>
+        <h3>Time hoje</h3>
+        <p>Rafael (tech lead + fundador) e Mari (produto + co-fundadora). Time enxuto — cada pessoa multiplica impacto.</p>
+        <div class="val" style="color:var(--verde)">2 pessoas</div>
+      </div>
+      <div class="c">
+        <div class="c-icon">💎</div>
+        <h3>Modelo de entrada</h3>
+        <p>Sem salário fixo no início. Compensação via equity — você entra como sócia desde o dia 1 e cresce junto com o negócio.</p>
+        <div class="val" style="color:var(--roxo)">Equity first</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 03 FORJA — PRODUTO PRINCIPAL ══ -->
+  <div class="slide orange">
+    <div class="sh"><span class="chip orange">03</span><span class="sh-label">Produto principal · foco imediato</span></div>
+    <h2>Forja — Agent-as-a-Service</h2>
+    <p style="margin-bottom:0.5rem; font-size:1rem; color:#cbd5e1; font-style:italic">"Stop building agents. Start using the best one."</p>
+    <p style="margin-bottom:1.5rem">Forja entrega o ecossistema Olimpo para devs sem overhead de infra. Você não constrói um orquestrador — você usa o nosso.</p>
+
+    <div class="g3" style="margin-bottom:1.5rem">
+      <div class="c">
+        <div class="c-icon">🗂️</div>
+        <h3>Memória episódica nativa</h3>
+        <p>Contexto cross-sessão persistente no Neon. Agente lembra decisões, arquitetura, histórico — não apenas a conversa atual.</p>
+      </div>
+      <div class="c">
+        <div class="c-icon">🧬</div>
+        <h3>Personas psicométricas</h3>
+        <p>Calibração DISC/Eneagrama por agente. Não é prompt engineering genérico — é comportamento real e evolutivo.</p>
+      </div>
+      <div class="c">
+        <div class="c-icon">🛡️</div>
+        <h3>Veto hierarchy</h3>
+        <p>Decisões críticas requerem aprovação humana. Não autonomia cega — orquestração com controle.</p>
+      </div>
+    </div>
+
+    <!-- MOAT TABLE -->
+    <div style="background:#080f1f;border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem">
+      <div class="moat-row">
+        <div class="moat-head">Alternativa</div>
+        <div class="moat-head">Problema</div>
+        <div class="moat-head">Forja resolve</div>
+      </div>
+      <div class="moat-row">
+        <div class="moat-cell">ChatGPT / Claude</div>
+        <div class="moat-cell x">❌ Zero memória cross-sessão</div>
+        <div class="moat-cell ok">✅ Memória episódica nativa</div>
+      </div>
+      <div class="moat-row">
+        <div class="moat-cell">Cursor / Copilot</div>
+        <div class="moat-cell x">❌ Contexto limitado ao editor</div>
+        <div class="moat-cell ok">✅ Multi-agente (code+docs+decisões)</div>
+      </div>
+      <div class="moat-row">
+        <div class="moat-cell">Replit Agent</div>
+        <div class="moat-cell x">❌ Stateless, sem memória</div>
+        <div class="moat-cell ok">✅ Memória + psicometria + veto</div>
+      </div>
+      <div class="moat-row">
+        <div class="moat-cell">LangChain / CrewAI</div>
+        <div class="moat-cell x">❌ Framework — você constrói tudo</div>
+        <div class="moat-cell ok">✅ Produto pronto out-of-the-box</div>
+      </div>
+      <div class="moat-row">
+        <div class="moat-cell" style="color:var(--verde);font-weight:600">Concorrentes BR</div>
+        <div class="moat-cell" style="color:var(--verde)">—</div>
+        <div class="moat-cell ok">✅ Nenhum identificado (Jun 2026)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 03b POSICIONAMENTO ══ -->
+  <div class="slide orange">
+    <div class="sh"><span class="chip orange">03b</span><span class="sh-label">Posicionamento de mercado</span></div>
+    <h2>Onde o Forja se encaixa</h2>
+    <p style="margin-bottom:1.5rem">Dois eixos definem o mercado de ferramentas IA para devs: <strong style="color:#e2e8f0">Memória</strong> (stateless vs persistente) e <strong style="color:#e2e8f0">Escopo</strong> (editor vs orquestração completa). O Forja é o único produto no quadrante certo.</p>
+
+    <!-- MATRIZ 2x2 -->
+    <div style="background:#080f1f;border:1px solid var(--border);border-radius:14px;padding:1.5rem;margin-bottom:1.25rem">
+      <div style="display:grid;grid-template-columns:40px 1fr 1fr;grid-template-rows:1fr 1fr 32px;gap:0;height:320px">
+
+        <!-- label eixo Y -->
+        <div style="grid-column:1;grid-row:1/3;display:flex;align-items:center;justify-content:center">
+          <span style="writing-mode:vertical-rl;transform:rotate(180deg);font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase">MEMÓRIA</span>
+        </div>
+
+        <!-- Q1: persistente + orquestração = FORJA -->
+        <div style="grid-column:2;grid-row:1;background:rgba(249,115,22,0.08);border:2px solid var(--orange-b);border-radius:10px 0 0 0;padding:1rem;display:flex;flex-direction:column;justify-content:space-between;position:relative;overflow:hidden">
+          <div style="position:absolute;top:0.5rem;right:0.5rem;font-size:0.55rem;font-weight:800;background:var(--orange);color:#000;padding:0.15rem 0.5rem;border-radius:4px;letter-spacing:0.08em">FORJA AQUI</div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:0.4rem">PERSISTENTE · ORQUESTRAÇÃO</div>
+            <div style="font-size:1.1rem;font-weight:900;color:var(--orange)">🔨 Forja</div>
+            <div style="font-size:0.75rem;color:#94a3b8;margin-top:0.3rem">Memória cross-sessão + 15 agentes + veto hierarchy</div>
+          </div>
+          <div style="font-size:0.7rem;color:var(--orange);font-weight:600">← Blue Ocean BR</div>
+        </div>
+
+        <!-- Q2: persistente + editor -->
+        <div style="grid-column:3;grid-row:1;background:#060d1a;border:1px solid #0f1e38;border-radius:0 10px 0 0;padding:1rem;display:flex;flex-direction:column;justify-content:space-between">
+          <div>
+            <div style="font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:0.4rem">PERSISTENTE · EDITOR</div>
+            <div style="font-size:0.85rem;font-weight:700;color:#64748b">Vazio</div>
+            <div style="font-size:0.72rem;color:#475569;margin-top:0.3rem">Nenhum player consolidado neste quadrante</div>
+          </div>
+          <div style="font-size:0.65rem;color:#334155">próxima expansão natural</div>
+        </div>
+
+        <!-- Q3: stateless + orquestração -->
+        <div style="grid-column:2;grid-row:2;background:#060d1a;border:1px solid #0f1e38;border-radius:0 0 0 10px;padding:1rem;display:flex;flex-direction:column;justify-content:space-between">
+          <div>
+            <div style="font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:0.4rem">STATELESS · ORQUESTRAÇÃO</div>
+            <div style="font-size:0.82rem;font-weight:700;color:#64748b">LangChain · CrewAI · n8n</div>
+            <div style="font-size:0.72rem;color:#475569;margin-top:0.3rem">Frameworks — você constrói tudo do zero</div>
+          </div>
+          <div style="font-size:0.65rem;color:#ef4444">alta fricção de entrada</div>
+        </div>
+
+        <!-- Q4: stateless + editor -->
+        <div style="grid-column:3;grid-row:2;background:#060d1a;border:1px solid #0f1e38;border-radius:0 0 10px 0;padding:1rem;display:flex;flex-direction:column;justify-content:space-between">
+          <div>
+            <div style="font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:0.4rem">STATELESS · EDITOR</div>
+            <div style="font-size:0.82rem;font-weight:700;color:#64748b">Cursor · Copilot · Replit</div>
+            <div style="font-size:0.72rem;color:#475569;margin-top:0.3rem">Contexto morre ao fechar a aba</div>
+          </div>
+          <div style="font-size:0.65rem;color:#ef4444">mercado lotado, sem diferencial</div>
+        </div>
+
+        <!-- eixo X labels -->
+        <div style="grid-column:1/4;grid-row:3;display:grid;grid-template-columns:40px 1fr 1fr;align-items:center;padding-top:6px">
+          <div></div>
+          <div style="text-align:center;font-size:0.62rem;font-weight:700;color:var(--orange);letter-spacing:0.08em;text-transform:uppercase">ORQUESTRAÇÃO COMPLETA</div>
+          <div style="text-align:center;font-size:0.62rem;font-weight:700;color:var(--muted);letter-spacing:0.08em;text-transform:uppercase">FOCO EM EDITOR</div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:0.75rem;font-size:0.72rem;color:var(--muted)">Eixo X: escopo de atuação &nbsp;·&nbsp; Eixo Y: capacidade de memória</div>
+    </div>
+
+    <!-- TABELA COMPARATIVA -->
+    <div style="background:#080f1f;border:1px solid var(--border);border-radius:12px;overflow:hidden">
+      <div style="display:grid;grid-template-columns:1.2fr repeat(5,1fr);background:#060d1a;border-bottom:1px solid var(--border)">
+        <div style="padding:0.65rem 1rem;font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.08em">Produto</div>
+        <div style="padding:0.65rem 0.5rem;font-size:0.65rem;font-weight:700;color:var(--orange);text-transform:uppercase;letter-spacing:0.06em;text-align:center">Forja</div>
+        <div style="padding:0.65rem 0.5rem;font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;text-align:center">Cursor</div>
+        <div style="padding:0.65rem 0.5rem;font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;text-align:center">Copilot</div>
+        <div style="padding:0.65rem 0.5rem;font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;text-align:center">LangChain</div>
+        <div style="padding:0.65rem 0.5rem;font-size:0.65rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.06em;text-align:center">Replit</div>
+      </div>
+
+      <!-- rows -->
+      <div style="display:grid;grid-template-columns:1.2fr repeat(5,1fr);border-bottom:1px solid #0a1628;align-items:center">
+        <div style="padding:0.6rem 1rem;font-size:0.82rem;color:#94a3b8">Memória cross-sessão</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr repeat(5,1fr);border-bottom:1px solid #0a1628;align-items:center">
+        <div style="padding:0.6rem 1rem;font-size:0.82rem;color:#94a3b8">Multi-agente especializado</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">⚠️ DIY</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr repeat(5,1fr);border-bottom:1px solid #0a1628;align-items:center">
+        <div style="padding:0.6rem 1rem;font-size:0.82rem;color:#94a3b8">Produto pronto (zero config)</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr repeat(5,1fr);border-bottom:1px solid #0a1628;align-items:center">
+        <div style="padding:0.6rem 1rem;font-size:0.82rem;color:#94a3b8">Personas psicométricas</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr repeat(5,1fr);border-bottom:1px solid #0a1628;align-items:center">
+        <div style="padding:0.6rem 1rem;font-size:0.82rem;color:#94a3b8">Mobile nativo</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">⚠️ beta</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr repeat(5,1fr);border-bottom:1px solid #0a1628;align-items:center">
+        <div style="padding:0.6rem 1rem;font-size:0.82rem;color:#94a3b8">Veto hierarchy</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">✅</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">⚠️ manual</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.85rem">❌</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1.2fr repeat(5,1fr);align-items:center">
+        <div style="padding:0.6rem 1rem;font-size:0.82rem;color:#94a3b8">Concorrente BR direto</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.75rem;color:var(--verde);font-weight:700">ÚNICO</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.75rem;color:#ef4444">Global</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.75rem;color:#ef4444">Global</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.75rem;color:#ef4444">Global</div>
+        <div style="padding:0.6rem 0.5rem;text-align:center;font-size:0.75rem;color:#ef4444">Global</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 04 PRODUTO — SCREENS ══ -->
+  <div class="slide orange">
+    <div class="sh"><span class="chip orange">04</span><span class="sh-label">Produto · telas reais</span></div>
+    <h2>Como fica na tela</h2>
+    <p style="margin-bottom:0.25rem">O que você vai ver quando abrir o Forja — desktop e mobile. Produto funcional hoje.</p>
+
+    <div class="screens-wrap">
+      <div class="screens-label" style="display:flex;justify-content:space-between;align-items:center">
+        <span>✦ mockups aprovados · interface real Forja v0.5</span>
+        <span style="display:flex;gap:0.75rem">
+          <a href="mockup-app-shell.html" target="_blank" style="font-size:0.65rem;font-weight:700;color:var(--orange);background:rgba(249,115,22,0.1);border:1px solid rgba(249,115,22,0.3);padding:0.25rem 0.75rem;border-radius:6px;text-decoration:none;letter-spacing:0.06em">↗ ABRIR DESKTOP</a>
+          <a href="mockup-mobile-shell.html" target="_blank" style="font-size:0.65rem;font-weight:700;color:var(--blue);background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.3);padding:0.25rem 0.75rem;border-radius:6px;text-decoration:none;letter-spacing:0.06em">↗ ABRIR MOBILE</a>
+        </span>
+      </div>
+      <div class="screens-body">
+
+        <!-- DESKTOP -->
+        <div class="desktop-frame" style="flex:1;min-width:300px">
+          <div class="desktop-bar">
+            <div class="wb r"></div><div class="wb y"></div><div class="wb g"></div>
+            <span style="font-size:10px;color:#475569;margin-left:8px">forja.dev — Workspace · Lucas</span>
+          </div>
+          <div class="desktop-screen">
+            <!-- sidebar icons -->
+            <div class="ds-nav">
+              <div class="ds-logo">F</div>
+              <div class="ds-ni active">💬</div>
+              <div class="ds-ni">🔨</div>
+              <div class="ds-ni">📁</div>
+              <div class="ds-ni">⚙️</div>
+            </div>
+            <!-- agent list -->
+            <div class="ds-agents">
+              <div class="ds-agents-h">Agentes Online</div>
+              <div class="ds-agent active">
+                <div class="ds-a-dot" style="background:#f97316"></div>
+                <div><div class="ds-a-name active">Atena</div><div class="ds-a-role">Arquitetura</div></div>
+              </div>
+              <div class="ds-agent">
+                <div class="ds-a-dot" style="background:#22c55e"></div>
+                <div><div class="ds-a-name">Apolo</div><div class="ds-a-role">QA · Testes</div></div>
+              </div>
+              <div class="ds-agent">
+                <div class="ds-a-dot" style="background:#3b82f6"></div>
+                <div><div class="ds-a-name">Hermes</div><div class="ds-a-role">Infra · Deploy</div></div>
+              </div>
+              <div class="ds-agent">
+                <div class="ds-a-dot" style="background:#8b5cf6"></div>
+                <div><div class="ds-a-name">Afrodite</div><div class="ds-a-role">Produto · UX</div></div>
+              </div>
+              <div class="ds-agent">
+                <div class="ds-a-dot" style="background:#06b6d4"></div>
+                <div><div class="ds-a-name">Gaia</div><div class="ds-a-role">Docs · ADRs</div></div>
+              </div>
+              <div class="ds-agent">
+                <div class="ds-a-dot" style="background:#f59e0b"></div>
+                <div><div class="ds-a-name">Íris</div><div class="ds-a-role">Design</div></div>
+              </div>
+            </div>
+            <!-- chat -->
+            <div class="ds-chat">
+              <div class="ds-chat-h">
+                <div class="ds-a-dot" style="background:#f97316;width:8px;height:8px;border-radius:50%"></div>
+                <div><div class="title">Atena</div><div class="sub">Arquitetura · lembra 12 sessões</div></div>
+              </div>
+              <div class="ds-msgs">
+                <div class="msg">
+                  <div class="msg-av" style="background:rgba(249,115,22,0.15);color:#f97316">A</div>
+                  <div class="msg-body">
+                    <div class="msg-name" style="color:#f97316">Atena</div>
+                    <div class="msg-txt">Lembro da última sessão — você estava migrando o <span class="hl">auth para JWT ES256</span>. O endpoint <code style="background:#0a1628;border-radius:3px;padding:1px 4px;font-size:10px;color:#7dd3fc">/api/auth/login</code> ainda usa o role antigo.</div>
+                  </div>
+                </div>
+                <div class="msg">
+                  <div class="msg-av" style="background:rgba(59,130,246,0.15);color:#3b82f6">L</div>
+                  <div class="msg-body">
+                    <div class="msg-name" style="color:#3b82f6">Lucas</div>
+                    <div class="msg-txt">Como resolvo isso sem quebrar o mobile?</div>
+                  </div>
+                </div>
+                <div class="msg">
+                  <div class="msg-av" style="background:rgba(249,115,22,0.15);color:#f97316">A</div>
+                  <div class="msg-body">
+                    <div class="msg-name" style="color:#f97316">Atena</div>
+                    <div class="msg-txt"><span class="hl">Invocar Hermes para revisar o deploy</span> antes de mergear.
+                      <span class="code">olimpo invoke hermes --review auth-migration</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="ds-input">
+                <div class="ds-input-box">Pergunte à Atena…</div>
+                <div class="ds-send">↑</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MOBILE -->
+        <div class="mobile-frame">
+          <div class="mobile-notch"></div>
+          <div class="mobile-screen">
+            <div class="m-header">
+              <div class="m-logo">
+                <div class="m-logo-box">F</div>
+                <div class="m-logo-txt">Forja</div>
+              </div>
+              <div class="m-avatar">L</div>
+            </div>
+            <div class="m-agents-scroll">
+              <div class="m-agent-chip active"><div class="m-agent-dot" style="background:#f97316"></div>Atena</div>
+              <div class="m-agent-chip idle"><div class="m-agent-dot" style="background:#22c55e"></div>Apolo</div>
+              <div class="m-agent-chip idle"><div class="m-agent-dot" style="background:#3b82f6"></div>Hermes</div>
+              <div class="m-agent-chip idle"><div class="m-agent-dot" style="background:#8b5cf6"></div>Afrodite</div>
+              <div class="m-agent-chip idle"><div class="m-agent-dot" style="background:#06b6d4"></div>Gaia</div>
+            </div>
+            <div class="m-chat">
+              <div class="m-bubble">Lembro da sessão anterior — auth estava migrando. Endpoint <strong>/api/login</strong> usa role antigo ainda.</div>
+              <div class="m-user-bubble">Como faço sem quebrar o mobile?</div>
+              <div class="m-bubble">Invoca o <strong>Hermes</strong> pra revisar o deploy antes do merge. Ele lembra do último rollback.</div>
+              <div class="m-user-bubble">faz isso</div>
+              <div style="display:flex;align-items:center;gap:6px;padding:4px 0">
+                <div style="width:14px;height:14px;border-radius:50%;background:rgba(249,115,22,0.3);display:flex;align-items:center;justify-content:center;font-size:8px">H</div>
+                <span style="font-size:9px;color:#64748b">Hermes entrou na conversa…</span>
+              </div>
+            </div>
+            <div class="m-input-row">
+              <div class="m-input-box">Mensagem…</div>
+              <div class="m-send-btn">↑</div>
+            </div>
+            <div class="m-navbar">
+              <div class="m-nb-item active"><div class="m-nb-icon">💬</div>Chat</div>
+              <div class="m-nb-item"><div class="m-nb-icon">🔨</div>Projetos</div>
+              <div class="m-nb-item"><div class="m-nb-icon">🧠</div>Memória</div>
+              <div class="m-nb-item"><div class="m-nb-icon">⚙️</div>Config</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="note orange" style="margin-top:1rem">
+      Stack: <strong>Angular 19 · Ionic · NestJS · Prisma · PostgreSQL (Neon) · AWS Bedrock · TypeScript</strong> — você entra direto no produto real.
+    </div>
+  </div>
+
+  <!-- ══ 05 PORTFÓLIO ══ -->
+  <div class="slide verde">
+    <div class="sh"><span class="chip verde">05</span><span class="sh-label">Portfólio Lavita Code</span></div>
+    <h2>5 produtos, 1 ecossistema</h2>
+    <p style="margin-bottom:1.5rem">Forja é o foco agora. Mas cada produto tem base sólida de mercado — não são apostas paralelas, são ativos reais que se reforçam.</p>
+
+    <div class="prod-row">
+      <div class="prod-icon">🔨</div>
+      <div>
+        <div class="prod-name">Forja <span class="tag o" style="margin-left:4px">FOCO IMEDIATO</span></div>
+        <div class="prod-desc">AaaS com memória episódica — mercado dev tools IA explodindo globalmente. Cursor saiu do zero pra $9B em 3 anos. Nenhum concorrente direto no Brasil identificado. Go-live Jul 2026.</div>
+      </div>
+      <div style="text-align:right"><div class="prod-val">R$4–6M</div><div class="prod-stake">100% Lavita</div></div>
+    </div>
+    <div class="prod-row">
+      <div class="prod-icon">🧠</div>
+      <div>
+        <div class="prod-name">Olimpo Platform</div>
+        <div class="prod-desc">Motor core da holding — 15 agentes em produção. É o que torna o Forja possível e o que diferencia qualquer produto da Lavita de um SaaS comum. Barreira técnica real: 6 meses pra construir, impossível de replicar em semanas.</div>
+      </div>
+      <div style="text-align:right"><div class="prod-val">R$3–8M</div><div class="prod-stake">100% Lavita</div></div>
+    </div>
+    <div class="prod-row">
+      <div class="prod-icon">🧬</div>
+      <div>
+        <div class="prod-name">BCM — Behavioral Cognitive Model</div>
+        <div class="prod-desc">Mercado de saúde mental digital no Brasil cresceu 340% pós-pandemia. BCM aplica IA clínica real — 31 detectores validados, pipeline ABA, design neurodivergente. Niche defensável com barreiras regulatórias que protegem quem chegou primeiro.</div>
+      </div>
+      <div style="text-align:right"><div class="prod-val">R$1–3M</div><div class="prod-stake">100% Lavita</div></div>
+    </div>
+    <div class="prod-row">
+      <div class="prod-icon">🏗️</div>
+      <div>
+        <div class="prod-name">Fundah</div>
+        <div class="prod-desc">Engenharia civil é um mercado de R$400B/ano no Brasil — e ainda usa planilha Excel pra cálculo estrutural. Fundah é v1.2 em produção, 519 testes, NBR implementada. Produto maduro num mercado grande e mal atendido por software.</div>
+      </div>
+      <div style="text-align:right"><div class="prod-val">R$255k–1M</div><div class="prod-stake">51% Lavita</div></div>
+    </div>
+    <div class="prod-row">
+      <div class="prod-icon">⚔️</div>
+      <div>
+        <div class="prod-name">Agent Battle Arena <span class="tag g" style="margin-left:4px">OPEN SOURCE</span></div>
+        <div class="prod-desc">Canal de distribuição com a comunidade de IA — devs que usam a arena são o mesmo ICP do Forja. Open source cria awareness orgânico e backlinks técnicos. Sponsorship e doação são modelos validados (Hugging Face, LangChain).</div>
+      </div>
+      <div style="text-align:right"><div class="prod-val">R$100–400k</div><div class="prod-stake">100% Lavita</div></div>
+    </div>
+  </div>
+
+  <!-- ══ 06 VALUATION ══ -->
+  <div class="slide">
+    <div class="sh"><span class="chip amber">06</span><span class="sh-label">De onde vêm os números</span></div>
+    <h2>Por que esse valuation faz sentido</h2>
+    <p style="margin-bottom:1.25rem">Não temos receita hoje — e é exatamente por isso que entrar agora vale mais. O valuation é projetado, não auditado. Mas a metodologia é a mesma usada pelo mercado.</p>
+
+    <!-- HONESTIDADE PRIMEIRO -->
+    <div style="background:rgba(239,68,68,0.06);border:1px solid rgba(239,68,68,0.2);border-radius:12px;padding:1.1rem 1.4rem;margin-bottom:1rem;display:flex;gap:1rem;align-items:flex-start">
+      <span style="font-size:1.2rem;flex-shrink:0">🔴</span>
+      <div>
+        <div style="font-size:0.82rem;font-weight:700;color:#fca5a5;margin-bottom:0.35rem">O que é verdade hoje — sem enfeite</div>
+        <div style="font-size:0.82rem;color:#94a3b8;line-height:1.6">
+          MRR atual: <strong style="color:#fca5a5">R$297</strong> (3 users, N=1 externo pagante). Caixa: <strong style="color:#fca5a5">R$0</strong>. Sem investidor, sem salário. O produto funciona — a distribuição ainda não existe. <br>
+          <strong style="color:#e2e8f0">Você está sendo convidada antes do mercado saber que isso existe.</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- POR QUE VAI RENTABILIZAR -->
+    <div style="background:#080f1f;border:1px solid var(--verde-b);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem">
+      <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.1em;color:var(--verde);text-transform:uppercase;margin-bottom:0.85rem">Por que acreditamos que vai rentabilizar</div>
+      <div style="display:flex;flex-direction:column;gap:0.6rem">
+        <div style="display:flex;gap:0.75rem;align-items:flex-start">
+          <span style="color:var(--verde);font-weight:800;flex-shrink:0">01</span>
+          <div><span style="font-size:0.88rem;color:#e2e8f0;font-weight:600">O problema é real e não resolvido no Brasil.</span><span style="font-size:0.85rem;color:#64748b"> Nenhum produto AaaS com memória persistente existe no mercado BR — Hermes fez o scan em Jun/2026. Primeiro a chegar define o padrão.</span></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:flex-start">
+          <span style="color:var(--verde);font-weight:800;flex-shrink:0">02</span>
+          <div><span style="font-size:0.88rem;color:#e2e8f0;font-weight:600">O produto já existe e funciona.</span><span style="font-size:0.85rem;color:#64748b"> Não é ideia — são 15 agentes rodando em produção, memória real no Neon, CLI publicado no npm, Mobile funcional. 6 meses de construção, zero dívida técnica crítica.</span></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:flex-start">
+          <span style="color:var(--verde);font-weight:800;flex-shrink:0">03</span>
+          <div><span style="font-size:0.88rem;color:#e2e8f0;font-weight:600">O modelo de negócio é simples e testado.</span><span style="font-size:0.85rem;color:#64748b"> SaaS recorrente R$99/mês Pro. Break-even em ~50 contas. Cursor tem 4M de devs pagando $20/mês — o mercado paga por ferramenta que funciona.</span></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:flex-start">
+          <span style="color:var(--verde);font-weight:800;flex-shrink:0">04</span>
+          <div><span style="font-size:0.88rem;color:#e2e8f0;font-weight:600">Portfólio diversifica o risco.</span><span style="font-size:0.85rem;color:#64748b"> Fundah já tem 519 testes e v1.2 em produção. BCM tem aplicação clínica. Battle Arena abre canal com comunidade open source. Não é tudo numa só aposta.</span></div>
+        </div>
+        <div style="display:flex;gap:0.75rem;align-items:flex-start">
+          <span style="color:var(--verde);font-weight:800;flex-shrink:0">05</span>
+          <div><span style="font-size:0.88rem;color:#e2e8f0;font-weight:600">A janela de mercado é agora.</span><span style="font-size:0.85rem;color:#64748b"> IA aplicada a produto está explodindo globalmente. Quem chegar primeiro no Brasil com produto maduro captura o early adopter. Esse ciclo dura 12–18 meses.</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MÉTODO + COMPS -->
+    <div class="g2">
+      <div class="val-box">
+        <h3>Metodologia — Múltiplo ARR M12</h3>
+        <div class="val-row"><span class="lbl">Múltiplo seed SaaS BR</span><span class="v">12× ARR</span></div>
+        <div class="val-row"><span class="lbl">ARR projetado M12</span><span class="v">R$360–600k</span></div>
+        <div class="val-row"><span class="lbl">Implied value Forja</span><span class="v">R$4,3–7,2M</span></div>
+        <div class="val-row"><span class="lbl">Adotado (conservador)</span><span class="v" style="color:var(--orange)">R$4–6M</span></div>
+        <div class="val-row"><span class="lbl">Break-even</span><span class="v">~50 contas · R$50k MRR</span></div>
+        <div class="val-row"><span class="lbl">Range BR (ABVCAP 25)</span><span class="v">8–15× ARR</span></div>
+      </div>
+      <div class="val-box">
+        <h3>Por que podemos nos comparar</h3>
+        <div class="val-row"><span class="lbl">Cursor — dev tools IA</span><span class="v" style="color:var(--muted)">$9B</span></div>
+        <div class="val-row"><span class="lbl">Linear — produto dev</span><span class="v" style="color:var(--muted)">$400M</span></div>
+        <div class="val-row"><span class="lbl">Vercel — infra dev</span><span class="v" style="color:var(--muted)">$3.25B</span></div>
+        <div class="val-row" style="padding-top:0.5rem"><span class="lbl" style="color:#94a3b8;font-size:0.8rem;line-height:1.5">Mesma categoria (dev tools + IA), mesmo ICP (founder técnico), mesmo modelo (SaaS recorrente). Eles são o teto — a gente é o começo da curva no Brasil.</span></div>
+      </div>
+    </div>
+
+    <div class="val-box" style="margin-top:1rem">
+      <h3>Consolidado Lavita Code</h3>
+      <div class="val-row"><span class="lbl">🔨 Forja</span><span class="v">R$4–6M</span></div>
+      <div class="val-row"><span class="lbl">🧠 Olimpo Platform</span><span class="v">R$3–8M</span></div>
+      <div class="val-row"><span class="lbl">🧬 BCM</span><span class="v">R$1–3M</span></div>
+      <div class="val-row"><span class="lbl">🏗️ Fundah (51%)</span><span class="v">R$255k–1M</span></div>
+      <div class="val-row"><span class="lbl">⚔️ Battle Arena</span><span class="v">R$100–400k</span></div>
+      <div class="val-row" style="padding-top:0.6rem">
+        <span class="lbl" style="color:var(--text);font-weight:700">Total Lavita Code pre-money</span>
+        <span class="v" style="color:var(--amber);font-size:1.1rem">R$8–18M</span>
+      </div>
+      <div class="val-row">
+        <span class="lbl" style="color:var(--orange)">Ponto médio para negociação</span>
+        <span class="v" style="color:var(--orange);font-size:1rem">~R$12–14M</span>
+      </div>
+    </div>
+
+    <div class="note">
+      ⚠️ Estimativas internas, não auditadas. Valuation formal necessário para rodada SAFE (R$600k, cap R$10M, planejada Q3-Q4 2027). Referências: Venture Deals (Feld & Mendelson), The Lean Startup (Ries), ABVCAP 2025.
+    </div>
+  </div>
+
+  <!-- ══ 07 CAP TABLE ══ -->
+  <div class="slide">
+    <div class="sh"><span class="chip amber">07</span><span class="sh-label">Estrutura societária</span></div>
+    <h2>Cap table</h2>
+    <p style="margin-bottom:1.5rem">Entrada dilui apenas o Rafael — Laura e Mari ficam intocadas.</p>
+
+    <div class="cap-row">
+      <div class="cap-av" style="background:rgba(249,115,22,0.15);color:var(--orange)">R</div>
+      <div class="cap-info"><div class="cap-name">Rafael Dias</div><div class="cap-role">Fundador · Tech Lead · CEO</div></div>
+      <div class="cap-bar-wrap">
+        <div class="cap-bar-bg"><div class="cap-bar" style="width:63%;background:var(--orange)"></div></div>
+        <div class="cap-pct" style="color:var(--orange)">63%</div>
+      </div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-av" style="background:rgba(34,197,94,0.15);color:var(--verde)">L</div>
+      <div class="cap-info"><div class="cap-name">Laura</div><div class="cap-role">Sócia · Corpus Ayla</div></div>
+      <div class="cap-bar-wrap">
+        <div class="cap-bar-bg"><div class="cap-bar" style="width:22%;background:var(--verde)"></div></div>
+        <div class="cap-pct" style="color:var(--verde)">22%</div>
+      </div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-av" style="background:rgba(59,130,246,0.15);color:var(--blue)">M</div>
+      <div class="cap-info"><div class="cap-name">Mari Alves</div><div class="cap-role">Co-fundadora · Produto</div></div>
+      <div class="cap-bar-wrap">
+        <div class="cap-bar-bg"><div class="cap-bar" style="width:15%;background:var(--blue)"></div></div>
+        <div class="cap-pct" style="color:var(--blue)">15%</div>
+      </div>
+    </div>
+    <div class="cap-row">
+      <div class="cap-av" style="background:rgba(139,92,246,0.15);color:var(--roxo)">D</div>
+      <div class="cap-info"><div class="cap-name">Dev (você)</div><div class="cap-role">Eng. Full-stack · a negociar</div></div>
+      <div class="cap-bar-wrap">
+        <div class="cap-bar-bg"><div class="cap-bar" style="width:3%;background:var(--roxo)"></div></div>
+        <div class="cap-pct" style="color:var(--roxo)">1–5%</div>
+      </div>
+    </div>
+
+    <hr />
+
+    <div class="deal-g">
+      <div class="deal-c">
+        <div class="deal-pct">1%</div>
+        <div class="deal-eq">≈ R$120–140k</div>
+        <div class="deal-sub">Rafael: 62%<br>Entrada mínima</div>
+      </div>
+      <div class="deal-c rec">
+        <div class="deal-pct">3%</div>
+        <div class="deal-eq">≈ R$360–420k</div>
+        <div class="deal-sub">Rafael: 60%<br>Melhor equilíbrio</div>
+      </div>
+      <div class="deal-c">
+        <div class="deal-pct">5%</div>
+        <div class="deal-eq">≈ R$600–700k</div>
+        <div class="deal-sub">Rafael: 58%<br>Comprometimento total</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 08 O QUE VOCÊ FAZ ══ -->
+  <div class="slide verde">
+    <div class="sh"><span class="chip verde">08</span><span class="sh-label">Papel no time · Backend Engineer</span></div>
+    <h2>Sua função no ecossistema</h2>
+    <p style="margin-bottom:1.25rem">Backend puro no início — sem precisar dominar IA. A curva de aprendizado em IA é gradual e estruturada. Stack: <strong>NestJS · Prisma · PostgreSQL (Neon) · TypeScript · AWS EC2 · Stripe</strong>.</p>
+
+    <!-- FASE 0 — urgência -->
+    <div style="background:#080f1f;border:1px solid var(--orange-b);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem">
+      <div style="display:flex;align-items:center;gap:0.6rem;margin-bottom:0.75rem">
+        <span style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--orange);text-transform:uppercase">Fase 0 · Semanas 1–2 · Sprint go-live</span>
+        <span style="font-size:0.65rem;background:rgba(239,68,68,0.1);color:#ef4444;border:1px solid rgba(239,68,68,0.3);padding:0.15rem 0.5rem;border-radius:4px;font-weight:700">URGENTE</span>
+      </div>
+      <div class="g2">
+        <div>
+          <div class="ri"><div class="ri-dot o"></div><span>Stripe webhook → provisionar org no Neon → ativar plano</span></div>
+          <div class="ri"><div class="ri-dot o"></div><span>Self-serve signup (email + GitHub OAuth)</span></div>
+          <div class="ri"><div class="ri-dot o"></div><span>Free tier enforced — 10 invocações/dia, 1 agente</span></div>
+        </div>
+        <div>
+          <div class="ri"><div class="ri-dot o"></div><span>Deploy EC2 estável + CI/CD automático</span></div>
+          <div class="ri"><div class="ri-dot o"></div><span>Health pipeline — /healthz + alertas p95 Neon</span></div>
+          <div class="ri"><div class="ri-dot o"></div><span>Testes e2e — cobertura mínima antes do go-live</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 1 — desacoplamento -->
+    <div style="background:#080f1f;border:1px solid var(--blue-b);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1rem">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--blue);text-transform:uppercase;margin-bottom:0.75rem">Fase 1 · Mês 1–2 · Desacoplamento do server monolítico</div>
+      <p style="font-size:0.82rem;color:#64748b;margin-bottom:0.75rem">O <code style="background:#0a1628;padding:1px 5px;border-radius:3px;font-size:0.78rem;color:#7dd3fc">server.ts</code> tem 6.500 linhas — tudo acoplado num único arquivo. É o maior risco de escala do ecossistema. Não precisa entender IA para fazer.</p>
+      <div class="g2">
+        <div>
+          <div class="ri"><div class="ri-dot" style="background:var(--blue)"></div><span>Extrair <strong>BillingModule</strong> — Stripe, planos, cotas</span></div>
+          <div class="ri"><div class="ri-dot" style="background:var(--blue)"></div><span>Extrair <strong>AuthModule</strong> — JWT ES256, rate limiter, sessions</span></div>
+          <div class="ri"><div class="ri-dot" style="background:var(--blue)"></div><span>Extrair <strong>AgentInvokeModule</strong> — bridge de invocação</span></div>
+        </div>
+        <div>
+          <div class="ri"><div class="ri-dot" style="background:var(--blue)"></div><span>Extrair <strong>ChannelModule</strong> — mensageria IRC + SSE</span></div>
+          <div class="ri"><div class="ri-dot" style="background:var(--blue)"></div><span>server.ts vira bootstrap — monta módulos, sem lógica</span></div>
+          <div class="ri"><div class="ri-dot" style="background:var(--blue)"></div><span>Testes por módulo — cobertura isolada e auditável</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FASE 2 — IA gradual -->
+    <div style="background:#080f1f;border:1px solid var(--verde-b);border-radius:12px;padding:1.25rem 1.5rem">
+      <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--verde);text-transform:uppercase;margin-bottom:0.75rem">Fase 2 · Mês 3+ · Entrada no pipeline de agentes</div>
+      <p style="font-size:0.82rem;color:#64748b;margin-bottom:0.75rem">Curva de IA gradual — você aprende o ecossistema pelo código antes de tocar em cognição.</p>
+      <div class="g2">
+        <div>
+          <div class="ri"><div class="ri-dot"></div><span>Pipeline <strong>invoke_agent</strong> — entender o flow EC2 → agente → resposta</span></div>
+          <div class="ri"><div class="ri-dot"></div><span>Observability por agente — latência, budget, erros por orgId</span></div>
+          <div class="ri"><div class="ri-dot"></div><span>PLG features — referral tracking, activation funnel</span></div>
+        </div>
+        <div>
+          <div class="ri"><div class="ri-dot"></div><span>Fundah backend — reposicionamento + BCM integração</span></div>
+          <div class="ri"><div class="ri-dot"></div><span>Battle Arena — features open source</span></div>
+          <div class="ri"><div class="ri-dot"></div><span>Melhoria de agentes — só após dominar o pipeline</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note orange" style="margin-top:1rem">
+      <strong>O que ela NÃO toca agora:</strong> <code style="background:#0a1628;padding:1px 5px;border-radius:3px;font-size:0.78rem;color:#fca5a5">core/ayla/</code>, corpus Laura, persona, vault, constituição — área exclusiva do Rafael. Protocolos obrigatórios: <strong>TDD-first · §422 · PRE_FLIGHT</strong>.
+    </div>
+  </div>
+
+  <!-- ══ 08b PROJEÇÕES ══ -->
+  <div class="slide blue">
+    <div class="sh"><span class="chip blue">08b</span><span class="sh-label">C3 · Modelo de Negócio · Projeções</span></div>
+    <h2>O que os números dizem</h2>
+    <p style="margin-bottom:1.5rem">Value-based pricing — âncora no mercado, WTP do ICP validado. 3 cenários: conservador, base e agressivo. Todos partem do mesmo break-even.</p>
+
+    <!-- PREMISSAS -->
+    <div style="background:#080f1f;border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:0.75rem">Premissas Lean Canvas (fonte: doc mestre Jun/2026)</div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem">
+        <div>
+          <div style="font-size:0.72rem;color:var(--muted)">Preço Pro</div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--amber)">R$99/mês</div>
+          <div style="font-size:0.7rem;color:#475569">WTP validado ICP</div>
+        </div>
+        <div>
+          <div style="font-size:0.72rem;color:var(--muted)">Break-even</div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--orange)">50 contas</div>
+          <div style="font-size:0.7rem;color:#475569">R$4.950/mês</div>
+        </div>
+        <div>
+          <div style="font-size:0.72rem;color:var(--muted)">Burn rate pós-Q3</div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--vermelho,#ef4444)">R$50–65k</div>
+          <div style="font-size:0.7rem;color:#475569">infra + eng #1</div>
+        </div>
+        <div>
+          <div style="font-size:0.72rem;color:var(--muted)">Churn target</div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--verde)">≤5%/mês</div>
+          <div style="font-size:0.7rem;color:#475569">meta M12</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CURVA MRR -->
+    <div style="background:#080f1f;border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:1.25rem">
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:1rem">Curva MRR M1→M12 · 3 cenários</div>
+
+      <!-- SVG chart -->
+      <svg viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto">
+        <!-- grid lines -->
+        <line x1="60" y1="10"  x2="750" y2="10"  stroke="#0f1e38" stroke-width="1"/>
+        <line x1="60" y1="50"  x2="750" y2="50"  stroke="#0f1e38" stroke-width="1"/>
+        <line x1="60" y1="90"  x2="750" y2="90"  stroke="#0f1e38" stroke-width="1"/>
+        <line x1="60" y1="130" x2="750" y2="130" stroke="#0f1e38" stroke-width="1"/>
+        <line x1="60" y1="170" x2="750" y2="170" stroke="#1e293b" stroke-width="1.5"/>
+
+        <!-- y-axis labels -->
+        <text x="52" y="13"  font-size="9" fill="#475569" text-anchor="end">50k</text>
+        <text x="52" y="53"  font-size="9" fill="#475569" text-anchor="end">37k</text>
+        <text x="52" y="93"  font-size="9" fill="#475569" text-anchor="end">25k</text>
+        <text x="52" y="133" font-size="9" fill="#475569" text-anchor="end">12k</text>
+        <text x="52" y="173" font-size="9" fill="#475569" text-anchor="end">0</text>
+
+        <!-- x-axis labels M1→M12 -->
+        <text x="63"  y="185" font-size="8" fill="#334155" text-anchor="middle">M1</text>
+        <text x="122" y="185" font-size="8" fill="#334155" text-anchor="middle">M2</text>
+        <text x="181" y="185" font-size="8" fill="#334155" text-anchor="middle">M3</text>
+        <text x="240" y="185" font-size="8" fill="#334155" text-anchor="middle">M4</text>
+        <text x="299" y="185" font-size="8" fill="#334155" text-anchor="middle">M5</text>
+        <text x="358" y="185" font-size="8" fill="#334155" text-anchor="middle">M6</text>
+        <text x="417" y="185" font-size="8" fill="#334155" text-anchor="middle">M7</text>
+        <text x="476" y="185" font-size="8" fill="#334155" text-anchor="middle">M8</text>
+        <text x="535" y="185" font-size="8" fill="#334155" text-anchor="middle">M9</text>
+        <text x="594" y="185" font-size="8" fill="#334155" text-anchor="middle">M10</text>
+        <text x="653" y="185" font-size="8" fill="#334155" text-anchor="middle">M11</text>
+        <text x="712" y="185" font-size="8" fill="#334155" text-anchor="middle">M12</text>
+
+        <!-- LINHA ALTO — R$50k M12 (verde) -->
+        <!-- M1=297 M2=800 M3=2k M4=4k M5=7k M6=12k M7=18k M8=25k M9=32k M10=39k M11=45k M12=50k -->
+        <!-- y = 170 - (val/50000)*160 -->
+        <polyline
+          points="63,169 122,167 181,164 240,157 299,148 358,132 417,113 476,90 535,68 594,45 653,26 712,10"
+          fill="none" stroke="#22c55e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <!-- dot M12 alto -->
+        <circle cx="712" cy="10" r="4" fill="#22c55e"/>
+        <text x="718" y="9" font-size="9" fill="#22c55e" font-weight="700">R$50k</text>
+
+        <!-- LINHA BASE — R$40k M12 (laranja) -->
+        <!-- M1=297 M2=600 M3=1.5k M4=3k M5=5.5k M6=9k M7=13k M8=18k M9=24k M10=30k M11=35k M12=40k -->
+        <polyline
+          points="63,169 122,168 181,165 240,160 299,152 358,141 417,128 476,113 535,93 594,74 653,58 712,42"
+          fill="none" stroke="#f97316" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="712" cy="42" r="4" fill="#f97316"/>
+        <text x="718" y="41" font-size="9" fill="#f97316" font-weight="700">R$40k</text>
+
+        <!-- LINHA BAIXO — R$30k M12 (azul) -->
+        <!-- M1=297 M2=400 M3=800 M4=2k M5=3.5k M6=6k M7=9k M8=13k M9=18k M10=22k M11=26k M12=30k -->
+        <polyline
+          points="63,169 122,169 181,167 240,164 299,159 358,151 417,141 476,128 535,113 594,99 653,87 712,74"
+          fill="none" stroke="#3b82f6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="712" cy="74" r="4" fill="#3b82f6"/>
+        <text x="718" y="73" font-size="9" fill="#3b82f6" font-weight="700">R$30k</text>
+
+        <!-- break-even line -->
+        <line x1="60" y1="154" x2="750" y2="154" stroke="#ef4444" stroke-width="1" stroke-dasharray="4,3"/>
+        <text x="54" y="153" font-size="8" fill="#ef4444" text-anchor="end">BE</text>
+        <text x="755" y="153" font-size="8" fill="#ef4444">R$5k</text>
+
+        <!-- legenda -->
+        <rect x="63" y="195" width="8" height="3" fill="#22c55e" rx="1"/>
+        <text x="74" y="198" font-size="8" fill="#22c55e">Alto</text>
+        <rect x="105" y="195" width="8" height="3" fill="#f97316" rx="1"/>
+        <text x="116" y="198" font-size="8" fill="#f97316">Base</text>
+        <rect x="150" y="195" width="8" height="3" fill="#3b82f6" rx="1"/>
+        <text x="161" y="198" font-size="8" fill="#3b82f6">Conservador</text>
+        <line x1="225" y1="197" x2="233" y2="197" stroke="#ef4444" stroke-width="1" stroke-dasharray="3,2"/>
+        <text x="237" y="198" font-size="8" fill="#ef4444">Break-even</text>
+      </svg>
+    </div>
+
+    <!-- TABELA CENÁRIOS -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;margin-bottom:1.25rem">
+
+      <!-- CONSERVADOR -->
+      <div style="background:#080f1f;border:1px solid rgba(59,130,246,0.3);border-radius:12px;padding:1.1rem">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--blue);text-transform:uppercase;margin-bottom:0.75rem">Cenário Baixo</div>
+        <div style="font-size:0.72rem;color:#64748b;margin-bottom:0.3rem">MRR M12</div>
+        <div style="font-size:1.4rem;font-weight:900;color:var(--blue);margin-bottom:0.75rem">R$30k</div>
+        <div style="font-size:0.75rem;color:#475569;line-height:1.6">
+          ~30 contas Pro<br>
+          ARR R$360k<br>
+          Valuation 12× → <strong style="color:var(--blue)">R$4,3M</strong><br>
+          Break-even: M10<br>
+          Churn: 8%/mês
+        </div>
+      </div>
+
+      <!-- BASE -->
+      <div style="background:#080f1f;border:2px solid var(--orange-b);border-radius:12px;padding:1.1rem;position:relative;overflow:hidden">
+        <div style="position:absolute;top:0.5rem;right:0.5rem;font-size:0.55rem;font-weight:800;background:var(--orange);color:#000;padding:0.12rem 0.5rem;border-radius:3px">BASE</div>
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--orange);text-transform:uppercase;margin-bottom:0.75rem">Cenário Base</div>
+        <div style="font-size:0.72rem;color:#64748b;margin-bottom:0.3rem">MRR M12</div>
+        <div style="font-size:1.4rem;font-weight:900;color:var(--orange);margin-bottom:0.75rem">R$40k</div>
+        <div style="font-size:0.75rem;color:#475569;line-height:1.6">
+          ~40 contas Pro<br>
+          ARR R$480k<br>
+          Valuation 12× → <strong style="color:var(--orange)">R$5,8M</strong><br>
+          Break-even: M8<br>
+          Churn: 5%/mês
+        </div>
+      </div>
+
+      <!-- ALTO -->
+      <div style="background:#080f1f;border:1px solid rgba(34,197,94,0.3);border-radius:12px;padding:1.1rem">
+        <div style="font-size:0.65rem;font-weight:700;letter-spacing:0.1em;color:var(--verde);text-transform:uppercase;margin-bottom:0.75rem">Cenário Alto</div>
+        <div style="font-size:0.72rem;color:#64748b;margin-bottom:0.3rem">MRR M12</div>
+        <div style="font-size:1.4rem;font-weight:900;color:var(--verde);margin-bottom:0.75rem">R$50k</div>
+        <div style="font-size:0.75rem;color:#475569;line-height:1.6">
+          ~50 contas Pro<br>
+          ARR R$600k<br>
+          Valuation 12× → <strong style="color:var(--verde)">R$7,2M</strong><br>
+          Break-even: M7<br>
+          Churn: ≤3%/mês
+        </div>
+      </div>
+    </div>
+
+    <!-- UNIT ECONOMICS -->
+    <div style="background:#080f1f;border:1px solid var(--border);border-radius:12px;padding:1.1rem 1.5rem">
+      <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:0.75rem">Unit Economics · Cenário Base</div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:1rem">
+        <div style="text-align:center">
+          <div style="font-size:0.7rem;color:var(--muted)">ARPU</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--text)">R$99</div>
+          <div style="font-size:0.68rem;color:#475569">por conta/mês</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:0.7rem;color:var(--muted)">CAC</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--text)">R$0–300</div>
+          <div style="font-size:0.68rem;color:#475569">outbound founder</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:0.7rem;color:var(--muted)">LTV (20% churn)</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--verde)">R$4.752</div>
+          <div style="font-size:0.68rem;color:#475569">R$99 × 48 meses</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:0.7rem;color:var(--muted)">LTV/CAC</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--verde)">≥15×</div>
+          <div style="font-size:0.68rem;color:#475569">meta &gt;10×</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:0.7rem;color:var(--muted)">Payback</div>
+          <div style="font-size:1rem;font-weight:800;color:var(--amber)">3–4 meses</div>
+          <div style="font-size:0.68rem;color:#475569">excelente SaaS</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note" style="margin-top:1rem">
+      ⚠️ Projeções baseadas em Lean Canvas (Maurya) + Value-based Pricing. Assumem PLG ativo (Q4 2026), Eng #1 contratado (Q3 2026), churn conforme benchmarks SaaS seed BR. Não são garantias — são hipóteses testáveis.
+    </div>
+  </div>
+
+  <!-- ══ 09 ROADMAP ══ -->
+  <div class="slide blue">
+    <div class="sh"><span class="chip blue">09</span><span class="sh-label">Roadmap</span></div>
+    <h2>Próximas 8 semanas</h2>
+    <p style="margin-bottom:1.5rem">Cada etapa é um gate — Q3 Foundation deve estar completo antes do PLG começar.</p>
+
+    <div style="display:flex;flex-direction:column;gap:0">
+      <div class="tl-item">
+        <div class="tl-l"><div class="tl-week">W1–2</div><div class="tl-date">Jun · Jul</div></div>
+        <div class="tl-r">
+          <div class="tl-title" style="color:var(--orange)">⚡ Forja go-live</div>
+          <div class="tl-li">Sprint final + polish + testes e2e</div>
+          <div class="tl-li">Deploy EC2 · domínio · SSL · monitoring</div>
+          <div class="tl-li">Self-serve + Stripe + free tier enforced</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-l"><div class="tl-week">W3–4</div><div class="tl-date">Jul</div></div>
+        <div class="tl-r v">
+          <div class="tl-title" style="color:var(--verde)">Primeiros pagantes</div>
+          <div class="tl-li">Beta fechado — devs selecionados (ICP: founder técnico)</div>
+          <div class="tl-li">Outbound direto Rafael — 3–5 contas meta M3</div>
+          <div class="tl-li">MRR M1 target: R$297 → R$800</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-l"><div class="tl-week">W5–6</div><div class="tl-date">Jul · Ago</div></div>
+        <div class="tl-r b">
+          <div class="tl-title" style="color:var(--blue)">PLG Activation</div>
+          <div class="tl-li">Free tier viral + referral tracking</div>
+          <div class="tl-li">Activation funnel — onboarding → primeiro invoke → valor</div>
+          <div class="tl-li">Case studies N=3 + ADRs públicos</div>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-l"><div class="tl-week">W7–8</div><div class="tl-date">Ago</div></div>
+        <div class="tl-r r">
+          <div class="tl-title" style="color:var(--roxo)">Team tier + escala</div>
+          <div class="tl-li">Workspace compartilhado, roles, audit log</div>
+          <div class="tl-li">Integrações: Notion, Linear, Slack</div>
+          <div class="tl-li">Preparação SAFE R$600k — cap R$10M</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ 10 CTA ══ -->
+  <div class="slide">
+    <div class="sh"><span class="chip amber">10</span><span class="sh-label">Proposta · Dayra Jefil</span></div>
+    <div class="cta">
+      <h2>Uma aposta honesta.<br><span style="color:var(--orange)">Você entra antes do mercado saber.</span></h2>
+      <p style="margin-top:0.75rem;font-size:1rem;color:#94a3b8;max-width:580px;margin-inline:auto">
+        Não temos um real de caixa agora. O produto vai ao ar em 14 dias. Se você precisar de renda fixa pra sobreviver hoje, esse não é o momento certo — e a gente respeita isso. Se você pode apostar alguns meses, a conversa continua.
+      </p>
+
+      <!-- COMPARAÇÃO MERCADO -->
+      <div style="background:#080f1f;border:1px solid var(--border);border-radius:12px;padding:1.25rem 1.5rem;margin-top:1.5rem;text-align:left">
+        <div style="font-size:0.7rem;font-weight:700;letter-spacing:0.1em;color:var(--muted);text-transform:uppercase;margin-bottom:0.85rem;text-align:center">O que você deixa na mesa vs o que entra</div>
+        <div class="g2">
+          <div>
+            <div style="font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:0.5rem">Mercado hoje (Ruby · 5 anos · SP)</div>
+            <div class="val-row"><span class="lbl">Salário CLT Senior</span><span class="v" style="color:#ef4444">R$8–14k/mês</span></div>
+            <div class="val-row"><span class="lbl">PJ equivalente</span><span class="v" style="color:#ef4444">R$12–18k/mês</span></div>
+            <div class="val-row"><span class="lbl">Equity típico empresa</span><span class="v" style="color:#ef4444">0% (ou 0,01% vesting 4 anos)</span></div>
+            <div class="val-row"><span class="lbl">Decisão sobre produto</span><span class="v" style="color:#ef4444">Nenhuma</span></div>
+          </div>
+          <div>
+            <div style="font-size:0.72rem;color:var(--muted);font-weight:600;margin-bottom:0.5rem">Lavita Code · proposta</div>
+            <div class="val-row"><span class="lbl">Salário inicial</span><span class="v" style="color:var(--amber)">R$0 (honesto)</span></div>
+            <div class="val-row"><span class="lbl">Equity</span><span class="v" style="color:var(--verde)">3% da holding</span></div>
+            <div class="val-row"><span class="lbl">Valor em pre-money</span><span class="v" style="color:var(--verde)">≈ R$360–420k</span></div>
+            <div class="val-row"><span class="lbl">Decisão sobre produto</span><span class="v" style="color:var(--verde)">Desde o dia 1</span></div>
+          </div>
+        </div>
+        <div style="margin-top:1rem;padding:0.75rem;background:rgba(34,197,94,0.06);border-radius:8px;border:1px solid var(--verde-b);font-size:0.82rem;color:#94a3b8;text-align:center">
+          Se o Forja chegar a <strong style="color:#e2e8f0">R$30k MRR em M12</strong> e a holding for avaliada em R$14M, <strong style="color:var(--verde)">3% = R$420k</strong> — o equivalente a <strong style="color:var(--verde)">~2,5 anos de salário Senior PJ</strong>, em equity líquido na próxima rodada.
+        </div>
+      </div>
+
+      <div class="g3" style="margin-top:1.25rem">
+        <div class="c" style="text-align:center">
+          <div class="c-icon">📅</div>
+          <h3>Início</h3>
+          <p>Imediato — sprint Stripe + billing esta semana</p>
+        </div>
+        <div class="c" style="text-align:center">
+          <div class="c-icon">📊</div>
+          <h3>Equity sugerido</h3>
+          <p><strong style="color:var(--amber)">3%</strong> Lavita Code<br><span style="font-size:0.78rem;color:var(--muted)">range: 1–5% · a negociar</span></p>
+        </div>
+        <div class="c" style="text-align:center">
+          <div class="c-icon">🚀</div>
+          <h3>Próximo evento de liquidez</h3>
+          <p>SAFE R$600k · cap R$10M<br><span style="font-size:0.78rem;color:var(--muted)">planejado Q3-Q4 2027</span></p>
+        </div>
+      </div>
+
+      <p style="margin-top:1.5rem;font-size:0.8rem;color:var(--muted)">
+        Negociação: Mari Alves · Co-fundadora · Lavita Code &nbsp;·&nbsp; Documento confidencial · Jun 2026
+      </p>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
