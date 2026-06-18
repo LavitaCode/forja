@@ -2,9 +2,9 @@
 id: forja-business-rules
 type: specification
 status: canonical
-version: 1.0.0
+version: 1.2.0
 created: 2026-06-17
-updated: 2026-06-17
+updated: 2026-06-18
 owners: [ayla, atena]
 contributors: [atena, iris, artemis, hermes]
 war-room: 2026-06-17-v2
@@ -43,12 +43,17 @@ Story Map contém a jornada. Este documento contém as regras que governam cada 
 | Termo | Definição |
 |-------|-----------|
 | **Invocação** | 1 chamada ao agente, iniciada com sucesso (POST /invoke aceito pelo backend). Streaming = 1 invocação. Cancelamento mid-flight pelo usuário = conta. Retry automático por erro 5xx do servidor = NÃO conta. Retry iniciado pelo usuário = conta. |
+| **Mensagem** | 1 turno de conversa de um usuário comum (não-dev) com um agente especialista. Unidade de UX — internamente contabilizada em tokens. |
+| **Token** | Unidade real de consumo. ~4 chars ≈ 1 token. É o que de fato é cobrado do backend. Tokens são invisíveis ao usuário — a UI mostra barra de uso. |
 | **Sessão** | Conjunto de turns vinculados a um `session_id`. Persiste cross-sessão (dias, semanas). Uma sessão = um agente. |
 | **Turn** | 1 par prompt+response dentro de uma sessão. Turn incrementa apenas após invoke bem-sucedido + memória salva. |
 | **AHA Moment** | 2ª invocação onde o agente retoma contexto sem re-explicação do usuário (AHA-2). AHA-1 = sinalização na 1ª resposta ("I'll remember this"). |
-| **Janela de uso** | Período no qual invocações são contadas. Free = mensal (dia 1º ao último do mês). Pro/Team = rolling por atividade. |
+| **Janela de uso** | Período no qual tokens são contados. Free = diário (00:00 às 23:59 UTC-3). Pro/Team = rolling por atividade. |
+| **Barra de uso** | Indicador visual (UI) que mostra consumo de tokens relativo ao teto do tier. Sem número absoluto — só preenchimento proporcional. Estilo Claude. |
 | **Tenant** | Organização/workspace de um usuário (org_id). Billing é por usuário, não por tenant. |
 | **Agente default** | Ayla — primeiro agente que o usuário encontra. Orquestradora geral. |
+| **Perfil dev** | Usuário técnico que invoca agentes para construir produto (CLI, War Room, code review). |
+| **Perfil usuário comum** | Usuário não-técnico que conversa com agente especialista (Afrodite, Quiron, etc.) como serviço. |
 
 ---
 
@@ -56,58 +61,71 @@ Story Map contém a jornada. Este documento contém as regras que governam cada 
 
 ### 2.1 Tabela de Tiers
 
-| Tier | Invocações | Agentes | Preço | Mínimo | Estado |
-|------|-----------|---------|-------|--------|--------|
-| **Free** | 10/mês | 1 (Ayla) | R$0 | — | R0 (não enforced), R1 (enforced) |
-| **Pro** | Janela 5h | Todos (15) | R$99/mês/usuário | — | R0 (não enforced), R1 (enforced) |
-| **Team** | Pool 8h compartilhado | Todos (15) | R$119/assento/mês | 3 assentos | R0 (não enforced), R1 (enforced) |
+| Tier | Teto diário/janela | Perfil dev | Perfil usuário comum | Preço | Estado |
+|------|-------------------|-----------|----------------------|-------|--------|
+| **Free** | 100k tokens/dia (dev) · 50k tokens/dia (usuário) | 20 invocações equiv. | ~30 msgs equiv. | R$0 | R0 (não enforced), R1 (enforced) |
+| **Pro** | Janela 5h (token pool implícito) | Todos (15) agentes | Todos (15) agentes | R$99/mês/usuário | R0 (não enforced), R1 (enforced) |
+| **Team** | Pool 8h compartilhado | Todos (15) + War Room | Todos (15) | R$119/assento/mês | R0 (não enforced), R1 (enforced) |
 
 > **Nota R0 (hoje):** Nenhum limite é enforced. Tiers existem no produto mas sem billing counter implementado. Gate obrigatório para R1.
+> **Rotação de modelos:** Qwen (~20x mais barato) absorve casual; Sonnet absorve técnico; Opus só Pro/Team heavy. Isso permite tetos generosos no Free sem comprometer margens.
+> **Tokens invisíveis ao usuário:** UI exibe barra de uso (estilo Claude) — sem número absoluto. As equivalências "20 invocações" / "30 msgs" são orientativas e não aparecem na UI.
 
 ### 2.2 Free Tier — Detalhamento
 
-- **Invocações:** 10 por mês calendário (não por dia, não rolling)
-- **Agente disponível:** Ayla (exclusivo — não escolha do usuário)
-- **Reset:** Dia 1º de cada mês, 00:00 UTC-3 (horário de Brasília)
-- **Hard limit:** Na 11ª invocação → HTTP 429 + mensagem de upgrade
+**Perfil dev:**
+- **Teto:** 100k tokens/dia (≈ 20 invocações técnicas médias de ~5k tokens cada)
+- **Agentes disponíveis:** Ayla + acesso ao catálogo completo (outros com lock upgrade)
+- **Reset:** Todo dia às 00:00 UTC-3 (horário de Brasília) — estilo Claude
+- **Hard limit:** Ao atingir 100k tokens → HTTP 429 + barra vermelha + CTA upgrade
 - **Degradação:** NÃO. Sem fallback para Qwen-only após limite. Hard block.
-- **Modelo no Free:** Qwen (casual) + Sonnet (técnico), até a quota
-- **War room:** NÃO disponível (Team tier)
-- **Soft daily limit:** Não há — ICP pode fazer sprint de 3 dias sem punição. Risco de exaurir no dia 1 é aceito (leva ao AHA + conversão)
+- **Modelo:** Qwen (casual) + Sonnet (técnico), rotação automática
+
+**Perfil usuário comum:**
+- **Teto:** 50k tokens/dia (≈ 30 mensagens casuais médias de ~1.5k tokens cada)
+- **Agentes disponíveis:** 1 agente especialista (escolha na criação da conta — Afrodite, Quiron, etc.) + Ayla
+- **Reset:** Todo dia às 00:00 UTC-3 — estilo Claude
+- **Hard limit:** Ao atingir 50k tokens → 429 + barra vermelha + CTA upgrade
+- **Modelo:** Qwen (casual padrão) + Sonnet se complexidade detectada
+
+**Ambos:**
+- **Barra de uso:** Visível na UI, preenche proporcionalmente ao consumo. Sem número de tokens.
+- **Sinalização:** 70% preenchido → barra amarela. 90% → laranja. 100% → vermelha + bloqueio.
+- **War room:** NÃO disponível no Free (Team tier)
 
 ### 2.3 Pro Tier — Detalhamento
 
-- **Invocações:** Janela rolling de 5h a partir da última invocação do usuário
-- **Sonnet:** 50 invocações por janela
-- **Opus:** 20 invocações por janela
-- **Reset:** 5h após última invoke (não meia-noite, não dia 1º)
-- **Agentes:** Todos os 15 ativos
-- **Pausa no limite:** 429 + timestamp do reset + CTA Team
-- **Modelo:** Qwen + Sonnet (default técnico) + Opus (heavy tasks)
-- **Soft daily limit:** Não há
+- **Teto:** Janela rolling de 5h (token pool implícito — não exposto ao usuário)
+- **Sonnet:** ~50 invocações técnicas por janela (ou equivalente em tokens)
+- **Opus:** ~20 invocações heavy por janela
+- **Reset:** 5h após última atividade (não meia-noite, não dia 1º)
+- **Agentes:** Todos os 15 ativos — ambos perfis (dev e usuário comum)
+- **Pausa no limite:** barra cheia + timestamp do reset + CTA Team
+- **Modelo:** Qwen + Sonnet (default) + Opus (heavy tasks)
+- **Barra de uso:** Mostra preenchimento da janela atual (reseta a cada 5h)
 
 ### 2.4 Team Tier — Detalhamento
 
-- **Invocações:** Pool compartilhado entre todos os assentos da org
-- **Pool Sonnet:** 150 por janela de 8h
-- **Pool Opus:** 60 por janela de 8h
-- **Reset:** 8h após última invoke de qualquer membro da org
-- **Agentes:** Todos os 15 ativos
-- **Pausa no limite:** 429 + timestamp do reset + notificação para o admin da org
-- **War room:** Disponível (orquestração multi-agente)
-- **Audit log:** Quem invocou, qual agente, quando — visível para admin
+- **Teto:** Pool de tokens compartilhado entre todos os assentos, janela de 8h
+- **Pool Sonnet:** equiv. 150 invocações por janela
+- **Pool Opus:** equiv. 60 invocações por janela
+- **Reset:** 8h após última atividade de qualquer membro da org
+- **Agentes:** Todos os 15 + War Room (orquestração multi-agente)
+- **Pausa no limite:** barra cheia + timestamp do reset + notificação para o admin da org
+- **Audit log:** Quem usou, qual agente, quando, tokens consumidos — visível para admin
 - **Workspace compartilhado:** Sessões visíveis para todos os membros
 
 ---
 
 ## 3. Reset de Invocações
 
-### 3.1 Free — Reset Mensal
+### 3.1 Free — Reset Diário
 
-- **Quando:** Dia 1º de cada mês às 00:00 UTC-3
-- **Implementação:** Cron job diário verifica se `now >= resetAt`. Se sim, `SET count = 0, resetAt = next_reset`.
+- **Quando:** Todo dia às 00:00 UTC-3 (meia-noite, horário de Brasília) — estilo Claude
+- **Implementação:** Cron job diário zera o contador de tokens: `SET tokens_used = 0` onde `tier = FREE`.
 - **Fuso padrão:** UTC-3 (Brasília). Se timezone do tenant não armazenado, usar UTC-3 como default.
-- **Notificação:** Email D-1 antes do reset: "Suas 10 invocações renovam amanhã."
+- **Teto dev:** 100k tokens/dia. **Teto usuário comum:** 50k tokens/dia. Diferenciado por `user_profile` no tenant.
+- **Notificação:** Nenhuma — reset é previsível (meia-noite todo dia). UI mostra horário do próximo reset ao atingir o limite.
 
 ### 3.2 Pro — Janela Rolling 5h
 
@@ -122,13 +140,12 @@ Story Map contém a jornada. Este documento contém as regras que governam cada 
 - **Implementação:** Redis counter com TTL = 8h. Key: `quota:{orgId}:sonnet` / `quota:{orgId}:opus`.
 - **Admin notificado:** Quando pool atingir 80% → alerta no dashboard admin.
 
-### 3.4 Transições de Tier (Upgrade/Downgrade)
+### 3.4 Transições de Tier (Upgrade / Cancelamento voluntário)
 
 - **Upgrade Free → Pro:** Reset imediato da janela (usuário ganha janela cheia). Goodwill.
 - **Upgrade Pro → Team:** Reset imediato do pool. Goodwill.
-- **Downgrade Pro → Free:** Limites novos aplicam-se no próximo ciclo mensal (grace period até dia 1º). Invocações já usadas no mês corrente não são recalculadas.
-- **Downgrade Team → Pro:** Limites novos no próximo ciclo. Sessions compartilhadas viram sessions individuais do owner.
-- **Cancelamento:** Plano ativo até fim do período pago. Depois, downgrade para Free.
+- **Cancelamento voluntário Pro/Team:** Plano ativo até fim do período pago. Após expirar, conta entra em estado **BLOCKED** (não Free) — acesso ao histórico e sessões preservado, invocações bloqueadas. Usuário reativa inserindo novo cartão e volta ao tier anterior com goodwill (janela/pool cheia).
+- **Sem downgrade automático para Free:** Downgrade destrói o moat (histórico de sessões, contexto acumulado) e é antipadrão punitivo. Block preserva tudo e mantém a conversão possível.
 
 ---
 
@@ -169,7 +186,7 @@ Story Map contém a jornada. Este documento contém as regras que governam cada 
 ### 4.3 Comportamento de Warm-up
 
 - **Timeout de carga de memória:** 5s para carregar contexto do Neon.
-- **Se timeout:** Fallback para sessão stateless (sem contexto anterior) + aviso ao usuário: "Context load timed out — continuing without session memory."
+- **Se timeout:** Fallback para sessão stateless (sem contexto anterior) + aviso ao usuário: "Contexto não carregado — continuando sem histórico da sessão."
 - **Warm-up NÃO conta como invocação** se falhar (timeout ou erro de storage).
 
 ---
@@ -286,14 +303,16 @@ Ordem de verificação (primeiro gate que falhar retorna):
 
 | Tier | Código | Mensagem | CTA |
 |------|--------|----------|-----|
-| Free (mensal) | 429 | "Free tier limit reached (10/10). Resets on [data]." | "Upgrade to Pro (R$99/mês)" |
-| Pro (janela) | 429 | "Usage window exhausted. Resets in {time}." | "Upgrade to Team" |
-| Team (pool) | 429 | "Team pool exhausted. Resets in {time}." | "Contact admin" |
+| Free dev (diário) | 429 | "Limite diário atingido. Renova à meia-noite." | "Upgrade to Pro (R$99/mês)" |
+| Free usuário (diário) | 429 | "Limite diário atingido. Renova à meia-noite." | "Upgrade to Pro (R$99/mês)" |
+| Pro (janela) | 429 | "Janela esgotada. Renova em {time}." | "Upgrade to Team" |
+| Team (pool) | 429 | "Pool do time esgotado. Renova em {time}." | "Fale com o admin" |
 
-**Sinalização preventiva (antes do bloqueio):**
-- 8/10 usado (Free) → badge amarelo: "2 invocations left"
-- 10/10 (Free) → badge vermelho: "Limit reached", botão Invoke desabilitado
-- 80% da janela (Pro/Team) → aviso no dashboard admin (Team only)
+**Sinalização preventiva via barra de uso (estilo Claude):**
+- 70% da barra → barra amarela (sem mensagem intrusiva)
+- 90% → barra laranja + tooltip discreto: "Quase no limite"
+- 100% → barra vermelha + botão de ação desabilitado + CTA upgrade
+- Sem contadores numéricos de tokens na UI — só a barra proporcional
 
 ### 8.2 Agent Not Available
 
@@ -305,10 +324,10 @@ Ordem de verificação (primeiro gate que falhar retorna):
 
 | Cenário | Comportamento |
 |---------|---------------|
-| Timeout (>5s) | Continua stateless + aviso: "Context load timed out — starting fresh." |
-| Storage error | Continua stateless + aviso: "Context unavailable — this invoke won't remember session history." |
-| Session not found | 404: "Session not found. Start a new session: `forja session new`" |
-| TTL expirado (archived) | "Session archived (30+ days inactive). [Restore →] or start new." |
+| Timeout (>5s) | Continua stateless + aviso: "Contexto não carregado — iniciando sessão sem histórico." |
+| Storage error | Continua stateless + aviso: "Contexto indisponível — esta invocação não terá histórico da sessão." |
+| Session not found | 404: "Sessão não encontrada. Inicie uma nova: `forja session new`" |
+| TTL expirado (archived) | "Sessão arquivada (inativa há 30+ dias). [Restaurar →] ou iniciar nova." |
 
 ### 8.4 Billing Error
 
@@ -318,10 +337,16 @@ Ordem de verificação (primeiro gate que falhar retorna):
 
 ### 8.5 Cartão Recusado (Stripe)
 
-- Grace period: 7 dias após falha de cobrança (retenta 3x em 3 dias)
-- Após grace period: downgrade para Free até regularização
-- Email: D-0 (falha), D-3 (aviso), D-7 (downgrade iminente), D-8 (downgraded)
-- Self-cure: usuário atualiza cartão → tier restaurado imediatamente
+- **Grace period:** 7 dias após falha de cobrança
+- **Retries automáticos:** D+0 (falha inicial), D+3, D+5 — 3 tentativas no total
+- **Após 7 dias sem pagamento:** conta entra em estado **BLOCKED** — sem downgrade para Free. Invocações bloqueadas, histórico e sessões intactos.
+- **Timeline de emails:**
+  - D+0: "Falha no pagamento — atualize seu cartão para continuar usando o Forja."
+  - D+3: "Seu acesso será bloqueado em 4 dias se o pagamento não for regularizado."
+  - D+6: "Último aviso — bloqueio amanhã."
+  - D+7: "Conta bloqueada. Regularize para reativar com tudo que você tinha."
+- **Self-cure:** usuário atualiza cartão → desbloqueio imediato + tier restaurado + janela/pool cheia (goodwill)
+- **Sem perda de dados:** sessões, memória e histórico são preservados durante o bloqueio.
 
 ---
 
@@ -342,7 +367,7 @@ Ordem de verificação (primeiro gate que falhar retorna):
 
 - **Free → Pro:** Janela Pro começa imediatamente. Reset da cota Free. Goodwill.
 - **Pro → Team:** Pool Team começa imediatamente. Sessões individuais tornam-se compartilhadas.
-- **Qualquer downgrade:** Novos limites no ciclo seguinte (grace period até próximo reset).
+- **Não existe downgrade automático:** Ver §3.4 — cancelamento gera BLOCK, não Free.
 
 ### 9.3 Memória: Sessão Ativa vs Expirada
 
@@ -353,13 +378,13 @@ Ordem de verificação (primeiro gate que falhar retorna):
 
 ### 9.4 Limites Simultâneos
 
-- Usuário Free atingiu quota mensal E está em grace period de downgrade → quota mensal tem precedência (429 primeiro)
+- Usuário Free atingiu quota mensal E conta está BLOCKED → quota mensal tem precedência (429 primeiro)
 - Mensagem deve ser específica ao gate ativo (não genérica "upgrade")
 
 ### 9.5 Sessão Multi-Agente (Team)
 
 - War room cria `session_id` compartilhado para todos os agentes da sala
-- Cada invoke dentro do war room conta do pool do tier (1 invoke = 1 do pool, independente de quantos agentes respondem)
+- **1 mensagem do usuário ao War Room = 1 invoke do pool** — independente de quantos agentes especialistas a Ayla acionar internamente para responder. A orquestração interna é invisível para o billing.
 - Timeout de agente no war room: 30s por agente. Se timeout → output parcial com marcação `[TIMEOUT: agent_name]`
 
 ---
@@ -387,8 +412,8 @@ Ordem de verificação (primeiro gate que falhar retorna):
 
 ### 10.4 Auto-Archive & Purge
 
-- D-7 antes de auto-archive: email "Your session '{name}' will be archived in 7 days."
-- D-7 antes de hard delete: email "Your archived session '{name}' will be permanently deleted in 7 days. Export or restore."
+- D-7 antes de auto-archive: email "Sua sessão '{name}' será arquivada em 7 dias."
+- D-7 antes de hard delete: email "Sua sessão arquivada '{name}' será deletada permanentemente em 7 dias. Exporte ou restaure."
 - Restauração: sempre disponível até hard delete (self-serve)
 
 ---
@@ -399,7 +424,7 @@ Ordem de verificação (primeiro gate que falhar retorna):
 
 | ID | Regra | Decisão | Rationale | Alternativa descartada |
 |----|-------|---------|-----------|------------------------|
-| BR-01 | Reset Free | **Mensal (dia 1º)**, não diário | ICP faz sprints de 2-3 dias — reset diário puniria uso legítimo. Previsibilidade de budget. | Diário (punitive para sprints) |
+| BR-01 | Reset Free | **Diário (meia-noite)** — estilo Claude | Cria hábito diário + urgência de conversão. Dev: 100k tokens/dia. Usuário comum: 50k tokens/dia. Rotação Qwen/Sonnet/Opus mantém margem. | Mensal (baixa frequência de uso, sem urgência) |
 | BR-02 | TTL Free | **30 dias** de inatividade | ICP tem ciclos erráticos. 7 dias mataria o AHA. 30d cobre sprints normais. | 7 dias (mataria moat), Infinito (COGS incontrolável) |
 | BR-03 | Contexto | **Mesmo para todos** (gate por invocações, não por contexto) | Limitar contexto no free quebra o teste de valor real. ICP técnico detecta e desconfia. | Contexto menor no free (antipadrão Copilot) |
 | BR-04 | Agente Free | **Ayla exclusivo**, catálogo visível com lock | Reduz friction, Ayla = rosto do produto. Catálogo visível = FOMO específico para upgrade. | Escolha de 1 entre 15 (friction), esconder catálogo (antipadrão) |
@@ -408,7 +433,8 @@ Ordem de verificação (primeiro gate que falhar retorna):
 | BR-07 | Catálogo UI | **Mostrar todos com lock** | Transparência + aspiração. "Não sabia que tinha isso" = churn post-launch. | Esconder locked (Vercel-style) |
 | BR-08 | Billing fail | **Fail-closed**: não retorna resposta se billing não foi registrado | Billing inconsistente = dívida técnica acumulada. Fail-open criaria free usage infinito. | Fail-open + corrigir depois |
 | BR-09 | Invocação def | **Request iniciado = conta**, exceto retry 5xx servidor | Previsível para o usuário. Alinhado com OpenAI (quem conta é a tentativa do usuário). | Só contar se response completa (complexo de implementar) |
-| BR-10 | Downgrade | **Grace period até próximo ciclo** | Não punir usuário que já pagou até o fim do mês. | Downgrade imediato (antipadrão Vercel que gerou reclamações) |
+| BR-10 | Cancelamento voluntário | **BLOCK após expirar período pago** (não downgrade) | Tier cancelado = conta em espera, não conta degradada. Histórico e sessões preservados. Reativação com goodwill. | Downgrade para Free (destrói moat, antipadrão punitivo) |
+| BR-11 | Cartão recusado | **BLOCK após 7 dias** (D+0/D+3/D+5 retries; D+0/D+3/D+6/D+7 emails) | Sem perda de dados. Block é reversível com 1 clique. Downgrade exigiria re-upgrade e re-onboarding = fricção desnecessária. | Downgrade imediato para Free |
 
 ---
 

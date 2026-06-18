@@ -323,6 +323,57 @@ CTO ou founder solo, stack Python/TS, equipe de 1–2, orçamento apertado, prec
 
 ---
 
+### 4.5b. Code Panel (App Web/Mobile)
+
+**Outcome:** Dev acompanha e controla o ciclo completo de desenvolvimento — commit, push, PR, merge, drift, reviews, diff — sem sair do Forja.
+
+> **Rationale:** O moat do Forja é o pipeline de dev dentro do produto. Abrir o GitHub para qualquer ação contradiz o posicionamento. GitHub é infraestrutura, não destino do usuário.
+
+#### T5b.1 — Pipeline Git (Commit → Push → PR → Merge) · P1 | R2 | L
+
+| Story   | Descrição                                                       | Priority | Release | Esforço | Deps              |
+|---------|-----------------------------------------------------------------|----------|---------|---------|-------------------|
+| S5b.1.1 | Stepper visual Commit → Push → PR → Merge com estado em tempo real | P1    | R2      | M       | github-api        |
+| S5b.1.2 | PR ativo: título, branch, autor, agentes auditando, status      | P1       | R2      | M       | github-api        |
+| S5b.1.3 | Botão "Aprovar e Merge" diretamente no Code Panel               | P1       | R2      | M       | github-api        |
+| S5b.1.4 | Botão "Rejeitar PR" com campo de motivo                         | P1       | R2      | S       | github-api        |
+| S5b.1.5 | Histórico recente de actions (commit/push/merge/branch) in-app  | P1       | R2      | S       | github-api        |
+| S5b.1.6 | "Copiar link do PR" — único escape permitido (não "Ver no GitHub") | P2    | R2      | S       | —                 |
+
+#### T5b.2 — Drift Detection · P1 | R2 | M
+
+| Story   | Descrição                                                       | Priority | Release | Esforço | Deps              |
+|---------|-----------------------------------------------------------------|----------|---------|---------|-------------------|
+| S5b.2.1 | Detectar drift lockfile (package-lock vs package.json)          | P1       | R2      | M       | hermes-scan       |
+| S5b.2.2 | Detectar drift schema (migration aplicada vs prisma.schema)     | P1       | R2      | M       | hermes-scan       |
+| S5b.2.3 | Detectar drift env (vars locais vs EC2)                         | P1       | R2      | S       | hermes-scan       |
+| S5b.2.4 | Alertas por severidade: bloqueante (vermelho) / atenção (amarelo) / info (azul) | P1 | R2 | S  | —                 |
+| S5b.2.5 | Ação "Resolver" inline (ex: rodar npm install direto do painel) | P2       | R3      | M       | shell-exec        |
+
+#### T5b.3 — Movimentações · P1 | R2 | S
+
+| Story   | Descrição                                                       | Priority | Release | Esforço | Deps              |
+|---------|-----------------------------------------------------------------|----------|---------|---------|-------------------|
+| S5b.3.1 | Feed de commits, PRs, merges e branches em tempo real           | P1       | R2      | M       | github-api        |
+| S5b.3.2 | Filtro por branch, agente, tipo de ação                         | P2       | R3      | S       | —                 |
+
+#### T5b.4 — Reviews in-app · P1 | R2 | M
+
+| Story   | Descrição                                                       | Priority | Release | Esforço | Deps              |
+|---------|-----------------------------------------------------------------|----------|---------|---------|-------------------|
+| S5b.4.1 | Lista de PRs abertos com autor, agentes e status de auditoria   | P1       | R2      | M       | github-api        |
+| S5b.4.2 | Auditoria paralela (Atena, Apolo, Hermes) visível no painel     | P1       | R2      | M       | invoke-agent      |
+| S5b.4.3 | Relatório consolidado: PASS / FAIL / em auditoria               | P1       | R2      | M       | invoke-agent      |
+
+#### T5b.5 — Diff visual · P1 | R2 | S
+
+| Story   | Descrição                                                       | Priority | Release | Esforço | Deps              |
+|---------|-----------------------------------------------------------------|----------|---------|---------|-------------------|
+| S5b.5.1 | Diff colorido (+ verde / - vermelho) por arquivo, por PR        | P1       | R2      | M       | code-diff-parser  |
+| S5b.5.2 | Navegação por arquivo dentro do diff                            | P2       | R3      | S       | —                 |
+
+---
+
 ### 4.6. Escalar
 
 **Outcome:** War room multi-agente (Team tier).

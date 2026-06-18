@@ -1,0 +1,1173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forja — App Shell (aprovado)</title>
+  <link rel="icon" type="image/svg+xml" href="../identidade/forja-logo.svg">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #020617;
+      --surface:  #0f172a;
+      --border:   #1e293b;
+      --border2:  #334155;
+      --text:     #e2e8f0;
+      --muted:    #64748b;
+      --muted2:   #475569;
+      --orange:   #f97316;
+      --orange2:  #ea580c;
+      --nav-w:    220px;
+      --sala-w:   264px;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 13px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    /* ═══════════════════════════════════════════
+       SCREEN TABS (demo navigation)
+    ═══════════════════════════════════════════ */
+    .demo-tabs {
+      background: #000;
+      border-bottom: 1px solid #1e293b;
+      display: flex;
+      gap: 2px;
+      padding: 6px 8px 0;
+      flex-shrink: 0;
+      z-index: 100;
+    }
+    .demo-tab {
+      padding: 6px 14px;
+      font-size: 11px;
+      font-weight: 600;
+      color: #475569;
+      border-radius: 6px 6px 0 0;
+      cursor: pointer;
+      border: 1px solid transparent;
+      border-bottom: none;
+      background: transparent;
+      letter-spacing: .03em;
+    }
+    .demo-tab.active {
+      background: #0f172a;
+      color: #f1f5f9;
+      border-color: #1e293b;
+    }
+
+    /* ═══════════════════════════════════════════
+       APP LAYOUT
+    ═══════════════════════════════════════════ */
+    .app {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* ── LEFT NAV ── */
+    .nav {
+      width: var(--nav-w);
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo-icon {
+      width: 28px; height: 28px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 14px; color: #fff; flex-shrink: 0;
+    }
+    .nav-logo-name { font-weight: 700; font-size: 15px; color: #f1f5f9; }
+    .nav-logo-sub { font-size: 9px; color: var(--muted); letter-spacing: .04em; }
+
+    .nav-cta {
+      margin: 12px 12px 10px;
+      padding: 9px 14px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      border-radius: 8px;
+      font-weight: 700; font-size: 12px; color: #fff;
+      display: flex; align-items: center; gap: 7px;
+      cursor: pointer;
+      box-shadow: 0 0 16px #f9731630;
+    }
+
+    .nav-section { padding: 14px 16px 4px; font-size: 9.5px; font-weight: 700; color: var(--muted2); letter-spacing: .1em; text-transform: uppercase; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 12px 7px 14px;
+      border-radius: 7px; margin: 1px 6px;
+      cursor: pointer; color: var(--muted);
+      font-size: 12.5px; font-weight: 500;
+      position: relative;
+    }
+    .nav-item:hover { background: #1e293b88; color: var(--text); }
+    .nav-item.active { background: #1e293b; color: #f1f5f9; }
+    .nav-item .icon { font-size: 15px; width: 18px; text-align: center; flex-shrink: 0; }
+    .nav-badge {
+      margin-left: auto; font-size: 9px; font-weight: 800;
+      background: var(--orange); color: #fff;
+      padding: 1px 5px; border-radius: 10px; min-width: 16px; text-align: center;
+    }
+    .nav-badge.live {
+      background: #dc2626; font-size: 8px; letter-spacing: .04em;
+      padding: 2px 5px;
+    }
+
+    .nav-footer {
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding: 10px 12px;
+      display: flex; align-items: center; gap: 9px;
+    }
+    .nav-avatar {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: linear-gradient(135deg, #7c3aed, #a855f7);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 800; color: #fff; flex-shrink: 0;
+    }
+    .nav-user-name { font-weight: 600; font-size: 12px; color: #f1f5f9; }
+    .nav-user-role { font-size: 9px; color: #f97316; font-weight: 700; letter-spacing: .04em; }
+    .nav-logout { margin-left: auto; color: var(--muted2); cursor: pointer; font-size: 14px; }
+
+    /* ═══════════════════════════════════════════
+       RIGHT SIDEBAR — NA SALA
+    ═══════════════════════════════════════════ */
+    .sala {
+      width: var(--sala-w);
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .sala-header {
+      padding: 14px 16px 10px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sala-title { font-weight: 700; font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+    .sala-count {
+      background: #1e293b; color: #94a3b8;
+      font-size: 9px; font-weight: 700;
+      padding: 2px 6px; border-radius: 10px;
+    }
+    .sala-list { overflow-y: auto; flex: 1; padding: 6px 0; }
+    .sala-item {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 16px;
+      cursor: pointer;
+    }
+    .sala-item:hover { background: #1e293b44; }
+    .sala-dot {
+      width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+    }
+    .sala-name { font-size: 12.5px; color: var(--text); flex: 1; }
+    .sala-status { font-size: 10px; color: var(--muted2); }
+
+    /* dot colors by agent */
+    .dot-ayla    { background: #22d3ee; box-shadow: 0 0 5px #22d3ee88; }
+    .dot-hermes  { background: #f97316; }
+    .dot-atena   { background: #a78bfa; }
+    .dot-apolo   { background: #34d399; }
+    .dot-iris    { background: #fb923c; }
+    .dot-artemis { background: #f472b6; }
+    .dot-hefesto { background: #94a3b8; }
+    .dot-afrodite{ background: #f9a8d4; }
+    .dot-hera    { background: #c084fc; }
+    .dot-quiron  { background: #67e8f9; }
+    .dot-gaia    { background: #86efac; }
+    .dot-musa    { background: #fde68a; }
+    .dot-atlas   { background: #7dd3fc; }
+    .dot-hestia  { background: #fca5a5; }
+    .dot-yara    { background: #a5f3fc; }
+    .dot-zeus    { background: #fbbf24; box-shadow: 0 0 5px #fbbf2488; }
+
+    /* ═══════════════════════════════════════════
+       MAIN CONTENT
+    ═══════════════════════════════════════════ */
+    .main {
+      flex: 1;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .screen { display: none; flex: 1; overflow: hidden; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      padding: 12px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+      flex-shrink: 0;
+    }
+    .topbar-icon { font-size: 18px; }
+    .topbar-title { font-weight: 700; font-size: 15px; color: #f1f5f9; }
+    .topbar-sub { font-size: 11px; color: var(--muted); }
+    .topbar-actions { margin-left: auto; display: flex; gap: 8px; }
+    .btn-outline {
+      padding: 5px 12px; border-radius: 7px; font-size: 11px; font-weight: 600;
+      background: transparent; border: 1px solid var(--border2); color: #cbd5e1;
+      cursor: pointer;
+    }
+    .btn-primary {
+      padding: 5px 12px; border-radius: 7px; font-size: 11px; font-weight: 700;
+      background: linear-gradient(135deg, #f97316, #ea580c); color: #fff;
+      border: none; cursor: pointer;
+    }
+
+    /* ════════════════════════════════
+       SCREEN 1 — HOME / COCKPIT
+    ════════════════════════════════ */
+    .cockpit-body { padding: 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+
+    .stat-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 14px 16px;
+    }
+    .stat-val { font-size: 28px; font-weight: 800; color: #f1f5f9; line-height: 1; }
+    .stat-label { font-size: 10px; color: var(--muted); letter-spacing: .06em; text-transform: uppercase; margin-top: 6px; }
+
+    .section-head { font-size: 13px; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; gap: 7px; }
+    .section-head .badge-live { font-size: 9px; background: #7f1d1d; color: #fca5a5; padding: 2px 6px; border-radius: 4px; font-weight: 700; }
+
+    .exec-table { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .exec-header {
+      display: grid; grid-template-columns: 1fr 120px 120px 100px 90px;
+      padding: 8px 16px; border-bottom: 1px solid var(--border);
+      font-size: 9.5px; font-weight: 700; color: var(--muted2); letter-spacing: .08em; text-transform: uppercase;
+    }
+    .exec-row {
+      display: grid; grid-template-columns: 1fr 120px 120px 100px 90px;
+      padding: 10px 16px; border-bottom: 1px solid #1e293b55;
+      align-items: center; font-size: 12px; color: #cbd5e1;
+    }
+    .exec-row:last-child { border-bottom: none; }
+    .exec-branch { font-family: monospace; font-size: 11px; color: #7dd3fc; }
+    .chip-status {
+      display: inline-block; padding: 2px 8px; border-radius: 5px;
+      font-size: 10px; font-weight: 700;
+    }
+    .chip-ok   { background: #052e16; color: #4ade80; }
+    .chip-run  { background: #1e3a5f; color: #7dd3fc; }
+    .chip-wait { background: #2d1b00; color: #fbbf24; }
+    .chip-fail { background: #450a0a; color: #f87171; }
+
+    /* ── USO BAR ── */
+    .uso-bar-wrap { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 14px 18px; }
+    .uso-bar-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+    .uso-bar-title { font-size: 12px; font-weight: 700; color: #f1f5f9; }
+    .uso-bar-reset { font-size: 10px; color: var(--muted); }
+    .uso-rows { display: flex; flex-direction: column; gap: 8px; }
+    .uso-row { display: flex; align-items: center; gap: 10px; }
+    .uso-label { font-size: 11px; color: var(--muted); min-width: 70px; }
+    .uso-track { flex: 1; height: 6px; background: #1e293b; border-radius: 4px; overflow: hidden; }
+    .uso-fill { height: 100%; border-radius: 4px; transition: width .3s; }
+    .uso-pct { font-size: 10px; color: var(--muted2); min-width: 28px; text-align: right; }
+    .uso-fill.ok     { background: linear-gradient(90deg, #34d399, #22d3ee); }
+    .uso-fill.warn   { background: linear-gradient(90deg, #fbbf24, #f97316); }
+    .uso-fill.danger { background: linear-gradient(90deg, #f87171, #dc2626); }
+
+    /* ════════════════════════════════
+       SCREEN 2 — CHAT
+    ════════════════════════════════ */
+    .chat-layout { display: flex; flex: 1; overflow: hidden; }
+
+    .chat-sidebar {
+      width: 240px; flex-shrink: 0;
+      background: #080f1e; border-right: 1px solid var(--border);
+      display: flex; flex-direction: column; overflow: hidden;
+    }
+    .chat-sidebar-head {
+      padding: 10px 14px 8px;
+      font-size: 11px; font-weight: 700; color: #f1f5f9;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+    }
+    .chat-sidebar-head .icon { color: var(--muted); }
+    .chat-actions { margin-left: auto; display: flex; gap: 6px; color: var(--muted); cursor: pointer; font-size: 14px; }
+    .chat-section { padding: 10px 14px 4px; font-size: 9.5px; font-weight: 700; color: var(--muted2); letter-spacing: .08em; text-transform: uppercase; }
+    .chat-channel {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 14px; font-size: 12px; color: var(--muted);
+      cursor: pointer; border-radius: 6px; margin: 1px 6px;
+    }
+    .chat-channel:hover { background: #1e293b55; color: var(--text); }
+    .chat-channel.active { background: #1e293b; color: #f1f5f9; }
+    .chat-channel .ch-icon { font-size: 13px; }
+    .chat-dm {
+      display: flex; align-items: center; gap: 8px;
+      padding: 5px 14px; cursor: pointer;
+      border-radius: 6px; margin: 1px 6px;
+    }
+    .chat-dm:hover { background: #1e293b55; }
+    .chat-dm.active { background: #1e293b; }
+    .dm-avatar {
+      width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 800; color: #fff;
+    }
+    .dm-name { font-size: 12px; color: var(--muted); }
+    .chat-dm.active .dm-name { color: #f1f5f9; }
+
+    .chat-main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    .chat-content { flex: 1; display: flex; align-items: center; justify-content: center; flex-direction: column; gap: 8px; color: var(--muted); }
+    .chat-content .icon-big { font-size: 36px; opacity: .3; }
+    .chat-content .hint { font-size: 13px; }
+    .chat-input-wrap {
+      padding: 12px 16px; border-top: 1px solid var(--border);
+      display: flex; gap: 10px; align-items: center;
+    }
+    .chat-input {
+      flex: 1; background: #1e293b; border: 1px solid var(--border2);
+      border-radius: 8px; padding: 9px 14px; color: var(--text);
+      font-size: 13px; outline: none;
+    }
+    .chat-input::placeholder { color: var(--muted2); }
+    .chat-send {
+      width: 34px; height: 34px; border-radius: 8px;
+      background: #1e293b; border: 1px solid var(--border2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; color: var(--muted); font-size: 16px;
+    }
+
+    /* ════════════════════════════════
+       SCREEN 3 — DRIFT DETECTION
+    ════════════════════════════════ */
+    .drift-body { padding: 20px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 18px; }
+
+    .drift-alert {
+      background: #1a0a0a; border: 1px solid #7f1d1d;
+      border-radius: 12px; padding: 16px 20px;
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .drift-alert-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+    .drift-alert-title { font-size: 14px; font-weight: 800; color: #f87171; margin-bottom: 4px; }
+    .drift-alert-desc { font-size: 12px; color: #fca5a5; line-height: 1.6; }
+    .drift-alert.warn { background: #1a1200; border-color: #78350f; }
+    .drift-alert.warn .drift-alert-title { color: #fbbf24; }
+    .drift-alert.warn .drift-alert-desc { color: #fde68a; }
+    .drift-alert.info { background: #0a1628; border-color: #1e3a5f; }
+    .drift-alert.info .drift-alert-title { color: #7dd3fc; }
+    .drift-alert.info .drift-alert-desc { color: #bae6fd; }
+
+    .drift-section-title { font-size: 12px; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .08em; }
+
+    .drift-table { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
+    .drift-thead {
+      display: grid; grid-template-columns: 180px 1fr 1fr 100px 90px;
+      padding: 8px 16px; border-bottom: 1px solid var(--border);
+      font-size: 9.5px; font-weight: 700; color: var(--muted2); letter-spacing: .08em; text-transform: uppercase;
+    }
+    .drift-row {
+      display: grid; grid-template-columns: 180px 1fr 1fr 100px 90px;
+      padding: 10px 16px; border-bottom: 1px solid #1e293b55;
+      align-items: center; font-size: 12px;
+    }
+    .drift-row:last-child { border-bottom: none; }
+    .drift-file { font-family: monospace; font-size: 11px; color: #7dd3fc; }
+    .drift-val-old { font-family: monospace; font-size: 11px; color: #f87171; }
+    .drift-val-new { font-family: monospace; font-size: 11px; color: #4ade80; }
+    .drift-kind { font-size: 10px; color: var(--muted); }
+    .chip-drift-lock  { background: #450a0a; color: #fca5a5; }
+    .chip-drift-schema{ background: #2d1b00; color: #fde68a; }
+    .chip-drift-env   { background: #0a1628; color: #7dd3fc; }
+    .chip-drift-ok    { background: #052e16; color: #4ade80; }
+
+    .drift-actions { display: flex; gap: 10px; }
+    .drift-btn {
+      padding: 8px 16px; border-radius: 8px; font-size: 12px; font-weight: 700;
+      cursor: pointer; border: none;
+    }
+    .drift-btn.primary { background: linear-gradient(135deg, #f97316, #ea580c); color: #fff; }
+    .drift-btn.danger  { background: #7f1d1d; color: #fca5a5; }
+    .drift-btn.ghost   { background: #1e293b; color: #cbd5e1; border: 1px solid var(--border2); }
+
+    .drift-detail-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+      overflow: hidden;
+    }
+    .drift-detail-head {
+      padding: 10px 16px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; font-weight: 700; color: #f1f5f9;
+    }
+    .drift-detail-body { padding: 14px 16px; }
+    pre.drift-diff {
+      font-size: 11px; line-height: 1.7; font-family: 'SF Mono', 'Fira Code', monospace;
+      white-space: pre-wrap; overflow-x: auto;
+    }
+    .diff-add { color: #4ade80; }
+    .diff-rem { color: #f87171; }
+    .diff-ctx { color: var(--muted2); }
+
+    /* ════════════════════════════════
+       SCREEN 4 — USAGE BLOCK STATE
+    ════════════════════════════════ */
+    .block-body { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px; }
+    .block-card {
+      max-width: 480px; width: 100%;
+      background: var(--surface); border: 1px solid #7f1d1d;
+      border-radius: 16px; padding: 32px; text-align: center;
+      display: flex; flex-direction: column; align-items: center; gap: 16px;
+    }
+    .block-icon { font-size: 40px; }
+    .block-title { font-size: 18px; font-weight: 800; color: #f87171; }
+    .block-desc { font-size: 13px; color: #fca5a5; line-height: 1.6; }
+    .block-bar-wrap { width: 100%; }
+    .block-bar-label { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); margin-bottom: 6px; }
+    .block-bar-track { width: 100%; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden; }
+    .block-bar-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #dc2626, #ef4444); width: 100%; }
+    .block-reset { font-size: 12px; color: var(--muted); }
+    .block-reset strong { color: #f1f5f9; }
+    .block-actions { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    .block-cta-pro {
+      padding: 12px; border-radius: 10px; font-weight: 800; font-size: 13px;
+      background: linear-gradient(135deg, #f97316, #ea580c); color: #fff;
+      cursor: pointer; border: none;
+      box-shadow: 0 0 20px #f9731640;
+    }
+    .block-cta-wait {
+      padding: 10px; border-radius: 10px; font-weight: 600; font-size: 12px;
+      background: #1e293b; color: #94a3b8; cursor: pointer; border: 1px solid var(--border2);
+    }
+
+    /* ════════ USAGE BAR NA SALA ════════ */
+    .sala-uso {
+      margin: 8px 12px 0;
+      background: #020617; border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .sala-uso-title { font-size: 9.5px; font-weight: 700; color: var(--muted2); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 8px; }
+    .sala-uso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 5px; }
+    .sala-uso-label { font-size: 10px; color: var(--muted); min-width: 44px; }
+    .sala-uso-track { flex: 1; height: 5px; background: #1e293b; border-radius: 3px; overflow: hidden; }
+    .sala-uso-fill { height: 100%; border-radius: 3px; }
+    .sala-uso-fill.ok   { background: linear-gradient(90deg,#34d399,#22d3ee); }
+    .sala-uso-fill.warn { background: linear-gradient(90deg,#fbbf24,#f97316); }
+    .sala-uso-fill.red  { background: #dc2626; }
+    .sala-uso-reset { font-size: 9px; color: var(--muted2); margin-top: 4px; }
+  </style>
+</head>
+<body>
+
+  <!-- DEMO TABS -->
+  <div class="demo-tabs">
+    <div class="demo-tab active" onclick="switchTab('home')">🏠 Home / Cockpit</div>
+    <div class="demo-tab" onclick="switchTab('codepanel')">🖥️ Code Panel</div>
+    <div class="demo-tab" onclick="switchTab('chat')">💬 Chat</div>
+    <div class="demo-tab" onclick="switchTab('block')">🔴 Limite atingido</div>
+  </div>
+
+  <!-- APP -->
+  <div class="app">
+
+    <!-- ══════════════════════════
+         LEFT NAV
+    ══════════════════════════ -->
+    <nav class="nav">
+      <div class="nav-logo">
+        <div class="nav-logo-icon">F</div>
+        <div>
+          <div class="nav-logo-name">Forja</div>
+          <div class="nav-logo-sub">war room · PRs · agents</div>
+        </div>
+      </div>
+
+      <div class="nav-cta">+ Nova Demanda</div>
+
+      <div class="nav-section">Produto</div>
+      <div class="nav-item active" onclick="switchTab('home')">
+        <span class="icon">🏠</span> Home
+        <span class="nav-badge">3</span>
+      </div>
+      <div class="nav-item" onclick="switchTab('codepanel')">
+        <span class="icon">🖥️</span> Code Panel
+        <span class="nav-badge">2</span>
+      </div>
+      <div class="nav-item">
+        <span class="icon">⚔️</span> War Room
+        <span class="nav-badge live">ao vivo</span>
+      </div>
+
+      <div class="nav-section">Comunicação</div>
+      <div class="nav-item" onclick="switchTab('chat')">
+        <span class="icon">💬</span> Chat
+        <span class="nav-badge">2</span>
+      </div>
+
+      <div class="nav-section">Sistema</div>
+      <div class="nav-item" onclick="switchTab('drift')">
+        <span class="icon">📊</span> Relatórios
+      </div>
+      <div class="nav-item">
+        <span class="icon">🤖</span> Ayla
+      </div>
+      <div class="nav-item">
+        <span class="icon">⚙️</span> Config
+      </div>
+
+      <div class="nav-footer">
+        <div class="nav-avatar">R</div>
+        <div>
+          <div class="nav-user-name">Rafael</div>
+          <div class="nav-user-role">● ROOT</div>
+        </div>
+        <div class="nav-logout">↪</div>
+      </div>
+    </nav>
+
+    <!-- ══════════════════════════
+         MAIN AREA
+    ══════════════════════════ -->
+    <div class="main">
+
+      <!-- SCREEN 1: HOME / COCKPIT -->
+      <div class="screen active" id="screen-home">
+        <div class="topbar">
+          <span class="topbar-icon">🏠</span>
+          <div>
+            <div class="topbar-title">Home — Cockpit</div>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn-outline">Filtrar</button>
+            <button class="btn-primary">↗ Ver todos PRs</button>
+          </div>
+        </div>
+
+        <div class="cockpit-body">
+          <div class="stat-grid">
+            <div class="stat-card"><div class="stat-val">0</div><div class="stat-label">Em Execução</div></div>
+            <div class="stat-card"><div class="stat-val">0</div><div class="stat-label">Aguardando Review</div></div>
+            <div class="stat-card"><div class="stat-val">0</div><div class="stat-label">Commits Recentes</div></div>
+            <div class="stat-card"><div class="stat-val">16</div><div class="stat-label">Agentes Online</div></div>
+          </div>
+
+          <!-- Barra de uso (nova — modelo token) -->
+          <div class="uso-bar-wrap">
+            <div class="uso-bar-head">
+              <div class="uso-bar-title">⚡ Uso de hoje</div>
+              <div class="uso-bar-reset">Reseta à meia-noite (00:00 UTC-3)</div>
+            </div>
+            <div class="uso-rows">
+              <div class="uso-row">
+                <span class="uso-label">Dev</span>
+                <div class="uso-track"><div class="uso-fill ok" style="width:42%"></div></div>
+                <span class="uso-pct">42%</span>
+              </div>
+              <div class="uso-row">
+                <span class="uso-label">Qwen</span>
+                <div class="uso-track"><div class="uso-fill ok" style="width:65%"></div></div>
+                <span class="uso-pct">65%</span>
+              </div>
+              <div class="uso-row">
+                <span class="uso-label">Sonnet</span>
+                <div class="uso-track"><div class="uso-fill warn" style="width:78%"></div></div>
+                <span class="uso-pct">78%</span>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-head">⚡ Execuções ativas <span class="badge-live">ao vivo</span></div>
+          </div>
+          <div class="exec-table">
+            <div class="exec-header">
+              <span>Branch</span><span>Agentes</span><span>Fase</span><span>Iniciado</span><span>Status</span>
+            </div>
+            <div class="exec-row">
+              <span class="exec-branch">feat/auth-refresh</span>
+              <span>Apolo, Artemis</span>
+              <span>RED → GREEN</span>
+              <span style="color:var(--muted)">há 4 min</span>
+              <span><span class="chip-status chip-run">em execução</span></span>
+            </div>
+            <div class="exec-row">
+              <span class="exec-branch">fix/session-ttl</span>
+              <span>Hermes</span>
+              <span>Varredura</span>
+              <span style="color:var(--muted)">há 12 min</span>
+              <span><span class="chip-status chip-wait">aguardando</span></span>
+            </div>
+            <div class="exec-row">
+              <span class="exec-branch">chore/cleanup-branches</span>
+              <span>sistema</span>
+              <span>Concluído</span>
+              <span style="color:var(--muted)">há 18 min</span>
+              <span><span class="chip-status chip-ok">Concluído</span></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 2: CODE PANEL -->
+      <div class="screen" id="screen-codepanel">
+        <div class="topbar">
+          <span class="topbar-icon">🖥️</span>
+          <div>
+            <div class="topbar-title">Code Panel</div>
+            <div class="topbar-sub">Drift · Pipeline · Movimentações · Reviews · Diff</div>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn-outline">Filtrar</button>
+            <button class="btn-primary">↗ Ver todos PRs</button>
+          </div>
+        </div>
+
+        <!-- sub-tabs internos -->
+        <div style="display:flex;gap:0;border-bottom:1px solid #1e293b;flex-shrink:0;background:#080f1e;">
+          <div class="cp-tab active" onclick="switchCpTab('drift-tab')" style="padding:9px 18px;font-size:11px;font-weight:700;color:#f1f5f9;border-bottom:2px solid #f97316;cursor:pointer;">⚠️ Drift</div>
+          <div class="cp-tab" onclick="switchCpTab('pipeline-tab')" style="padding:9px 18px;font-size:11px;font-weight:600;color:#475569;border-bottom:2px solid transparent;cursor:pointer;">🚀 Pipeline</div>
+          <div class="cp-tab" onclick="switchCpTab('moves-tab')" style="padding:9px 18px;font-size:11px;font-weight:600;color:#475569;border-bottom:2px solid transparent;cursor:pointer;">📦 Movimentações</div>
+          <div class="cp-tab" onclick="switchCpTab('reviews-tab')" style="padding:9px 18px;font-size:11px;font-weight:600;color:#475569;border-bottom:2px solid transparent;cursor:pointer;">🔍 Reviews <span style="background:#f97316;color:#fff;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:4px;">2</span></div>
+          <div class="cp-tab" onclick="switchCpTab('diff-tab')" style="padding:9px 18px;font-size:11px;font-weight:600;color:#475569;border-bottom:2px solid transparent;cursor:pointer;">📄 Diff</div>
+        </div>
+
+        <!-- TAB: DRIFT -->
+        <div class="cp-panel active" id="drift-tab" style="overflow-y:auto;flex:1;padding:18px;display:flex;flex-direction:column;gap:14px;">
+          <div class="drift-alert">
+            <div class="drift-alert-icon">🔴</div>
+            <div>
+              <div class="drift-alert-title">Drift de lockfile — deploy bloqueado</div>
+              <div class="drift-alert-desc"><code>package-lock.json</code> dessincronizado com <code>package.json</code> (v0.4.28 → v0.5.0). Hermes detectou na varredura pré-deploy.</div>
+            </div>
+          </div>
+          <div class="drift-alert warn">
+            <div class="drift-alert-icon">🟡</div>
+            <div>
+              <div class="drift-alert-title">Drift de schema — coluna <code>agent_tier</code> ausente</div>
+              <div class="drift-alert-desc">Migration <code>0071</code> aplicada no Neon, não refletida em <code>prisma/schema.prisma</code>.</div>
+            </div>
+          </div>
+          <div class="drift-alert info">
+            <div class="drift-alert-icon">🔵</div>
+            <div>
+              <div class="drift-alert-title">2 envs ausentes no EC2</div>
+              <div class="drift-alert-desc"><code>OLIMPO_PERSONAL_VAULT_KEY</code> e <code>OLIMPO_ORCHESTRATE_ENABLED</code> em <code>.env.local</code> mas não no servidor.</div>
+            </div>
+          </div>
+          <div class="drift-table">
+            <div class="drift-thead">
+              <span>Arquivo</span><span>Atual</span><span>Esperado</span><span>Tipo</span><span>Severidade</span>
+            </div>
+            <div class="drift-row">
+              <span class="drift-file">package-lock.json</span>
+              <span class="drift-val-old">v0.4.28</span><span class="drift-val-new">v0.5.0</span>
+              <span class="drift-kind">lockfile</span>
+              <span><span class="chip-status chip-fail">bloqueante</span></span>
+            </div>
+            <div class="drift-row">
+              <span class="drift-file">prisma/schema.prisma</span>
+              <span class="drift-val-old">sem agent_tier</span><span class="drift-val-new">agent_tier?</span>
+              <span class="drift-kind">schema</span>
+              <span><span class="chip-status chip-wait">atenção</span></span>
+            </div>
+            <div class="drift-row">
+              <span class="drift-file">EC2 .env</span>
+              <span class="drift-val-old">ausente</span><span class="drift-val-new">VAULT_KEY set</span>
+              <span class="drift-kind">env</span>
+              <span><span class="chip-status chip-wait">atenção</span></span>
+            </div>
+          </div>
+          <div class="drift-actions">
+            <button class="drift-btn primary">▶ npm install (corrige lockfile)</button>
+            <button class="drift-btn ghost">📋 Copiar relatório</button>
+            <button class="drift-btn danger">⚠️ Deploy mesmo assim</button>
+          </div>
+        </div>
+
+        <!-- TAB: PIPELINE -->
+        <div class="cp-panel" id="pipeline-tab" style="overflow-y:auto;flex:1;padding:18px;display:none;flex-direction:column;gap:16px;">
+
+          <!-- stepper visual -->
+          <div style="display:flex;align-items:center;gap:0;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:16px 20px;overflow-x:auto;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:#052e16;border:2px solid #4ade80;display:flex;align-items:center;justify-content:center;font-size:16px;">✅</div>
+              <span style="font-size:10px;font-weight:700;color:#4ade80;">Commit</span>
+              <span style="font-size:9px;color:var(--muted);">concluído</span>
+            </div>
+            <div style="flex:1;height:2px;background:linear-gradient(90deg,#4ade80,#22d3ee);min-width:24px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:#052e16;border:2px solid #4ade80;display:flex;align-items:center;justify-content:center;font-size:16px;">✅</div>
+              <span style="font-size:10px;font-weight:700;color:#4ade80;">Push</span>
+              <span style="font-size:9px;color:var(--muted);">origin/feat</span>
+            </div>
+            <div style="flex:1;height:2px;background:linear-gradient(90deg,#22d3ee,#f97316);min-width:24px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:#1a1206;border:2px solid #f97316;display:flex;align-items:center;justify-content:center;font-size:16px;">🔄</div>
+              <span style="font-size:10px;font-weight:700;color:#f97316;">PR</span>
+              <span style="font-size:9px;color:var(--muted);">em auditoria</span>
+            </div>
+            <div style="flex:1;height:2px;background:#1e293b;min-width:24px;"></div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:80px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:#0f172a;border:2px solid #334155;display:flex;align-items:center;justify-content:center;font-size:16px;">⏳</div>
+              <span style="font-size:10px;font-weight:600;color:var(--muted2);">Merge</span>
+              <span style="font-size:9px;color:var(--muted);">aguardando</span>
+            </div>
+          </div>
+
+          <!-- PR ativo -->
+          <div style="background:var(--surface);border:1px solid #1e3a5f;border-radius:10px;overflow:hidden;">
+            <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;">
+              <span style="font-size:13px;">🔄</span>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#f1f5f9;">PR #871 — feat(billing): token counter Free tier</div>
+                <div style="font-size:10px;color:var(--muted);">olimpo/feat/billing-token → main · Artemis · aberto há 14 min</div>
+              </div>
+              <span style="margin-left:auto;"><span class="chip-status chip-wait">em auditoria</span></span>
+            </div>
+            <div style="padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+              <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;">Auditoria dos agentes</div>
+              <div style="display:flex;flex-direction:column;gap:6px;">
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                  <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#a78bfa,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;">A</div>
+                  <span style="color:#cbd5e1;flex:1;">Atena — impacto arquitetural, dependências</span>
+                  <span class="chip-status chip-run" style="font-size:9px;">analisando</span>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;font-size:12px;">
+                  <div style="width:22px;height:22px;border-radius:50%;background:linear-gradient(135deg,#34d399,#059669);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#fff;">A</div>
+                  <span style="color:#cbd5e1;flex:1;">Apolo — cobertura de testes, regressão</span>
+                  <span class="chip-status chip-ok" style="font-size:9px;">PASS</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:8px;margin-top:4px;">
+                <button class="drift-btn primary" style="flex:1;font-size:11px;">✓ Aprovar e fazer Merge</button>
+                <button class="drift-btn danger" style="font-size:11px;">✗ Rejeitar PR</button>
+                <button class="drift-btn ghost" style="font-size:11px;">📋 Copiar link do PR</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- histórico recente -->
+          <div style="font-size:11px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:.06em;">Histórico recente</div>
+          <div class="exec-table">
+            <div class="exec-header" style="grid-template-columns:70px 1fr 90px 80px 80px;">
+              <span>Ação</span><span>Branch / Descrição</span><span>Agente</span><span>Há</span><span>Status</span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:70px 1fr 90px 80px 80px;">
+              <span><span class="chip-status chip-ok" style="font-size:9px;">merge</span></span>
+              <span class="exec-branch">fix/auth-refresh → main</span>
+              <span style="color:var(--muted);font-size:11px;">Rafael</span>
+              <span style="color:var(--muted);">1h</span>
+              <span><span class="chip-status chip-ok">✓</span></span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:70px 1fr 90px 80px 80px;">
+              <span><span class="chip-status chip-ok" style="font-size:9px;">push</span></span>
+              <span class="exec-branch">olimpo/feat/billing-token</span>
+              <span style="color:var(--muted);font-size:11px;">Artemis</span>
+              <span style="color:var(--muted);">14 min</span>
+              <span><span class="chip-status chip-ok">✓</span></span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:70px 1fr 90px 80px 80px;">
+              <span><span class="chip-status chip-ok" style="font-size:9px;">commit</span></span>
+              <span style="font-family:monospace;font-size:11px;color:#7dd3fc;">feat: token counter dual profile</span>
+              <span style="color:var(--muted);font-size:11px;">Artemis</span>
+              <span style="color:var(--muted);">16 min</span>
+              <span><span class="chip-status chip-ok">✓</span></span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TAB: MOVIMENTAÇÕES -->
+        <div class="cp-panel" id="moves-tab" style="overflow-y:auto;flex:1;padding:18px;display:none;flex-direction:column;gap:12px;">
+          <div class="exec-table">
+            <div class="exec-header" style="grid-template-columns:90px 1fr 140px 90px;">
+              <span>Tipo</span><span>Descrição</span><span>Branch</span><span>Há</span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:90px 1fr 140px 90px;">
+              <span><span class="chip-status chip-ok">commit</span></span>
+              <span style="color:#cbd5e1;">fix(auth): preserve role across refresh token rotation</span>
+              <span class="exec-branch">main</span>
+              <span style="color:var(--muted);">2 min</span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:90px 1fr 140px 90px;">
+              <span><span class="chip-status chip-run">PR aberto</span></span>
+              <span style="color:#cbd5e1;">feat(billing): token counter Free tier</span>
+              <span class="exec-branch">olimpo/feat/billing-token</span>
+              <span style="color:var(--muted);">14 min</span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:90px 1fr 140px 90px;">
+              <span><span class="chip-status chip-ok">merge</span></span>
+              <span style="color:#cbd5e1;">fix(model): roteamento por tier de agente</span>
+              <span class="exec-branch">main</span>
+              <span style="color:var(--muted);">1h</span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:90px 1fr 140px 90px;">
+              <span><span class="chip-status chip-wait">branch</span></span>
+              <span style="color:#cbd5e1;">olimpo/feat/code-panel criada</span>
+              <span class="exec-branch">olimpo/feat/code-panel</span>
+              <span style="color:var(--muted);">2h</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: REVIEWS -->
+        <div class="cp-panel" id="reviews-tab" style="overflow-y:auto;flex:1;padding:18px;display:none;flex-direction:column;gap:12px;">
+          <div class="exec-table">
+            <div class="exec-header" style="grid-template-columns:60px 1fr 120px 80px 90px;">
+              <span>PR</span><span>Título</span><span>Autor</span><span>Agentes</span><span>Status</span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:60px 1fr 120px 80px 90px;">
+              <span class="exec-branch">#871</span>
+              <span style="color:#cbd5e1;">feat(billing): token counter Free tier</span>
+              <span style="color:var(--muted);">Artemis</span>
+              <span style="color:var(--muted);">Atena · Apolo</span>
+              <span><span class="chip-status chip-wait">em auditoria</span></span>
+            </div>
+            <div class="exec-row" style="grid-template-columns:60px 1fr 120px 80px 90px;">
+              <span class="exec-branch">#870</span>
+              <span style="color:#cbd5e1;">docs(claude): regra canônica de auditoria de PR</span>
+              <span style="color:var(--muted);">rafasdiass</span>
+              <span style="color:var(--muted);">—</span>
+              <span><span class="chip-status chip-ok">aprovado</span></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- TAB: DIFF -->
+        <div class="cp-panel" id="diff-tab" style="overflow-y:auto;flex:1;padding:18px;display:none;flex-direction:column;gap:12px;">
+          <div class="drift-detail-card">
+            <div class="drift-detail-head">📄 platform/billing/token-counter.ts — PR #871</div>
+            <div class="drift-detail-body">
+              <pre class="drift-diff"><span class="diff-ctx">// token-counter.ts</span>
+<span class="diff-add">+ export const FREE_DEV_DAILY_TOKENS   = 100_000</span>
+<span class="diff-add">+ export const FREE_USER_DAILY_TOKENS  =  50_000</span>
+<span class="diff-ctx"></span>
+<span class="diff-ctx">  export async function incrementTokens(</span>
+<span class="diff-ctx">    userId: string,</span>
+<span class="diff-add">+   profile: 'dev' | 'user',</span>
+<span class="diff-ctx">    tokens: number</span>
+<span class="diff-ctx">  ) {</span>
+<span class="diff-rem">-   const limit = FREE_DAILY_TOKENS</span>
+<span class="diff-add">+   const limit = profile === 'dev'</span>
+<span class="diff-add">+     ? FREE_DEV_DAILY_TOKENS</span>
+<span class="diff-add">+     : FREE_USER_DAILY_TOKENS</span>
+<span class="diff-ctx">    const current = await redis.incrby(`tokens:${userId}:day`, tokens)</span>
+<span class="diff-ctx">    if (current > limit) throw new QuotaExceededError()</span>
+<span class="diff-ctx">  }</span></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: CHAT -->
+      <div class="screen" id="screen-chat">
+        <div class="topbar">
+          <span class="topbar-icon">💬</span>
+          <div class="topbar-title">Chat</div>
+          <div class="topbar-actions">
+            <span style="cursor:pointer;color:var(--muted);font-size:16px;">🔍</span>
+            <span style="cursor:pointer;color:var(--muted);font-size:16px;">✏️</span>
+          </div>
+        </div>
+        <div class="chat-layout">
+          <div class="chat-sidebar">
+            <div class="chat-section">Canais</div>
+            <div class="chat-channel"><span class="ch-icon">🔒</span> engenharia</div>
+            <div class="chat-channel"><span class="ch-icon">#</span> social</div>
+            <div class="chat-channel" style="color:var(--muted);font-size:11px;padding-left:18px;">+ Criar canal privado</div>
+
+            <div class="chat-section" style="margin-top:6px;">Direto — Agentes</div>
+            <div class="chat-dm active">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#06b6d4,#0891b2);">A</div>
+              <span class="dm-name">@Ayla</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#f472b6,#ec4899);">A</div>
+              <span class="dm-name">@Artemis</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#a78bfa,#7c3aed);">A</div>
+              <span class="dm-name">@Atena</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#34d399,#059669);">A</div>
+              <span class="dm-name">@Apolo</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#f9a8d4,#db2777);">A</div>
+              <span class="dm-name">@Afrodite</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#fbbf24,#d97706);">H</div>
+              <span class="dm-name">@Hermes</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#94a3b8,#475569);">H</div>
+              <span class="dm-name">@Hefesto</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#c084fc,#9333ea);">H</div>
+              <span class="dm-name">@Hera</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#67e8f9,#0891b2);">Í</div>
+              <span class="dm-name">@Íris</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#67e8f9,#0284c7);">Q</div>
+              <span class="dm-name">@Quíron</span>
+            </div>
+            <div class="chat-dm">
+              <div class="dm-avatar" style="background:linear-gradient(135deg,#86efac,#16a34a);">G</div>
+              <span class="dm-name">@Gaia</span>
+            </div>
+          </div>
+
+          <div class="chat-main">
+            <div class="chat-content">
+              <div class="icon-big">💬</div>
+              <div class="hint">Comece a conversa com Ayla</div>
+            </div>
+            <div class="chat-input-wrap">
+              <input class="chat-input" type="text" placeholder="Mensagem para Ayla…">
+              <div class="chat-send">➤</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SCREEN 3: DRIFT DETECTION -->
+      <div class="screen" id="screen-drift">
+        <div class="topbar">
+          <span class="topbar-icon">⚠️</span>
+          <div>
+            <div class="topbar-title">Drift Detection</div>
+            <div class="topbar-sub">3 drifts detectados — revisão necessária antes do deploy</div>
+          </div>
+          <div class="topbar-actions">
+            <button class="btn-outline">Ignorar todos</button>
+            <button class="btn-primary">✓ Resolver drifts</button>
+          </div>
+        </div>
+
+        <div class="drift-body">
+
+          <!-- Alert principal -->
+          <div class="drift-alert">
+            <div class="drift-alert-icon">🔴</div>
+            <div>
+              <div class="drift-alert-title">Drift de lockfile detectado — deploy bloqueado</div>
+              <div class="drift-alert-desc">
+                <code>package-lock.json</code> está dessincronizado com <code>package.json</code> (v0.4.28 → v0.5.0).
+                O Hermes detectou durante a varredura pré-deploy. O Apolo está aguardando resolução antes de rodar os testes de integração.
+              </div>
+            </div>
+          </div>
+
+          <div class="drift-alert warn">
+            <div class="drift-alert-icon">🟡</div>
+            <div>
+              <div class="drift-alert-title">Drift de schema — tabela <code>context_events</code></div>
+              <div class="drift-alert-desc">
+                Migration <code>0071</code> aplicada no Neon mas não refletida no schema local (<code>prisma/schema.prisma</code>).
+                Coluna <code>agent_tier</code> presente no banco, ausente no modelo.
+              </div>
+            </div>
+          </div>
+
+          <div class="drift-alert info">
+            <div class="drift-alert-icon">🔵</div>
+            <div>
+              <div class="drift-alert-title">Drift de env — 2 variáveis ausentes no EC2</div>
+              <div class="drift-alert-desc">
+                <code>OLIMPO_PERSONAL_VAULT_KEY</code> e <code>OLIMPO_ORCHESTRATE_ENABLED</code> estão em <code>.env.local</code> mas não foram detectadas no EC2.
+                Hermes recomenda sync antes do próximo deploy.
+              </div>
+            </div>
+          </div>
+
+          <div class="drift-section-title">Detalhamento</div>
+
+          <div class="drift-table">
+            <div class="drift-thead">
+              <span>Arquivo</span>
+              <span>Valor atual</span>
+              <span>Valor esperado</span>
+              <span>Tipo</span>
+              <span>Severidade</span>
+            </div>
+            <div class="drift-row">
+              <span class="drift-file">package-lock.json</span>
+              <span class="drift-val-old">v0.4.28</span>
+              <span class="drift-val-new">v0.5.0</span>
+              <span class="drift-kind">lockfile</span>
+              <span><span class="chip-status chip-fail">bloqueante</span></span>
+            </div>
+            <div class="drift-row">
+              <span class="drift-file">prisma/schema.prisma</span>
+              <span class="drift-val-old">sem agent_tier</span>
+              <span class="drift-val-new">agent_tier String?</span>
+              <span class="drift-kind">schema</span>
+              <span><span class="chip-status chip-wait">atenção</span></span>
+            </div>
+            <div class="drift-row">
+              <span class="drift-file">EC2 .env</span>
+              <span class="drift-val-old">ausente</span>
+              <span class="drift-val-new">VAULT_KEY set</span>
+              <span class="drift-kind">env</span>
+              <span><span class="chip-status chip-wait">atenção</span></span>
+            </div>
+            <div class="drift-row">
+              <span class="drift-file">tsconfig.json</span>
+              <span class="drift-val-old">—</span>
+              <span class="drift-val-new">—</span>
+              <span class="drift-kind">config</span>
+              <span><span class="chip-status chip-ok">ok</span></span>
+            </div>
+          </div>
+
+          <div class="drift-detail-card">
+            <div class="drift-detail-head">
+              <span>📄</span> Diff — package-lock.json (trecho)
+            </div>
+            <div class="drift-detail-body">
+              <pre class="drift-diff"><span class="diff-ctx">  "name": "olimpo",</span>
+<span class="diff-rem">-  "version": "0.4.28",</span>
+<span class="diff-add">+  "version": "0.5.0",</span>
+<span class="diff-ctx">  "lockfileVersion": 3,</span>
+<span class="diff-rem">-  "resolved": "https://registry.npmjs.org/olimpo/-/olimpo-0.4.28.tgz",</span>
+<span class="diff-add">+  "resolved": "https://registry.npmjs.org/olimpo/-/olimpo-0.5.0.tgz",</span></pre>
+            </div>
+          </div>
+
+          <div class="drift-actions">
+            <button class="drift-btn primary">▶ Rodar npm install (corrige lockfile)</button>
+            <button class="drift-btn ghost">📋 Copiar relatório completo</button>
+            <button class="drift-btn danger">⚠️ Deploy mesmo assim (não recomendado)</button>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SCREEN 4: LIMITE ATINGIDO -->
+      <div class="screen" id="screen-block">
+        <div class="topbar">
+          <span class="topbar-icon">🔴</span>
+          <div class="topbar-title">Home — Cockpit</div>
+        </div>
+        <div class="block-body">
+          <div class="block-card">
+            <div class="block-icon">⚡</div>
+            <div class="block-title">Limite diário atingido</div>
+            <div class="block-desc">
+              Você usou toda a sua cota de hoje. A barra reseta automaticamente à meia-noite — ou suba pro Pro e continue agora.
+            </div>
+            <div class="block-bar-wrap">
+              <div class="block-bar-label">
+                <span>Uso de hoje</span>
+                <span>100%</span>
+              </div>
+              <div class="block-bar-track">
+                <div class="block-bar-fill"></div>
+              </div>
+            </div>
+            <div class="block-reset">Próximo reset: <strong>00:00 UTC-3</strong> (meia-noite)</div>
+            <div class="block-actions">
+              <button class="block-cta-pro">⚡ Assinar o Pro — R$99/mês</button>
+              <button class="block-cta-wait">Esperar o reset (grátis)</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /main -->
+
+    <!-- ══════════════════════════
+         RIGHT SIDEBAR — NA SALA
+    ══════════════════════════ -->
+    <aside class="sala">
+      <div class="sala-header">
+        <span class="sala-title">Na Sala</span>
+        <span class="sala-count">16</span>
+      </div>
+
+      <!-- barra de uso compacta -->
+      <div class="sala-uso">
+        <div class="sala-uso-title">Uso hoje</div>
+        <div class="sala-uso-row">
+          <span class="sala-uso-label">Geral</span>
+          <div class="sala-uso-track"><div class="sala-uso-fill ok" style="width:42%"></div></div>
+        </div>
+        <div class="sala-uso-row">
+          <span class="sala-uso-label">Sonnet</span>
+          <div class="sala-uso-track"><div class="sala-uso-fill warn" style="width:78%"></div></div>
+        </div>
+        <div class="sala-uso-reset">Reseta à meia-noite</div>
+      </div>
+
+      <div class="sala-list">
+        <div class="sala-item"><div class="sala-dot dot-ayla"></div><span class="sala-name">Ayla</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-hermes"></div><span class="sala-name">Hermes</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-atena"></div><span class="sala-name">Atena</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-apolo"></div><span class="sala-name">Apolo</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-iris"></div><span class="sala-name">Íris</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-artemis"></div><span class="sala-name">Artemis</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-hefesto"></div><span class="sala-name">Hefesto</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-afrodite"></div><span class="sala-name">Afrodite</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-hera"></div><span class="sala-name">Hera</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-quiron"></div><span class="sala-name">Quíron</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-gaia"></div><span class="sala-name">Gaia</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-musa"></div><span class="sala-name">Musa</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-atlas"></div><span class="sala-name">Atlas</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-hestia"></div><span class="sala-name">Héstia</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-yara"></div><span class="sala-name">Yara</span><span class="sala-status">online</span></div>
+        <div class="sala-item"><div class="sala-dot dot-zeus"></div><span class="sala-name">Zeus</span><span class="sala-status">online</span></div>
+      </div>
+    </aside>
+
+  </div><!-- /app -->
+
+  <script>
+    const TAB_IDS = ['home','codepanel','chat','block']
+
+    function switchTab(id) {
+      document.querySelectorAll('.demo-tab').forEach((t,i) => {
+        t.classList.toggle('active', TAB_IDS[i] === id)
+      })
+      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'))
+      document.getElementById('screen-' + id).classList.add('active')
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'))
+    }
+
+    function switchCpTab(tabId) {
+      // update sub-tab styles
+      document.querySelectorAll('.cp-tab').forEach(t => {
+        const isActive = t.getAttribute('onclick').includes(tabId)
+        t.style.color = isActive ? '#f1f5f9' : '#475569'
+        t.style.borderBottom = isActive ? '2px solid #f97316' : '2px solid transparent'
+        t.style.fontWeight = isActive ? '700' : '600'
+      })
+      document.querySelectorAll('.cp-panel').forEach(p => {
+        p.style.display = p.id === tabId ? 'flex' : 'none'
+      })
+    }
+  </script>
+
+</body>
+</html>

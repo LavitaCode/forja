@@ -125,7 +125,7 @@
   <div class="header">
     <div class="brand"><img src="forja-logo.svg" alt="Forja"><span class="brand-name">Forja</span></div>
     <div class="h1">Comece grátis.<br><span class="ember">Forje sem limites</span> quando precisar.</div>
-    <div class="sub">10 invocações grátis, 1 agente — experimente a memória episódica sem cartão. Quando quiser todos os agentes sem limite, sobe pro Pro.</div>
+    <div class="sub">Comece grátis, sem cartão. Dev ou usuário comum — a Forja roteia o modelo certo em cada mensagem. Quando precisar de mais, sobe pro Pro.</div>
   </div>
 
   <!-- BILLING TOGGLE -->
@@ -141,7 +141,7 @@
     <div class="plan">
       <div class="plan-head">
         <div class="plan-name"><span class="plan-tier-icon" style="background:#0f2a1a;color:#34d399;">💬</span> Free</div>
-        <div class="plan-for">10 invocações · 1 agente · sentir o valor sem compromisso</div>
+        <div class="plan-for">Dev ou usuário comum · 1 agente · sentir o valor sem compromisso</div>
       </div>
       <div>
         <div class="plan-price"><span class="pp-currency">R$</span><span class="pp-value">0</span><span class="pp-period">/ sempre</span></div>
@@ -149,14 +149,15 @@
       </div>
       <a class="plan-cta cta-free">Criar conta grátis</a>
       <div class="feat-list">
-        <div class="feat-group-title">Invocações</div>
-        <div class="feat"><span class="ic yes">✓</span><div><strong>10 invocações</strong> · 1 agente especialista</div></div>
+        <div class="feat-group-title">Uso diário</div>
+        <div class="feat"><span class="ic yes">✓</span><div><strong>Barra de uso diária</strong> — reseta toda meia-noite (00:00 UTC-3)</div></div>
+        <div class="feat"><span class="ic yes">✓</span><div><strong>Dev:</strong> ~20 invocações técnicas/dia · <strong>Usuário:</strong> ~30 mensagens/dia</div></div>
+        <div class="feat"><span class="ic yes">✓</span><div>Roteamento automático — Qwen no casual, Sonnet no técnico</div></div>
         <div class="feat"><span class="ic yes">✓</span><div>Memória episódica cross-sessão (Neon)</div></div>
-        <div class="feat"><span class="ic yes">✓</span><div>Contexto persiste entre sessões de trabalho</div></div>
         <div class="feat-group-title">Não incluído</div>
-        <div class="feat off"><span class="ic no">—</span><div>Todos os agentes (só 1 no free)</div></div>
+        <div class="feat off"><span class="ic no">—</span><div>Todos os agentes (só 1 + Ayla no free)</div></div>
         <div class="feat off"><span class="ic no">—</span><div>War Room, Reviews e execução de código</div></div>
-        <div class="feat off"><span class="ic no">—</span><div>invoke_agent ilimitado</div></div>
+        <div class="feat off"><span class="ic no">—</span><div>Claude Opus (heavy tasks)</div></div>
       </div>
     </div>
 
@@ -169,7 +170,7 @@
       </div>
       <div>
         <div class="plan-price"><span class="pp-currency">R$</span><span class="pp-value">99</span><span class="pp-period">/ mês</span></div>
-        <div class="pp-note">Por usuário · cancele quando quiser</div>
+        <div class="pp-note">Por usuário · cancele quando quiser · dados preservados</div>
       </div>
       <a class="plan-cta cta-pro">Assinar o Pro</a>
       <div class="feat-list">
@@ -219,9 +220,11 @@
     <div class="wb-grid">
       <div class="wb-card">
         <div class="wb-card-name">Free · diário</div>
-        <div class="wb-bar-row"><span class="wb-bar-label">Sonnet</span><div class="wb-bar-track"><div class="wb-bar-fill" style="width:40%;background:#22d3ee;"></div></div></div>
-        <div class="wb-bar-row"><span class="wb-bar-label">Qwen</span><div class="wb-bar-track"><div class="wb-bar-fill" style="width:65%;background:#34d399;"></div></div></div>
-        <div class="wb-meta">~15 msg Sonnet + 20-25 Qwen/dia. <strong>Reseta toda meia-noite.</strong></div>
+        <div style="font-size:.6rem;color:#475569;margin-bottom:.5rem;">Dev (~20 invocações)</div>
+        <div class="wb-bar-row"><span class="wb-bar-label">Uso hoje</span><div class="wb-bar-track"><div class="wb-bar-fill" style="width:45%;background:linear-gradient(90deg,#34d399,#22d3ee);"></div></div></div>
+        <div style="font-size:.6rem;color:#475569;margin-top:.35rem;margin-bottom:.5rem;">Usuário comum (~30 mensagens)</div>
+        <div class="wb-bar-row"><span class="wb-bar-label">Uso hoje</span><div class="wb-bar-track"><div class="wb-bar-fill" style="width:30%;background:linear-gradient(90deg,#34d399,#22d3ee);"></div></div></div>
+        <div class="wb-meta"><strong>Reseta toda meia-noite (00:00 UTC-3).</strong> Qwen absorve o casual — sua barra dura mais.</div>
       </div>
       <div class="wb-card" style="border-color:#431407;">
         <div class="wb-card-name" style="color:#fb923c;">Pro · janela 5h</div>
@@ -255,11 +258,15 @@
     <div class="faq-title">Perguntas frequentes</div>
     <div class="faq-item">
       <div class="faq-q">O que acontece quando atinjo o limite?</div>
-      <div class="faq-a">O agente pausa e te diz quando a janela renova (no Free, à meia-noite; no Pro, a cada 5h). Nada é cobrado a mais — é só esperar o reset ou subir de plano.</div>
+      <div class="faq-a">A barra fica vermelha, o agente pausa e mostra quando renova (no Free, toda meia-noite; no Pro, a cada 5h após a última mensagem). Nada é cobrado a mais — é só esperar ou subir de plano.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">O Free é grátis de verdade?</div>
-      <div class="faq-a">Sim, pra sempre e sem cartão. 10 invocações, 1 agente — suficiente pra sentir a memória episódica. O que o Free não tem é acesso a todos os agentes e invocações ilimitadas — isso é Pro.</div>
+      <div class="faq-a">Sim, pra sempre e sem cartão. Dev ou usuário comum — a barra diária reseta toda meia-noite. O que o Free não tem é acesso a todos os agentes e à janela Pro — isso é Pro.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q">Como a Forja decide qual modelo usar?</div>
+      <div class="faq-a">Roteamento automático: Qwen no papo casual (rápido e econômico), Sonnet no técnico, Opus (Pro/Team) nas tarefas pesadas. Você não escolhe — a Forja faz por você, e isso é o que faz sua barra durar mais no Free.</div>
     </div>
     <div class="faq-item">
       <div class="faq-q">Quantas pessoas precisam pra ser um Team?</div>

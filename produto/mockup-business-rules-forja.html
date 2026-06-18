@@ -292,7 +292,7 @@
           <div class="tier-price-sub">sempre gratuito · sem cartão</div>
         </div>
         <ul class="tier-features">
-          <li><strong>10 invocações/mês</strong> (reset dia 1º)</li>
+          <li><strong>10 invocações/dia</strong> (reset meia-noite)</li>
           <li><strong>1 agente</strong> — Ayla (default, orquestradora)</li>
           <li>Qwen (casual) + Sonnet (técnico)</li>
           <li>32k tokens de contexto</li>
@@ -375,8 +375,8 @@
     <div class="reset-flow">
       <div class="reset-card">
         <div class="reset-card-label">Free — reset</div>
-        <div class="reset-card-value">Dia 1º do mês</div>
-        <div class="reset-card-desc">00:00 UTC-3 (horário Brasília). Cron job diário verifica e reseta se chegou a data. Email D-1 avisando.</div>
+        <div class="reset-card-value">Meia-noite (todo dia)</div>
+        <div class="reset-card-desc">00:00 UTC-3 (horário Brasília). Cron job diário zera o contador. UI mostra horário do próximo reset ao atingir o limite.</div>
       </div>
       <div class="reset-card">
         <div class="reset-card-label">Pro — reset</div>
@@ -399,9 +399,9 @@
         <div class="reset-card-desc">Janela/pool cheia imediatamente após upgrade. Não espera próximo ciclo.</div>
       </div>
       <div class="reset-card ok">
-        <div class="reset-card-label">Downgrade</div>
-        <div class="reset-card-value">Grace period</div>
-        <div class="reset-card-desc">Novos limites só no próximo ciclo. Tier atual mantido até fim do período pago.</div>
+        <div class="reset-card-label">Cancelamento</div>
+        <div class="reset-card-value">Block (não Free)</div>
+        <div class="reset-card-desc">Plano ativo até fim do período pago. Após expirar → BLOCKED. Histórico e sessões intactos. Reativa com 1 clique.</div>
       </div>
     </div>
   </section>
@@ -452,6 +452,7 @@
         <div class="mem-stages">
           <div class="mem-stage"><span class="mem-dot on"></span>Ativo enquanto usa</div>
           <div class="mem-stage"><span class="mem-dot on"></span>365 dias inatividade → soft archive</div>
+          <div class="mem-stage"><span class="mem-dot"></span>+180d após archive → hard delete (com aviso D-7)</div>
           <div class="mem-stage"><span class="mem-dot on"></span>Sessões compartilhadas no workspace</div>
           <div class="mem-stage"><span class="mem-dot"></span>Contexto: <span class="mem-token">200k tokens · 20 turns</span></div>
         </div>
@@ -489,7 +490,7 @@
             <td><span class="val">200.000 tokens</span></td>
             <td><span class="val">20 turns</span></td>
             <td>365 dias</td>
-            <td>+180d archive</td>
+            <td>+180d após archive</td>
           </tr>
         </tbody>
       </table>
@@ -690,8 +691,8 @@
         <div class="gate-num">⚠</div>
         <div class="gate-body">
           <div class="gate-title">Cartão recusado (Stripe)</div>
-          <div class="gate-desc">Grace period 7 dias. 3 retries (D+0, D+3, D+5). Emails: D+0 (falha), D+3 (aviso), D+6 (downgrade iminente), D+7 (downgraded para Free).</div>
-          <span class="gate-chip">D+7 sem pagamento → downgrade Free automático</span>
+          <div class="gate-desc">Grace period 7 dias. 3 retries: D+0, D+3, D+5. Emails: D+0 (falha), D+3 (aviso), D+6 (bloqueio iminente), D+7 (conta bloqueada). Sem downgrade — dados e sessões preservados. Self-cure: atualiza cartão → desbloqueio imediato + goodwill.</div>
+          <span class="gate-chip">D+7 sem pagamento → BLOCK (não Free) · reativa com 1 clique</span>
         </div>
       </div>
       <div class="gate-row ok">
@@ -705,9 +706,9 @@
       <div class="gate-row ok">
         <div class="gate-num">✓</div>
         <div class="gate-body">
-          <div class="gate-title">Downgrade — grace period</div>
-          <div class="gate-desc">Novos limites aplicam-se apenas no próximo ciclo de billing (não imediato). Usuário mantém tier pago até fim do período.</div>
-          <span class="gate-chip">Novos limites no próximo ciclo</span>
+          <div class="gate-title">Cancelamento voluntário — block após expirar</div>
+          <div class="gate-desc">Plano ativo até fim do período pago. Após expirar → BLOCKED (não downgrade para Free). Histórico, sessões e memória preservados. Reativação com goodwill (janela/pool cheia).</div>
+          <span class="gate-chip">Sem downgrade · dados intactos · reativa com 1 clique</span>
         </div>
       </div>
     </div>
@@ -750,8 +751,8 @@
       </div>
       <div class="edge-card">
         <div class="edge-title">War Room — pool por invoke</div>
-        <div class="edge-desc">Cada invoke no War Room = 1 do pool do tier, independente de quantos agentes respondem internamente. Orquestração interna não multiplica o custo.</div>
-        <div class="edge-rule yes">✓ 1 invoke = 1 do pool (sempre)</div>
+        <div class="edge-desc">1 mensagem do usuário ao War Room = 1 invoke do pool, independente de quantos agentes especialistas a Ayla acionar internamente. A orquestração interna é invisível para o billing.</div>
+        <div class="edge-rule yes">✓ 1 mensagem do usuário = 1 invoke (sempre)</div>
       </div>
       <div class="edge-card">
         <div class="edge-title">Limites simultâneos</div>
@@ -779,8 +780,8 @@
           <tr>
             <td><span class="dr-id">BR-01</span></td>
             <td>Reset Free</td>
-            <td><span class="dr-rule">Mensal (dia 1º)</span><br><span style="font-size:.75rem;color:#64748b;">ICP faz sprints — reset diário puniria uso legítimo</span></td>
-            <td><span class="dr-discard">Diário (punitive p/ sprints)</span></td>
+            <td><span class="dr-rule">Diário (meia-noite)</span><br><span style="font-size:.75rem;color:#64748b;">Cria hábito + urgência de conversão — estilo Claude. ICP que faz sprint paga Pro.</span></td>
+            <td><span class="dr-discard">Mensal (baixa frequência, sem urgência)</span></td>
           </tr>
           <tr>
             <td><span class="dr-id">BR-02</span></td>
@@ -832,9 +833,15 @@
           </tr>
           <tr>
             <td><span class="dr-id">BR-10</span></td>
-            <td>Downgrade</td>
-            <td><span class="dr-rule">Grace period até próximo ciclo</span><br><span style="font-size:.75rem;color:#64748b;">Usuário que pagou até fim do mês mantém o tier</span></td>
-            <td><span class="dr-discard">Downgrade imediato (Vercel: gerou reclamações)</span></td>
+            <td>Cancelamento voluntário</td>
+            <td><span class="dr-rule">BLOCK após expirar período pago</span><br><span style="font-size:.75rem;color:#64748b;">Tier cancelado = conta em espera, não degradada. Histórico preservado. Reativação com goodwill.</span></td>
+            <td><span class="dr-discard">Downgrade para Free (destrói moat)</span></td>
+          </tr>
+          <tr>
+            <td><span class="dr-id">BR-11</span></td>
+            <td>Cartão recusado</td>
+            <td><span class="dr-rule">BLOCK após 7 dias (D+0/D+3/D+5 retries)</span><br><span style="font-size:.75rem;color:#64748b;">Sem perda de dados. Block reversível com 1 clique. Downgrade exigiria re-onboarding.</span></td>
+            <td><span class="dr-discard">Downgrade imediato para Free</span></td>
           </tr>
         </tbody>
       </table>
