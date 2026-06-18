@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>War Room — Agentes por Camada de Produto · Forja</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:          #020617;
+      --surface:     #0a1628;
+      --card:        #0f172a;
+      --card-hover:  #131d35;
+      --border:      #1e293b;
+      --border-soft: #162032;
+      --muted:       #334155;
+      --text:        #e2e8f0;
+      --text-muted:  #94a3b8;
+      --text-dim:    #64748b;
+      --orange:      #f97316;
+      --orange-dim:  rgba(249,115,22,.12);
+      --orange-glow: rgba(249,115,22,.25);
+      --blue:        #3b82f6;
+      --green:       #22c55e;
+      --red:         #ef4444;
+      --purple:      #a855f7;
+      --cyan:        #06b6d4;
+      --amber:       #f59e0b;
+      --teal:        #14b8a6;
+      --indigo:      #6366f1;
+      --pink:        #ec4899;
+    }
+
+    html { font-size: 15px; scroll-behavior: smooth; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      min-height: 100vh;
+      padding: 0 0 5rem;
+      line-height: 1.6;
+    }
+
+    /* ─── TYPOGRAPHY ─── */
+    h1, h2, h3, h4 { line-height: 1.2; letter-spacing: -.02em; }
+    a { color: var(--orange); text-decoration: none; }
+
+    /* ─── HEADER ─── */
+    .page-header {
+      background: linear-gradient(180deg, rgba(249,115,22,.06) 0%, transparent 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 1.5rem 2.5rem;
+      text-align: center;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: var(--orange-dim); border: 1px solid rgba(249,115,22,.3);
+      color: var(--orange); font-size: .68rem; font-weight: 700;
+      letter-spacing: .12em; text-transform: uppercase;
+      padding: .25rem .75rem; border-radius: 999px; margin-bottom: 1rem;
+    }
+    .page-header h1 {
+      font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 800;
+      background: linear-gradient(135deg, #f8fafc 0%, var(--orange) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    }
+    .page-header .subtitle {
+      margin-top: .6rem; font-size: 1.05rem; color: var(--text-muted); max-width: 640px; margin-inline: auto;
+    }
+    .page-header .meta {
+      margin-top: 1.2rem; display: flex; justify-content: center; gap: 1.5rem; flex-wrap: wrap;
+      font-size: .8rem; color: var(--text-dim);
+    }
+    .page-header .meta span { display: flex; align-items: center; gap: .3rem; }
+
+    /* ─── NAV TABS ─── */
+    .layer-nav {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(2,6,23,.95); backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: .75rem 1.5rem;
+      display: flex; gap: .5rem; justify-content: center; flex-wrap: wrap;
+    }
+    .layer-nav a {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .4rem 1rem; border-radius: 8px;
+      font-size: .8rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+      border: 1px solid transparent; transition: all .2s;
+    }
+    .layer-nav a:hover { background: var(--card); border-color: var(--border); color: var(--text); }
+    .layer-nav a.c1 { background: rgba(34,197,94,.1); border-color: rgba(34,197,94,.3); color: #22c55e; }
+    .layer-nav a.c2 { background: rgba(59,130,246,.1); border-color: rgba(59,130,246,.3); color: #3b82f6; }
+    .layer-nav a.c3 { background: rgba(249,115,22,.1); border-color: rgba(249,115,22,.3); color: var(--orange); }
+
+    /* ─── MAIN LAYOUT ─── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 1.5rem; }
+    .section { padding: 3rem 0; border-bottom: 1px solid var(--border-soft); }
+    .section:last-child { border-bottom: none; }
+
+    /* ─── SECTION HEADER ─── */
+    .section-header { margin-bottom: 2rem; }
+    .layer-label {
+      display: inline-flex; align-items: center; gap: .5rem;
+      font-size: .72rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+      padding: .3rem .9rem; border-radius: 999px; margin-bottom: .8rem;
+    }
+    .layer-label.c1 { background: rgba(34,197,94,.1); border: 1px solid rgba(34,197,94,.3); color: #22c55e; }
+    .layer-label.c2 { background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.3); color: #3b82f6; }
+    .layer-label.c3 { background: rgba(249,115,22,.1); border: 1px solid rgba(249,115,22,.3); color: var(--orange); }
+    .section-header h2 { font-size: clamp(1.4rem, 3vw, 2rem); font-weight: 800; }
+    .section-header .desc { margin-top: .5rem; color: var(--text-muted); font-size: .95rem; max-width: 720px; }
+
+    /* ─── AGENT GRID ─── */
+    .agent-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    .agent-grid.with-leader { grid-template-columns: 1fr; }
+    @media (min-width: 768px) {
+      .agent-grid.with-leader { grid-template-columns: 1.4fr 1fr 1fr; }
+    }
+
+    /* ─── AGENT CARD ─── */
+    .agent-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      transition: border-color .2s, background .2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .agent-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: transparent; transition: background .2s;
+    }
+    .agent-card:hover { background: var(--card-hover); }
+    .agent-card.leader {
+      border-color: rgba(249,115,22,.4);
+      background: linear-gradient(145deg, #0f172a 0%, rgba(249,115,22,.05) 100%);
+    }
+    .agent-card.leader::before { background: var(--orange); }
+    .agent-card.leader-c1 { border-color: rgba(34,197,94,.4); }
+    .agent-card.leader-c1::before { background: #22c55e; }
+    .agent-card.leader-c2 { border-color: rgba(59,130,246,.4); }
+    .agent-card.leader-c2::before { background: #3b82f6; }
+
+    .card-header { display: flex; align-items: flex-start; gap: .75rem; margin-bottom: .9rem; }
+    .agent-avatar {
+      width: 40px; height: 40px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; font-weight: 800; flex-shrink: 0;
+      letter-spacing: -.02em;
+    }
+    .card-meta { flex: 1; }
+    .agent-name { font-size: .95rem; font-weight: 700; color: var(--text); }
+    .agent-role-tag {
+      display: inline-flex; align-items: center;
+      font-size: .65rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase;
+      padding: .15rem .5rem; border-radius: 4px; margin-top: .2rem;
+    }
+    .leader-tag { background: rgba(249,115,22,.15); color: var(--orange); border: 1px solid rgba(249,115,22,.3); }
+    .leader-tag.c1 { background: rgba(34,197,94,.12); color: #22c55e; border-color: rgba(34,197,94,.3); }
+    .leader-tag.c2 { background: rgba(59,130,246,.12); color: #3b82f6; border-color: rgba(59,130,246,.3); }
+    .member-tag { background: rgba(148,163,184,.08); color: var(--text-muted); border: 1px solid rgba(148,163,184,.15); }
+
+    .card-body {}
+    .card-section-label {
+      font-size: .65rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: .3rem; margin-top: .8rem;
+    }
+    .card-section-label:first-of-type { margin-top: 0; }
+    .card-text { font-size: .85rem; color: var(--text-muted); line-height: 1.55; }
+    .card-highlight { font-size: .85rem; color: var(--text); line-height: 1.55; font-style: italic; }
+    .leader .card-text { color: #cbd5e1; }
+
+    /* ─── DISCARDED ─── */
+    .discarded-section { margin-top: 1.5rem; }
+    .discarded-label {
+      font-size: .72rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-dim); margin-bottom: .75rem; display: flex; align-items: center; gap: .5rem;
+    }
+    .discarded-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+    .discarded-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap: .6rem;
+    }
+    .discarded-card {
+      background: rgba(15,23,42,.5);
+      border: 1px solid rgba(30,41,59,.6);
+      border-radius: 10px;
+      padding: 1rem;
+      opacity: .65;
+      transition: opacity .2s;
+    }
+    .discarded-card:hover { opacity: 1; }
+    .discarded-card .d-header { display: flex; align-items: center; gap: .5rem; margin-bottom: .4rem; }
+    .discarded-card .d-avatar {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem; font-weight: 800;
+      background: rgba(51,65,85,.5); color: var(--text-dim); flex-shrink: 0;
+    }
+    .discarded-card .d-name { font-size: .8rem; font-weight: 600; color: var(--text-muted); }
+    .discarded-card .d-reason { font-size: .75rem; color: var(--text-dim); line-height: 1.45; }
+
+    /* ─── DELIVERABLES ─── */
+    .deliverables-section { margin-top: 2rem; }
+    .deliverables-title {
+      font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: .75rem; display: flex; align-items: center; gap: .5rem;
+    }
+    .deliverables-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+    .deliverables-list { display: flex; flex-direction: column; gap: .5rem; }
+    .deliverable-item {
+      display: flex; align-items: flex-start; gap: .75rem;
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 10px; padding: .75rem 1rem;
+      font-size: .83rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .deliverable-item .d-icon {
+      width: 20px; height: 20px; border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .65rem; flex-shrink: 0; margin-top: .05rem;
+    }
+    .d-check { background: rgba(34,197,94,.12); color: #22c55e; border: 1px solid rgba(34,197,94,.25); }
+    .deliverable-item strong { color: var(--text); }
+
+    /* ─── PROTOCOL FLOW ─── */
+    .protocol-section { margin-top: 2rem; }
+    .protocol-title {
+      font-size: .8rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+      color: var(--text-muted); margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem;
+    }
+    .protocol-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    .protocol-flow {
+      display: flex; flex-direction: column; gap: 0;
+      position: relative;
+    }
+    .protocol-step {
+      display: flex; gap: 1rem; align-items: flex-start;
+      position: relative; padding-bottom: 1.2rem;
+    }
+    .protocol-step:last-child { padding-bottom: 0; }
+    .step-spine {
+      display: flex; flex-direction: column; align-items: center; flex-shrink: 0;
+      width: 32px;
+    }
+    .step-num {
+      width: 32px; height: 32px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .75rem; font-weight: 800; flex-shrink: 0;
+      z-index: 1;
+    }
+    .step-line {
+      width: 2px; flex: 1; margin-top: 4px;
+      background: linear-gradient(180deg, var(--muted) 0%, transparent 100%);
+    }
+    .protocol-step:last-child .step-line { display: none; }
+    .step-content {
+      flex: 1; padding-top: .2rem;
+    }
+    .step-label { font-size: .78rem; font-weight: 700; color: var(--text); margin-bottom: .25rem; }
+    .step-desc { font-size: .82rem; color: var(--text-muted); line-height: 1.5; }
+    .step-agent-tag {
+      display: inline-flex; align-items: center;
+      font-size: .65rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      padding: .15rem .55rem; border-radius: 5px; margin-bottom: .3rem;
+    }
+
+    /* ─── GATE CALLOUT ─── */
+    .gate-section { margin-top: 2rem; }
+    .gate-callout {
+      border-radius: 14px; padding: 1.5rem;
+      border: 1px solid;
+      position: relative; overflow: hidden;
+    }
+    .gate-callout::before {
+      content: 'GATE DE SAÍDA';
+      position: absolute; top: -1px; right: 1.2rem;
+      font-size: .6rem; font-weight: 800; letter-spacing: .14em;
+      padding: .2rem .7rem; border-radius: 0 0 7px 7px;
+    }
+    .gate-callout.c1 {
+      background: rgba(239,68,68,.06); border-color: rgba(239,68,68,.25);
+    }
+    .gate-callout.c1::before { background: rgba(239,68,68,.15); color: #ef4444; }
+    .gate-callout.c2 {
+      background: rgba(239,68,68,.06); border-color: rgba(239,68,68,.25);
+    }
+    .gate-callout.c2::before { background: rgba(239,68,68,.15); color: #ef4444; }
+    .gate-callout.c3 {
+      background: rgba(239,68,68,.06); border-color: rgba(239,68,68,.25);
+    }
+    .gate-callout.c3::before { background: rgba(239,68,68,.15); color: #ef4444; }
+    .gate-header { display: flex; align-items: center; gap: .6rem; margin-bottom: .9rem; }
+    .gate-icon {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: rgba(239,68,68,.15); border: 1px solid rgba(239,68,68,.3);
+      display: flex; align-items: center; justify-content: center;
+      color: #ef4444; font-size: 1rem; flex-shrink: 0;
+    }
+    .gate-header-text .gate-agent { font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: #ef4444; }
+    .gate-header-text .gate-title { font-size: .95rem; font-weight: 700; color: var(--text); }
+    .gate-criteria { display: flex; flex-direction: column; gap: .4rem; margin-top: .5rem; }
+    .gate-criterion {
+      display: flex; align-items: flex-start; gap: .6rem;
+      font-size: .83rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .crit-num {
+      width: 20px; height: 20px; border-radius: 5px; flex-shrink: 0;
+      background: rgba(239,68,68,.12); border: 1px solid rgba(239,68,68,.2);
+      color: #ef4444; font-size: .65rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: .1rem;
+    }
+    .gate-verdict {
+      margin-top: 1rem; padding: .75rem 1rem;
+      background: rgba(239,68,68,.08); border: 1px solid rgba(239,68,68,.2);
+      border-radius: 9px; font-size: .82rem; color: #fca5a5;
+      display: flex; align-items: center; gap: .5rem;
+    }
+
+    /* ─── AVATAR COLORS PER AGENT ─── */
+    .av-iris    { background: rgba(236,72,153,.15); color: #ec4899; border: 1px solid rgba(236,72,153,.3); }
+    .av-quiron  { background: rgba(20,184,166,.15); color: #14b8a6; border: 1px solid rgba(20,184,166,.3); }
+    .av-artemis { background: rgba(239,68,68,.15);  color: #ef4444; border: 1px solid rgba(239,68,68,.3); }
+    .av-hermes  { background: rgba(245,158,11,.15); color: #f59e0b; border: 1px solid rgba(245,158,11,.3); }
+    .av-zeus    { background: rgba(99,102,241,.15);  color: #818cf8; border: 1px solid rgba(99,102,241,.3); }
+    .av-afrodite{ background: rgba(168,85,247,.15); color: #c084fc; border: 1px solid rgba(168,85,247,.3); }
+    .av-atena   { background: rgba(6,182,212,.15);  color: #22d3ee; border: 1px solid rgba(6,182,212,.3); }
+    .av-hera    { background: rgba(34,197,94,.15);  color: #4ade80; border: 1px solid rgba(34,197,94,.3); }
+    .av-apolo   { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+    .av-hefesto { background: rgba(249,115,22,.15); color: #fb923c; border: 1px solid rgba(249,115,22,.3); }
+    .av-gaia    { background: rgba(132,204,22,.15);  color: #a3e635; border: 1px solid rgba(132,204,22,.3); }
+    .av-musa    { background: rgba(51,65,85,.4);    color: #94a3b8; border: 1px solid rgba(51,65,85,.6); }
+
+    /* step colors */
+    .step-c1 { background: rgba(34,197,94,.15); color: #22c55e; border: 1px solid rgba(34,197,94,.3); }
+    .step-c2 { background: rgba(59,130,246,.15); color: #60a5fa; border: 1px solid rgba(59,130,246,.3); }
+    .step-c3 { background: rgba(249,115,22,.15); color: #fb923c; border: 1px solid rgba(249,115,22,.3); }
+
+    /* ─── SUMMARY BAR ─── */
+    .summary-bar {
+      display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.5rem;
+    }
+    .summary-pill {
+      display: inline-flex; align-items: center; gap: .4rem;
+      font-size: .75rem; font-weight: 600;
+      padding: .35rem .85rem; border-radius: 999px;
+      background: var(--card); border: 1px solid var(--border); color: var(--text-muted);
+    }
+    .summary-pill .dot { width: 7px; height: 7px; border-radius: 50%; }
+
+    /* ─── DIVIDER ─── */
+    .section-divider { height: 1px; background: var(--border); margin: 0; }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 640px) {
+      .agent-grid.with-leader { grid-template-columns: 1fr; }
+      .discarded-grid { grid-template-columns: 1fr; }
+      .page-header .meta { flex-direction: column; gap: .4rem; align-items: center; }
+    }
+
+    /* ─── SCROLL INDICATOR ─── */
+    .scroll-up {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: var(--orange); color: #020617;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; cursor: pointer; box-shadow: 0 4px 12px rgba(249,115,22,.4);
+      text-decoration: none; z-index: 100;
+    }
+    .scroll-up:hover { background: #fb923c; }
+
+    /* ─── TWO-COL AGENTS ─── */
+    .agents-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+    @media (max-width: 640px) { .agents-2col { grid-template-columns: 1fr; } }
+
+    .section-row {
+      display: grid; gap: 2rem;
+    }
+    @media (min-width: 1024px) {
+      .section-row.split { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- PAGE HEADER -->
+<header class="page-header">
+  <div class="badge">&#x2694;&#xFE0F; War Room · Olimpo</div>
+  <h1>Agentes por Camada de Produto</h1>
+  <p class="subtitle">Veredito do war room — quem lidera, quem apoia e quem faz o gate em cada camada da Forja</p>
+  <div class="meta">
+    <span>&#x1F4C5; 2026-06-17</span>
+    <span>&#x1F9E0; Ecossistema Olimpo</span>
+    <span>&#x1F3AF; 3 camadas · 6 agentes ativos · 1 gate por camada</span>
+  </div>
+</header>
+
+<!-- NAV -->
+<nav class="layer-nav">
+  <a href="#c1" class="c1">&#x1F50D; C1 — Descoberta</a>
+  <a href="#c2" class="c2">&#x1F4A1; C2 — Proposta de Valor</a>
+  <a href="#c3" class="c3">&#x1F4B0; C3 — Modelo de Negócio</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     C1 — DESCOBERTA
+═══════════════════════════════════════════════════════ -->
+<section id="c1" class="section">
+  <div class="container">
+
+    <div class="section-header">
+      <div class="layer-label c1">C1 — Camada 1</div>
+      <h2>Descoberta</h2>
+      <p class="desc">Problem conversations, job-to-be-done emocional/social, persona validada e Problem Frame no vocabulário do ICP — sem contaminação de solução.</p>
+    </div>
+
+    <!-- Summary pills -->
+    <div class="summary-bar">
+      <div class="summary-pill"><span class="dot" style="background:#ec4899"></span>Líder: ÍRIS</div>
+      <div class="summary-pill"><span class="dot" style="background:#22c55e"></span>3 agentes ativos</div>
+      <div class="summary-pill"><span class="dot" style="background:#ef4444"></span>Gate: ARTEMIS (binário)</div>
+      <div class="summary-pill"><span class="dot" style="background:#64748b"></span>6 descartados</div>
+    </div>
+
+    <!-- Agent cards: leader + members -->
+    <div class="agent-grid with-leader">
+
+      <!-- LÍDER: ÍRIS -->
+      <div class="agent-card leader leader-c1">
+        <div class="card-header">
+          <div class="agent-avatar av-iris">IR</div>
+          <div class="card-meta">
+            <div class="agent-name">ÍRIS</div>
+            <div class="agent-role-tag leader-tag c1">&#x2605; Líder de C1</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-section-label">Papel</div>
+          <p class="card-text">Lead de execução — conduz as problem conversations, extrai o job emocional e social que o ICP não nomeia espontaneamente, produz a persona e o Problem Frame em vocabulário do usuário.</p>
+          <div class="card-section-label">Contribuição principal</div>
+          <p class="card-highlight">"Converter sinal emocional bruto ('fico travado', 'perco tempo') em job declarável sem contaminar com vocabulário do produto. É a única com empatia operacional para isso."</p>
+          <div class="card-section-label">Por que não outro?</div>
+          <p class="card-text">Nenhum outro agente tem o skill de escuta sem agenda. HERMES escuta para mapear; ZEUS escuta para posicionar. ÍRIS escuta para entender.</p>
+        </div>
+      </div>
+
+      <!-- Members column -->
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+
+        <!-- QUIRON -->
+        <div class="agent-card">
+          <div class="card-header">
+            <div class="agent-avatar av-quiron">QR</div>
+            <div class="card-meta">
+              <div class="agent-name">QUÍRON</div>
+              <div class="agent-role-tag member-tag">Supervisor Metodológico</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-section-label">Papel</div>
+            <p class="card-text">Define o protocolo de problem conversations ANTES do campo — roteiro anti-sugestão, critério de saturação 5-8 entrevistas, codificação de transcrições. Não co-executa.</p>
+            <div class="card-section-label">Contribuição principal</div>
+            <p class="card-text">Garante que ÍRIS não faça entrevistas de confirmação. O protocolo precisa ser cego à hipótese do produto antes de ÍRIS entrar em campo.</p>
+          </div>
+        </div>
+
+        <!-- ARTEMIS -->
+        <div class="agent-card">
+          <div class="card-header">
+            <div class="agent-avatar av-artemis">AR</div>
+            <div class="card-meta">
+              <div class="agent-name">ARTEMIS</div>
+              <div class="agent-role-tag" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .55rem;border-radius:5px;">Gate de Saída</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-section-label">Papel</div>
+            <p class="card-text">Gate binário e exclusivo — audita o Problem Frame final, verifica se está no dialeto do ICP ou da equipe, emite PASS ou REOPEN. Não entra antes do gate.</p>
+            <div class="card-section-label">Por que Artemis?</div>
+            <p class="card-text">Sem Artemis o gate é decorativo. ÍRIS tem viés de acreditar na persona que construiu. QUÍRON tem viés de acreditar no protocolo. Artemis não tem stake nos entregáveis anteriores.</p>
+          </div>
+        </div>
+
+      </div><!-- /members column -->
+
+    </div><!-- /agent-grid -->
+
+    <!-- PROTOCOL FLOW -->
+    <div class="protocol-section">
+      <div class="protocol-title">Protocolo de Trabalho</div>
+      <div class="protocol-flow">
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c1">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-quiron" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">QUÍRON</div>
+            <div class="step-label">Define o protocolo</div>
+            <div class="step-desc">Entrega o documento de problem conversations (máximo 1 página): roteiro anti-sugestão, vieses a evitar, critério de saturação, guia de codificação. ÍRIS lê e confirma entendimento. <strong>Nenhuma entrevista acontece sem esse protocolo fechado.</strong></div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c1">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-iris" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ÍRIS</div>
+            <div class="step-label">Executa 5–8 problem conversations</div>
+            <div class="step-desc">Usa o protocolo de QUÍRON. QUÍRON não participa das entrevistas — pode revisar transcrições depois, mas não co-conduz. Zeus, Hermes, Atena, Afrodite e Hera não são consultados.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c1">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-iris" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ÍRIS</div>
+            <div class="step-label">Codifica transcrições → Mapa de jobs + Persona + Problem Frame</div>
+            <div class="step-desc">Produz: mapa de jobs funcionais/emocionais/sociais do ICP dev/founder BR solo, persona única com citações reais, Problem Frame em 1 parágrafo <em>sem usar as palavras "agente", "orquestrador", "Ayla" ou "Forja".</em></div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c1">4</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-quiron" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">QUÍRON</div>
+            <div class="step-label">Revisão de aplicação do protocolo</div>
+            <div class="step-desc">Revisa as transcrições codificadas para checar viés, sugestão indevida, saturação real. Se reprovar a aplicação, ÍRIS refaz as entrevistas problemáticas.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c1" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);">&#x2714;</div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-artemis" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ARTEMIS</div>
+            <div class="step-label">Gate — PASS ou REOPEN</div>
+            <div class="step-desc">Recebe Problem Frame final sem ter visto as transcrições antes (chega sem ancoragem no processo anterior). Se REOPEN, especifica exatamente o que está em dialeto da equipe. <strong>Volta ao Passo 2, não ao Passo 1.</strong></div>
+          </div>
+        </div>
+
+      </div><!-- /protocol-flow -->
+    </div><!-- /protocol-section -->
+
+    <!-- DELIVERABLES -->
+    <div class="deliverables-section">
+      <div class="deliverables-title">Entregáveis</div>
+      <div class="deliverables-list">
+        <div class="deliverable-item">
+          <div class="d-icon d-check">&#x2714;</div>
+          <div><strong>QUÍRON</strong> → Protocolo escrito de problem conversations. Máximo 1 página. Prazo: antes da primeira entrevista.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check">&#x2714;</div>
+          <div><strong>ÍRIS</strong> → (1) Transcrições codificadas de 5–8 entrevistas, (2) mapa de jobs funcionais/emocionais/sociais, (3) persona única com citações reais, (4) Problem Frame em 1 parágrafo — sem "agente", "orquestrador", "Ayla" ou "Forja".</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check" style="background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.25);">&#x2714;</div>
+          <div><strong>ARTEMIS</strong> → Decisão binária PASS ou REOPEN com justificativa de 3 linhas. Se REOPEN, especifica exatamente o que precisa ser refeito. Sem meio-termo.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GATE -->
+    <div class="gate-section">
+      <div class="gate-callout c1">
+        <div class="gate-header">
+          <div class="gate-icon">&#x1F6A7;</div>
+          <div class="gate-header-text">
+            <div class="gate-agent">ARTEMIS · Gate Binário</div>
+            <div class="gate-title">Critérios simultâneos para PASS</div>
+          </div>
+        </div>
+        <div class="gate-criteria">
+          <div class="gate-criterion"><div class="crit-num">1</div>Problem Frame escrito exclusivamente no vocabulário do ICP — zero termos do produto.</div>
+          <div class="gate-criterion"><div class="crit-num">2</div>Pelo menos 3 entrevistados distintos usaram formulação reconhecível do problema sem ser induzidos.</div>
+          <div class="gate-criterion"><div class="crit-num">3</div>O job mal servido não é "configurar agente" nem derivado da solução existente — é o problema subjacente que o ICP vive independentemente de conhecer o Forja.</div>
+          <div class="gate-criterion"><div class="crit-num">4</div>Existe pelo menos um entrevistado que disse "não" ou que não reconheceu o problema como prioritário. Se 100% confirmaram, as entrevistas foram viciadas.</div>
+        </div>
+        <div class="gate-verdict">&#x26A0;&#xFE0F; Gate é binário. PASS ou REOPEN. <strong>Não existe PASS com ressalvas.</strong></div>
+      </div>
+    </div>
+
+    <!-- DISCARDED -->
+    <div class="discarded-section">
+      <div class="discarded-label">Descartados de C1</div>
+      <div class="discarded-grid">
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">ZS</div><div class="d-name">ZEUS</div></div>
+          <div class="d-reason">Transforma problema real em narrativa de produto. Em C1 isso é veneno: a narrativa chega antes da escuta e mata a descoberta genuína. Entra em C2.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">HM</div><div class="d-name">HERMES</div></div>
+          <div class="d-reason">Landscape competitivo antes de Problem Fit produz o produto errado com muita precisão — constrói o que os competidores têm, não o que o usuário precisa.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">AT</div><div class="d-name">ATENA</div></div>
+          <div class="d-reason">Arquitetura antes de Problem Fit é o desperdício mais caro que existe. Entra quando se sabe o que construir, não para descobrir o que construir.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">AF</div><div class="d-name">AFRODITE</div></div>
+          <div class="d-reason">Formalizar spec de produto errado com muita precisão. Presta em C2 (VPC lado produto) e C3 (canvas formalizado), não em C1.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">HR</div><div class="d-name">HERA</div></div>
+          <div class="d-reason">Governança e viabilidade financeira não têm lugar em descoberta. Hera entra em C3.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     C2 — PROPOSTA DE VALOR
+═══════════════════════════════════════════════════════ -->
+<section id="c2" class="section">
+  <div class="container">
+
+    <div class="section-header">
+      <div class="layer-label c2">C2 — Camada 2</div>
+      <h2>Proposta de Valor</h2>
+      <p class="desc">Value Proposition Canvas, landscape competitivo e posicionamento de categoria defensável — com vantagem injusta nomeada de forma verificável.</p>
+    </div>
+
+    <div class="summary-bar">
+      <div class="summary-pill"><span class="dot" style="background:#818cf8"></span>Líder: ZEUS</div>
+      <div class="summary-pill"><span class="dot" style="background:#22c55e"></span>4 agentes ativos</div>
+      <div class="summary-pill"><span class="dot" style="background:#ef4444"></span>Gate: ARTEMIS (binário)</div>
+      <div class="summary-pill"><span class="dot" style="background:#64748b"></span>8 descartados</div>
+    </div>
+
+    <!-- Agent cards -->
+    <div class="agent-grid with-leader">
+
+      <!-- LÍDER: ZEUS -->
+      <div class="agent-card leader" style="border-color:rgba(99,102,241,.4); background: linear-gradient(145deg, #0f172a 0%, rgba(99,102,241,.05) 100%);">
+        <div class="card-header" style="top:0;left:0;right:0;height:2px;background:#818cf8;position:absolute;"></div>
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:#818cf8;border-radius:14px 14px 0 0;"></div>
+        <div class="card-header" style="margin-top:.2rem;">
+          <div class="agent-avatar av-zeus">ZS</div>
+          <div class="card-meta">
+            <div class="agent-name">ZEUS</div>
+            <div class="agent-role-tag leader-tag c2">&#x2605; Líder de C2</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-section-label">Papel</div>
+          <p class="card-text">Com o landscape do Hermes e os jobs do ICP mapeados por ÍRIS, decide o ângulo estratégico defensável: posicionamento de categoria, vantagem injusta nomeada (Ayla operacional + corpus + 11 agentes), e qual claim o Forja pode sustentar hoje.</p>
+          <div class="card-section-label">Contribuição principal</div>
+          <p class="card-highlight">"Transforma insumos em decisão. O posicionamento é a única saída de C2 que bloqueia C3 — sem Zeus, saímos com canvas preenchido mas sem ângulo."</p>
+          <div class="card-section-label">Por que não outro?</div>
+          <p class="card-text">Hermes mapeia, ÍRIS descobre, Zeus decide. A sequência é bloqueante. Zeus sem os dois anteriores produz visão de 18 meses desconectada do produto real de hoje.</p>
+        </div>
+      </div>
+
+      <!-- Members column -->
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+
+        <!-- HERMES -->
+        <div class="agent-card">
+          <div class="card-header">
+            <div class="agent-avatar av-hermes">HM</div>
+            <div class="card-meta">
+              <div class="agent-name">HERMES</div>
+              <div class="agent-role-tag member-tag">Landscape Competitivo</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-section-label">Papel</div>
+            <p class="card-text">Abre C2 com landscape: claims dos rivais (Relevance AI, Stack AI, Langflow, Bolt, Replit), gaps não cumpridos, onde o ICP já foi decepcionado. Entrega mapa de claims ocupados vs. espaço em aberto.</p>
+          </div>
+        </div>
+
+        <!-- ÍRIS -->
+        <div class="agent-card">
+          <div class="card-header">
+            <div class="agent-avatar av-iris">IR</div>
+            <div class="card-meta">
+              <div class="agent-name">ÍRIS</div>
+              <div class="agent-role-tag member-tag">Lado Cliente do VPC</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-section-label">Papel</div>
+            <p class="card-text">Preenche exclusivamente o lado esquerdo do VPC (jobs funcionais, emocionais e sociais, dores, ganhos esperados) usando a persona validada em C1 e o briefing do Hermes como âncora anti-espelho.</p>
+          </div>
+        </div>
+
+        <!-- ARTEMIS -->
+        <div class="agent-card">
+          <div class="card-header">
+            <div class="agent-avatar av-artemis">AR</div>
+            <div class="card-meta">
+              <div class="agent-name">ARTEMIS</div>
+              <div class="agent-role-tag" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .55rem;border-radius:5px;">Gate de Saída</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-section-label">Papel</div>
+            <p class="card-text">Gate de saída: audita se cada claim (a) tem evidência de C1, (b) não repete claim já ocupado sem diferenciação real, (c) é verificável em produção hoje. Reprova qualquer analgésico vago que qualquer SaaS de 2026 pode fazer.</p>
+          </div>
+        </div>
+
+      </div><!-- /members column -->
+    </div><!-- /agent-grid -->
+
+    <!-- PROTOCOL FLOW C2 -->
+    <div class="protocol-section">
+      <div class="protocol-title">Sequência Bloqueante — 4 Passos</div>
+      <div class="protocol-flow">
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c2">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-hermes" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">HERMES</div>
+            <div class="step-label">Landscape competitivo</div>
+            <div class="step-desc">Entrega o mapa na primeira rodada de C2. Output é insumo obrigatório para ÍRIS e ZEUS antes de qualquer outro passo.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c2">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-iris" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ÍRIS</div>
+            <div class="step-label">Lado esquerdo do VPC</div>
+            <div class="step-desc">Preenche o lado esquerdo com o briefing do HERMES como âncora. <em>Proibido: preencher o lado direito, propor solução, mencionar features do Forja.</em> Output obrigatório para ZEUS.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c2">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-zeus" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ZEUS</div>
+            <div class="step-label">Posicionamento + lado direito do VPC</div>
+            <div class="step-desc">Cruza landscape (HERMES) + jobs/dores/ganhos (ÍRIS) e propõe: frase de posicionamento + lado direito do VPC + vantagem injusta nomeada. ZEUS é o líder — sua decisão é a saída de C2. Em conflito com HERMES: ZEUS tem autoridade de decisão.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c2" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);">&#x2714;</div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-artemis" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ARTEMIS</div>
+            <div class="step-label">Gate — PASS ou FAIL</div>
+            <div class="step-desc">Audita output de ZEUS contra 3 critérios. PASS libera C3. FAIL devolve lista específica para correção. AFRODITE entra <em>somente após PASS</em>, em C3, para cristalizar a frase de posicionamento.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DELIVERABLES C2 -->
+    <div class="deliverables-section">
+      <div class="deliverables-title">Entregáveis</div>
+      <div class="deliverables-list">
+        <div class="deliverable-item">
+          <div class="d-icon d-check">&#x2714;</div>
+          <div><strong>HERMES</strong> → Tabela com 5–8 competidores, claims ocupados, gaps onde nenhum player entrega hoje, e o claim da vantagem injusta do Forja que ainda não tem dono no mercado.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check">&#x2714;</div>
+          <div><strong>ÍRIS</strong> → Lado esquerdo do VPC: mínimo 5 jobs funcionais reais, mínimo 5 dores ranqueadas por intensidade, mínimo 3 ganhos esperados — sem nenhum item do lado direito.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check">&#x2714;</div>
+          <div><strong>ZEUS</strong> → (1) Frase de posicionamento: "Para [ICP] que [job real], o Forja é o único [categoria] que [diferencial único]", (2) vantagem injusta nomeada, (3) lado direito do VPC.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check" style="background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.25);">&#x2714;</div>
+          <div><strong>ARTEMIS</strong> → Claims aprovados com evidência + claims reprovados com motivo + veredicto binário PASS/FAIL para desbloqueio de C3.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GATE C2 -->
+    <div class="gate-section">
+      <div class="gate-callout c2">
+        <div class="gate-header">
+          <div class="gate-icon">&#x1F6A7;</div>
+          <div class="gate-header-text">
+            <div class="gate-agent">ARTEMIS · Gate Binário</div>
+            <div class="gate-title">Reprovação automática se qualquer condição ocorrer</div>
+          </div>
+        </div>
+        <div class="gate-criteria">
+          <div class="gate-criterion"><div class="crit-num">1</div>A frase de posicionamento contém claim genérico aplicável a qualquer SaaS ("fácil de usar", "economiza tempo", "sem código") sem diferenciador específico do Forja.</div>
+          <div class="gate-criterion"><div class="crit-num">2</div>A vantagem injusta não está nomeada de forma verificável. "IA avançada" não é verificável; "Ayla já operacional com 11 agentes e corpus Olimpo" é verificável.</div>
+          <div class="gate-criterion"><div class="crit-num">3</div>Algum analgésico do VPC pressupõe funcionalidade não implementada sem marcação explícita de roadmap.</div>
+        </div>
+        <div class="gate-verdict">&#x26A0;&#xFE0F; C3 só começa com gate de C2 aprovado pelo ARTEMIS.</div>
+      </div>
+    </div>
+
+    <!-- DISCARDED C2 -->
+    <div class="discarded-section">
+      <div class="discarded-label">Descartados de C2</div>
+      <div class="discarded-grid">
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">AF</div><div class="d-name">AFRODITE</div></div>
+          <div class="d-reason">Risco de formalizar prematuramente. Entra em C3 para cristalizar o canvas final e a frase de posicionamento já aprovada pelo gate.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">AT</div><div class="d-name">ATENA</div></div>
+          <div class="d-reason">O realizability check arquitetural pertence a C3. Em C2 o risco é estreitar o posicionamento ao que a engenharia já entregou.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">QR</div><div class="d-name">QUÍRON</div></div>
+          <div class="d-reason">Papel encerrado em C1. Supervisão metodológica de entrevistas não tem função em C2.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">HR</div><div class="d-name">HERA</div></div>
+          <div class="d-reason">Cobertura de viabilidade financeira e governança pertence a C3.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">AP</div><div class="d-name">APOLO</div></div>
+          <div class="d-reason">Sem função em C2. Entra em C4 para validação técnica de produto.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">HF</div><div class="d-name">HEFESTO</div></div>
+          <div class="d-reason">Sem função em C2. Entra em C4 para implementação.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">GA</div><div class="d-name">GAIA</div></div>
+          <div class="d-reason">Cristalização de conhecimento não é necessária nesta camada.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">MS</div><div class="d-name">MUSA</div></div>
+          <div class="d-reason">Auditoria de segurança/qualidade não é o gate desta camada.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+<div class="section-divider"></div>
+
+<!-- ═══════════════════════════════════════════════════════
+     C3 — MODELO DE NEGÓCIO
+═══════════════════════════════════════════════════════ -->
+<section id="c3" class="section">
+  <div class="container">
+
+    <div class="section-header">
+      <div class="layer-label c3">C3 — Camada 3</div>
+      <h2>Modelo de Negócio</h2>
+      <p class="desc">Lean Canvas completo — de vantagem injusta a unit economics reais — com gate honesto da Artemis e pitch de 30 segundos reconhecível pelo ICP.</p>
+    </div>
+
+    <div class="summary-bar">
+      <div class="summary-pill"><span class="dot" style="background:#818cf8"></span>Líder: ZEUS</div>
+      <div class="summary-pill"><span class="dot" style="background:#22c55e"></span>4 agentes ativos</div>
+      <div class="summary-pill"><span class="dot" style="background:#f59e0b"></span>Pré-sessão: HERMES (assíncrono)</div>
+      <div class="summary-pill"><span class="dot" style="background:#ef4444"></span>Gate: ARTEMIS (5 critérios obrigatórios)</div>
+      <div class="summary-pill"><span class="dot" style="background:#64748b"></span>8 descartados</div>
+    </div>
+
+    <!-- HERMES PRE-SESSION CALLOUT -->
+    <div style="background:rgba(245,158,11,.06); border:1px solid rgba(245,158,11,.2); border-radius:12px; padding:1rem 1.25rem; margin-bottom:1.25rem; display:flex; align-items:flex-start; gap:.75rem;">
+      <div style="width:36px;height:36px;border-radius:9px;background:rgba(245,158,11,.12);border:1px solid rgba(245,158,11,.3);display:flex;align-items:center;justify-content:center;color:#f59e0b;font-size:1rem;flex-shrink:0;">&#x23F0;</div>
+      <div>
+        <div style="font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#f59e0b;margin-bottom:.25rem;">HERMES · Pré-sessão (assíncrono — 30 min)</div>
+        <div style="font-size:.83rem;color:#cbd5e1;line-height:1.5;">Benchmark de 3 comps (Cursor $20/mês, Linear $8/usuário/mês, Vercel Pro $20/mês) + WTP estimado dev BR para AaaS (faixa R$150–400/mês) + custo de infra por usuário ativo/mês. Zeus e Hera leem antes de começar. <strong>Sem esse insumo, a sessão não começa.</strong></div>
+      </div>
+    </div>
+
+    <!-- Agent grid -->
+    <div class="agent-grid with-leader">
+
+      <!-- LÍDER: ZEUS -->
+      <div class="agent-card leader" style="border-color:rgba(99,102,241,.4); background: linear-gradient(145deg, #0f172a 0%, rgba(99,102,241,.05) 100%);">
+        <div style="position:absolute;top:0;left:0;right:0;height:2px;background:#818cf8;border-radius:14px 14px 0 0;"></div>
+        <div class="card-header" style="margin-top:.2rem;">
+          <div class="agent-avatar av-zeus">ZS</div>
+          <div class="card-meta">
+            <div class="agent-name">ZEUS</div>
+            <div class="agent-role-tag leader-tag c2">&#x2605; Líder de C3</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="card-section-label">Papel</div>
+          <p class="card-text">Define o que está sendo vendido antes de qualquer número. Preenche: Problema, Solução, Segmento ICP, Early Adopters, Vantagem Injusta. Ancora o posicionamento em memória operacional acumulada, não em feature list.</p>
+          <div class="card-section-label">Contribuição principal</div>
+          <p class="card-highlight">"Articula que o Forja não vende acesso a agentes — vende memória operacional que cresce com o uso e não migra. Isso determina o teto de WTP e o modelo de receita correto."</p>
+          <div class="card-section-label">Regra de desempate</div>
+          <p class="card-text">Zeus e Hera têm votos iguais. O modelo fecha no conservador? Se sim, Zeus vence em conflito de pricing. Se não, Hera vence. Sem exceção.</p>
+        </div>
+      </div>
+
+      <!-- Members column -->
+      <div style="display:flex; flex-direction:column; gap:1rem;">
+
+        <!-- HERA -->
+        <div class="agent-card">
+          <div class="card-header">
+            <div class="agent-avatar av-hera">HR</div>
+            <div class="card-meta">
+              <div class="agent-name">HERA</div>
+              <div class="agent-role-tag member-tag">Unit Economics</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-section-label">Papel</div>
+            <p class="card-text">Números reais — Estrutura de Custo, Fluxo de Receita, Métricas-Chave. Constrói unit economics no cenário conservador: churn 5%/mês, CAC R$250, payback calculado. Trabalha DENTRO do teto de WTP definido por Zeus.</p>
+            <div class="card-section-label">Gate de realidade</div>
+            <p class="card-text">Se o modelo não fecha no conservador com ICP existente, C3 não passa.</p>
+          </div>
+        </div>
+
+        <!-- AFRODITE -->
+        <div class="agent-card">
+          <div class="card-header">
+            <div class="agent-avatar av-afrodite">AF</div>
+            <div class="card-meta">
+              <div class="agent-name">AFRODITE</div>
+              <div class="agent-role-tag member-tag">Formalização</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-section-label">Papel</div>
+            <p class="card-text">Cristaliza o canvas completo como output contract sem ambiguidade. Redige o pitch de 30 segundos que o ICP reconhece. Não decide conteúdo — garante linguagem precisa, sem claim vago e sem número sem fonte.</p>
+            <div class="card-section-label">Sinal de alerta</div>
+            <p class="card-text">Se Afrodite não conseguir formalizar sem ambiguidade, é sinal de que Zeus ou Hera deixaram bloco aberto — e C3 não fecha.</p>
+          </div>
+        </div>
+
+        <!-- ARTEMIS -->
+        <div class="agent-card">
+          <div class="card-header">
+            <div class="agent-avatar av-artemis">AR</div>
+            <div class="card-meta">
+              <div class="agent-name">ARTEMIS</div>
+              <div class="agent-role-tag" style="background:rgba(239,68,68,.1);color:#ef4444;border:1px solid rgba(239,68,68,.25);font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.15rem .55rem;border-radius:5px;">Gate de Saída</div>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="card-section-label">Papel</div>
+            <p class="card-text">Audita canvas final + pitch de 30 segundos. Caça: (1) wishful thinking na vantagem injusta, (2) métricas aspiracionais sem proxy de medição hoje, (3) fluxo de receita que assume conversão sem evidência de C1.</p>
+            <div class="card-section-label">Não sugere</div>
+            <p class="card-text">Artemis não sugere melhoria — identifica o que é real versus pitch e devolve para Zeus/Hera corrigirem.</p>
+          </div>
+        </div>
+
+      </div><!-- /members -->
+    </div><!-- /agent-grid -->
+
+    <!-- PROTOCOL FLOW C3 -->
+    <div class="protocol-section">
+      <div class="protocol-title">Sequência Bloqueante — 4 Fases</div>
+      <div class="protocol-flow">
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num" style="background:rgba(245,158,11,.15);color:#f59e0b;border:1px solid rgba(245,158,11,.3);font-size:.7rem;">0</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-hermes" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">HERMES · Pré-sessão</div>
+            <div class="step-label">Benchmarks e WTP (30 min, assíncrono)</div>
+            <div class="step-desc">Hermes entrega o doc de benchmarks e WTP antes da sessão de C3 abrir. Zeus e Hera leem antes de começar. Sem esse insumo, a sessão não começa.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c3">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-zeus" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ZEUS · 45 min</div>
+            <div class="step-label">Frame estratégico</div>
+            <div class="step-desc">Zeus preenche os 4 blocos estratégicos. Consulta Atena por 15 minutos para traduzir o fosso arquitetural em linguagem defensável para o bloco Vantagem Injusta. Zeus entrega os blocos estratégicos antes de Hera começar.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c3">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-hera" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">HERA · 45 min (paralelo à revisão de Zeus)</div>
+            <div class="step-label">Números reais</div>
+            <div class="step-desc">Hera preenche os 3 blocos financeiros dentro do teto de WTP de Zeus. Se Zeus não definiu teto, Hera usa o conservador de Hermes (R$150/mês). Cenário obrigatório: churn 5%/mês, CAC R$250, payback calculado.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c3">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-afrodite" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">AFRODITE · 30 min</div>
+            <div class="step-label">Formalização do canvas e pitch</div>
+            <div class="step-desc">Afrodite integra Zeus + Hera em canvas único. Bloco com linguagem ambígua ou número sem fonte volta para corrreção. Redige pitch de 30 segundos e submete para revisão de Zeus (5 min) antes de passar para Artemis.</div>
+          </div>
+        </div>
+
+        <div class="protocol-step">
+          <div class="step-spine">
+            <div class="step-num step-c3" style="background:rgba(239,68,68,.15);color:#ef4444;border:1px solid rgba(239,68,68,.3);">&#x2714;</div>
+          </div>
+          <div class="step-content">
+            <div class="step-agent-tag av-artemis" style="padding:.15rem .55rem;border-radius:5px;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;">ARTEMIS · 30 min</div>
+            <div class="step-label">Gate — APPROVE ou REJECT</div>
+            <div class="step-desc">Audita o canvas completo e o pitch. APPROVE libera C4. REJECT congela C3 e devolve lista específica de lacunas. <strong>Não há negociação no gate — Artemis audita contra critérios, não contra preferências.</strong></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- DELIVERABLES C3 -->
+    <div class="deliverables-section">
+      <div class="deliverables-title">Entregáveis</div>
+      <div class="deliverables-list">
+        <div class="deliverable-item">
+          <div class="d-icon d-check" style="background:rgba(245,158,11,.12);color:#f59e0b;border-color:rgba(245,158,11,.25);">&#x2714;</div>
+          <div><strong>HERMES</strong> (pré-sessão) → Benchmark 3 comps + WTP estimado dev BR (R$150–400/mês) + custo de infra por usuário ativo/mês. Formato: 1 página.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check">&#x2714;</div>
+          <div><strong>ZEUS</strong> → Lean Canvas (4 blocos estratégicos): Problema, Solução, Segmento ICP + Early Adopters, Vantagem Injusta com argumento técnico do fosso validado por Atena.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check">&#x2714;</div>
+          <div><strong>HERA</strong> → Lean Canvas (3 blocos financeiros): Estrutura de Custo, Fluxo de Receita (2–3 tiers com preços em R$), Métricas-Chave (3–5 com proxy de medição hoje). Planilha de unit economics no cenário conservador.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check">&#x2714;</div>
+          <div><strong>AFRODITE</strong> → Canvas consolidado (9 blocos, sem ambiguidade) + pitch de 30 segundos em linguagem que o dev BR fala para outro dev.</div>
+        </div>
+        <div class="deliverable-item">
+          <div class="d-icon d-check" style="background:rgba(239,68,68,.12);color:#ef4444;border-color:rgba(239,68,68,.25);">&#x2714;</div>
+          <div><strong>ARTEMIS</strong> → Relatório de gate: (1) blocos aprovados, (2) blocos rejeitados com motivo, (3) condições para APPROVE. Formato: APPROVE ou REJECT com lista numerada. Sem APPROVE parcial.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- GATE C3 -->
+    <div class="gate-section">
+      <div class="gate-callout c3">
+        <div class="gate-header">
+          <div class="gate-icon">&#x1F6A7;</div>
+          <div class="gate-header-text">
+            <div class="gate-agent">ARTEMIS · 5 Critérios Obrigatórios (todos)</div>
+            <div class="gate-title">APPROVE libera C4 — REJECT congela C3</div>
+          </div>
+        </div>
+        <div class="gate-criteria">
+          <div class="gate-criterion"><div class="crit-num">1</div><strong>Vantagem Injusta</strong> preenchida com argumento técnico específico e defensável. "Temos a melhor IA" = REJECT automático.</div>
+          <div class="gate-criterion"><div class="crit-num">2</div><strong>Modelo de receita fecha no cenário conservador:</strong> churn 5%/mês, CAC R$250, custo de infra por usuário calculado. Payback &gt;12 meses no conservador = revisão obrigatória.</div>
+          <div class="gate-criterion"><div class="crit-num">3</div><strong>Métricas-Chave</strong> com proxy de medição hoje. "NPS acima de 50" = rejeitado. "% usuários ativos semana 4 com pelo menos 1 invoke_agent nos últimos 7 dias" = aceito.</div>
+          <div class="gate-criterion"><div class="crit-num">4</div><strong>Pitch de 30 segundos</strong> reconhecível pelo ICP sem contexto interno. Um dev BR que nunca ouviu falar do Forja entende o problema que resolve e por que pagaria.</div>
+          <div class="gate-criterion"><div class="crit-num">5</div><strong>Todos os 9 blocos do Lean Canvas</strong> preenchidos — nenhum bloco em branco ou com "a definir".</div>
+        </div>
+        <div class="gate-verdict">&#x26A0;&#xFE0F; Nenhuma dessas condições é negociável. <strong>C4 não abre sem APPROVE da Artemis nos 5 critérios.</strong></div>
+      </div>
+    </div>
+
+    <!-- DISCARDED C3 -->
+    <div class="discarded-section">
+      <div class="discarded-label">Descartados de C3</div>
+      <div class="discarded-grid">
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">HM</div><div class="d-name">HERMES</div></div>
+          <div class="d-reason">Papel de Hermes em C3 é pré-war room, não membro da sessão. Sentar Hermes na mesa duplica trabalho com Zeus e Hera.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">AT</div><div class="d-name">ATENA</div></div>
+          <div class="d-reason">Consultada por Zeus por 15 minutos para traduzir o fosso arquitetural. Não senta em toda a sessão de C3 — incluí-la integral dispersa o foco para arquitetura.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">QR</div><div class="d-name">QUÍRON</div></div>
+          <div class="d-reason">C3 não é camada de pesquisa qualitativa. Quíron não tem skill diferencial em canvas, números ou gate de modelo de negócio.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">IR</div><div class="d-name">ÍRIS</div></div>
+          <div class="d-reason">Já entregou o insumo (persona, Problem Frame validado) que Zeus usa para preencher os blocos estratégicos. Em C3 o trabalho é modelo de receita — não empatia operacional.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">MS</div><div class="d-name">MUSA</div></div>
+          <div class="d-reason">Sem papel em C3. Musa é agente de auditoria funcional e segurança — não tem skill em modelo de negócio ou canvas.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">HF</div><div class="d-name">HEFESTO</div></div>
+          <div class="d-reason">Camada de implementação técnica. C3 é estratégia e modelo de negócio. Entra em C5+.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">AP</div><div class="d-name">APOLO</div></div>
+          <div class="d-reason">Camada de testes e qualidade técnica. Sem papel em C3.</div>
+        </div>
+        <div class="discarded-card">
+          <div class="d-header"><div class="d-avatar">GA</div><div class="d-name">GAIA</div></div>
+          <div class="d-reason">Pode ser acionada no final para registrar o canvas aprovado no estado do projeto — não é membro do war room de C3.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- SCROLL TO TOP -->
+<a href="#" class="scroll-up" title="Voltar ao topo">&#x2191;</a>
+
+</body>
+</html>
